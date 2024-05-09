@@ -1,4 +1,4 @@
-package com.necohost.semi;
+package co.kr.necohost.semi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

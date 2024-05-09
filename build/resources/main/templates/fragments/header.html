@@ -1,31 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
-<th:block th:fragment="headerFragment">
-    <head>
-        <title th:utext="#{header_title}"></title>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <!--jQuery 추가-->
-        <script src="/js/jquery.js"></script>
-        <!--사용할 css 추가-->
-        <link rel="stylesheet" href="/css/bootstrap.css">
-        <link rel="stylesheet" href="/css/layout.css">
-        <!--부트스트랩 script 추가-->
-        <script src="/js/bootstrap.js"></script>
-        <script src="/js/bootstrap.bundle.js"></script>
-        <!--폰트-->
-        <link rel="stylesheet" href="http://fonts.googleapis.com/earlyaccess/notosansjp.css">
-        <link rel="stylesheet" href="http://fonts.googleapis.com/earlyaccess/notosanskr.css">
-    </head>
-    <header>
-        <!--    header 시작    -->
-        <div class="header border" style="height: var(--header-height) !important; background: palegoldenrod;">
-            <div class="header-wrapper m-center">
+<html xmlns:th="http://www.thymeleaf.org">
+<header th:fragment="headerFragment">
+    <!-- header 시작 -->
+    <div class="header border" style="height: var(--header-height) !important; background: palegoldenrod;">
+        <div class="header-wrapper m-center">
 
-            </div>
         </div>
-        <!--    header 끝남    -->
-    </header>
-</th:block>
+    </div>
+    <!-- header 끝남 -->
+</header>
 </html>
