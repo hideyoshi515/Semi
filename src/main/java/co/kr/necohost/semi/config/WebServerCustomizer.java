@@ -14,7 +14,8 @@ abstract class WebServerCustomizer implements WebServerFactoryCustomizer<Configu
         ErrorPage error404 = new ErrorPage(HttpStatus.NOT_FOUND, "/error-page/404");
         ErrorPage error500 = new ErrorPage(HttpStatus.INTERNAL_SERVER_ERROR, "/error-page/500");
         ErrorPage runtimeError = new ErrorPage(RuntimeException.class, "/error-page/500");
-
+        ErrorPage error400 = new ErrorPage(HttpStatus.BAD_REQUEST, "/error-page/400");
+        ErrorPage error401 = new ErrorPage(HttpStatus.UNAUTHORIZED, "/error-page/401");
 
         factory.addErrorPages(error404, error500, runtimeError);
     }
