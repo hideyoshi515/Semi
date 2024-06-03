@@ -1,9 +1,6 @@
 package co.kr.necohost.semi.domain.model.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,8 +23,8 @@ public class Sales {
     private int price;
     private int quantity;
     private int device;
-    private int devieNum;
-    private String salescol;
+    private int deviceNum;
+
 
 
 

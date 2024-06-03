@@ -3,6 +3,7 @@ package co.kr.necohost.semi.domain.model.dto;
 import co.kr.necohost.semi.domain.model.entity.Sales;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -10,14 +11,15 @@ import java.util.Date;
 @Setter
 public class SalesRequest {
     private Long id;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date date;
     private int category;
     private int menu;
     private int price;
     private int quantity;
     private int device;
-    private int devieNum;
-    private String salescol;
+    private int deviceNum;
+
 
     public Sales toEntity() {
         Sales sales = new Sales();
@@ -28,8 +30,8 @@ public class SalesRequest {
         sales.setPrice(price);
         sales.setQuantity(quantity);
         sales.setDevice(device);
-        sales.setDevieNum(devieNum);
-        sales.setSalescol(salescol);
+        sales.setDeviceNum(deviceNum);
+
         return sales;
 
     }
