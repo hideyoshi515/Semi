@@ -33,7 +33,6 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt:0.12.5")
     runtimeOnly("com.mysql:mysql-connector-j")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    jssssssssssssss
 }
 
 tasks.withType<Test> {
