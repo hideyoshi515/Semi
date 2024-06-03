@@ -1,6 +1,6 @@
-package co.kr.necohost.semi.app.order;
+package co.kr.necohost.semi.app;
 
-import co.kr.necohost.semi.domain.model.entity.order.Order;
+import co.kr.necohost.semi.domain.model.dto.OrderRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class OrderController {
     @GetMapping("/order")
     public String order(Model model) {
-        model.addAttribute("order", new Order());
+        model.addAttribute("orderRequest", new OrderRequest());
         return "order/orderInput/html";
     }
 }

@@ -1,6 +1,6 @@
-package co.kr.necohost.semi.domain.service.order;
+package co.kr.necohost.semi.domain.service;
 
-import co.kr.necohost.semi.domain.repository.order.OrderRepository;
+import co.kr.necohost.semi.domain.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -1,6 +1,6 @@
-package co.kr.necohost.semi.domain.model.dto.order;
+package co.kr.necohost.semi.domain.model.dto;
 
-import co.kr.necohost.semi.domain.model.entity.order.Order;
+import co.kr.necohost.semi.domain.model.entity.Order;
 import lombok.Getter;
 import lombok.Setter;
 
