@@ -1,5 +1,7 @@
 package co.kr.necohost.semi.oauth2.handler;
 
+import co.kr.necohost.semi.domain.model.entity.Account;
+import co.kr.necohost.semi.domain.repository.AccountRepository;
 import co.kr.necohost.semi.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import co.kr.necohost.semi.oauth2.user.OAuth2Provider;
 import co.kr.necohost.semi.oauth2.user.OAuth2UserUnlinkManager;
@@ -8,33 +10,38 @@ import co.kr.necohost.semi.oauth2.service.OAuth2UserPrincipal;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.ui.Model;
 
 import java.io.IOException;
 import java.util.Optional;
-
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private final OAuth2UserUnlinkManager oAuth2UserUnlinkManager;
+    private final AccountRepository accountRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
 
-        String targetUrl;
 
-        targetUrl = determineTargetUrl(request, response, authentication);
+        Optional<String> redirectUri = CookieUtils.getCookie(request, HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME)
+                .map(Cookie::getValue);
+
+        String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
+
+        OAuth(request, response, authentication);
 
         if (response.isCommitted()) {
-            logger.debug("Response has already been committed. Unable to redirect to " + targetUrl);
+            logger.debug("Response has already been committed.");
             return;
         }
 
@@ -42,13 +49,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
-    protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response,
+    protected Account OAuth(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) {
 
-        Optional<String> redirectUri = CookieUtils.getCookie(request, HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME)
-                .map(Cookie::getValue);
-
-        String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
         String mode = CookieUtils.getCookie(request, HttpCookieOAuth2AuthorizationRequestRepository.MODE_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue)
@@ -57,9 +60,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         OAuth2UserPrincipal principal = getOAuth2UserPrincipal(authentication);
 
         if (principal == null) {
-            return UriComponentsBuilder.fromUriString(targetUrl)
-                    .queryParam("error", "Login failed")
-                    .build().toUriString();
+            return null;
         }
 
         if ("login".equalsIgnoreCase(mode)) {
@@ -70,14 +71,24 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                     principal.getUserInfo().getNickname(),
                     principal.getUserInfo().getAccessToken()
             );
+            Account account = accountRepository.findByEmail(principal.getUserInfo().getEmail()).orElse(null);
+            if (account == null) {
+                account = new Account();
+                account.setEmail(principal.getUserInfo().getEmail());
+                account.setName(principal.getUserInfo().getLastName() + principal.getUserInfo().getFirstName());
+                account.setOAuth(principal.getUserInfo().getProvider().getRegistrationId());
+                accountRepository.save(account);
+            }
+
+            HttpSession session = request.getSession(true);
+            session.setAttribute("account", account);
+            session.setMaxInactiveInterval(60 * 60 * 24); //60s * 60m * 24h
+
 
             String accessToken = principal.getUserInfo().getAccessToken();
             String refreshToken = "test_refresh_token";
 
-            return UriComponentsBuilder.fromUriString(targetUrl)
-                    .queryParam("access_token", accessToken)
-                    .queryParam("refresh_token", refreshToken)
-                    .build().toUriString();
+            return account;
 
         } else if ("unlink".equalsIgnoreCase(mode)) {
 
@@ -88,13 +99,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             // TODO: 리프레시 토큰 삭제
             oAuth2UserUnlinkManager.unlink(provider, accessToken);
 
-            return UriComponentsBuilder.fromUriString(targetUrl)
-                    .build().toUriString();
+            return null;
         }
 
-        return UriComponentsBuilder.fromUriString(targetUrl)
-                .queryParam("error", "Login failed")
-                .build().toUriString();
+        return null;
     }
 
     private OAuth2UserPrincipal getOAuth2UserPrincipal(Authentication authentication) {
