@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Semi.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Semi.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Semi.test.iml" filepath="$PROJECT_DIR$/.idea/modules/Semi.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Semi.iml" filepath="$PROJECT_DIR$/.idea/Semi.iml" />
     </modules>
   </component>
 </project>
