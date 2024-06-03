@@ -24,7 +24,18 @@ public class MenuRequest {
         menu.setPrice(price);
         menu.setCategory(category);
         menu.setStock(stock);
-//        menu.setImage(String.valueOf(image));
+        menu.setDescription(description);
+        menu.setId(id);
+        return menu;
+    }
+
+    public Menu toEntity(String img){
+        Menu menu = new Menu();
+        menu.setName(name);
+        menu.setPrice(price);
+        menu.setCategory(category);
+        menu.setStock(stock);
+        menu.setImage(img);
         menu.setDescription(description);
         menu.setId(id);
         return menu;
