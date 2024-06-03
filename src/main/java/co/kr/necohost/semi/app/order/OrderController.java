@@ -1,4 +1,4 @@
-package co.kr.necohost.semi.app;
+package co.kr.necohost.semi.app.order;
 
 import co.kr.necohost.semi.domain.model.dto.OrderRequest;
 import org.springframework.stereotype.Controller;
