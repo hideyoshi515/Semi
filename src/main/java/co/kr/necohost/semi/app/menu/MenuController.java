@@ -1,4 +1,4 @@
-package co.kr.necohost.semi.app;
+package co.kr.necohost.semi.app.menu;
 
 
 import org.springframework.stereotype.Controller;
