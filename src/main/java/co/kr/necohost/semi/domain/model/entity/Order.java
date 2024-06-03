@@ -1,4 +1,4 @@
-package co.kr.necohost.semi.domain.model.entity.order;
+package co.kr.necohost.semi.domain.model.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
