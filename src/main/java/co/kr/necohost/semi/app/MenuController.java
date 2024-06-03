@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class MenuController {
     @GetMapping("/MenuIndex")
     public String MenuIndex(Model model) {
-        return "MenuIndex.html";
+        return "/menu/menuIndex.html";
     }
 }
