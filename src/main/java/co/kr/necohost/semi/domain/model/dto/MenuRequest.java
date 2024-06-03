@@ -12,9 +12,7 @@ public class MenuRequest {
     private int price;
     private long category;
     private int stock;
-
     private MultipartFile image;
-
     private String description;
     private long id;
 
