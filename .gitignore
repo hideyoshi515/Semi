@@ -15,6 +15,7 @@ HELP.md
 
 # Gradle files
 .gradle
+.idea/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
