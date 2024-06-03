@@ -86,7 +86,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
 
             String accessToken = principal.getUserInfo().getAccessToken();
-            String refreshToken = "test_refresh_token";
+            //String refreshToken = "test_refresh_token";
 
             return account;
 

@@ -1,4 +1,4 @@
-package co.kr.necohost.semi.app;
+package co.kr.necohost.semi.app.sales;
 
 import co.kr.necohost.semi.domain.model.dto.SalesRequest;
 import co.kr.necohost.semi.domain.model.entity.Sales;
