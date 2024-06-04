@@ -10854,7 +10854,7 @@ body {
 #layoutAuthentication {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: calc(100vh - var(--header-height));
 }
 #layoutAuthentication #layoutAuthentication_content {
   min-width: 0;
@@ -11056,6 +11056,12 @@ body {
   background-color: #f8f9fa;
   color: #212529;
 }
+
+.sb-sidenav-warning {
+  background-color: #ffc107 !important;
+  color: #000 !important;
+}
+
 .sb-sidenav-light .sb-sidenav-menu .sb-sidenav-menu-heading {
   color: #adb5bd;
 }

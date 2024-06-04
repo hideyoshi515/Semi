@@ -11,14 +11,12 @@
         function update(pk) {
             location.href="/menuUpdate?id=" + pk;
         }
-
         function deleteMenu(pk) {
             let ok = confirm('지우시겠습니까?');
             if (ok) {
                 location.href="/menuDelete?id=" + pk;
             }
         }
-
     </script>
     <style>
         #menu-detail-image {

@@ -1,12 +1,13 @@
 package co.kr.necohost.semi.oauth2.handler;
 
+import co.kr.necohost.semi.domain.model.dto.AccountRequest;
 import co.kr.necohost.semi.domain.model.entity.Account;
 import co.kr.necohost.semi.domain.repository.AccountRepository;
 import co.kr.necohost.semi.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import co.kr.necohost.semi.oauth2.service.OAuth2UserPrincipal;
 import co.kr.necohost.semi.oauth2.user.OAuth2Provider;
 import co.kr.necohost.semi.oauth2.user.OAuth2UserUnlinkManager;
 import co.kr.necohost.semi.oauth2.util.CookieUtils;
-import co.kr.necohost.semi.oauth2.service.OAuth2UserPrincipal;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,10 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.ui.Model;
 
 import java.io.IOException;
 import java.util.Optional;
+
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -29,12 +30,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final AccountRepository accountRepository;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
 
 
-        Optional<String> redirectUri = CookieUtils.getCookie(request, HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME)
-                .map(Cookie::getValue);
+        Optional<String> redirectUri = CookieUtils.getCookie(request, HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME).map(Cookie::getValue);
 
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
@@ -49,13 +48,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
-    protected Account OAuth(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) {
+    protected Account OAuth(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
 
 
-        String mode = CookieUtils.getCookie(request, HttpCookieOAuth2AuthorizationRequestRepository.MODE_PARAM_COOKIE_NAME)
-                .map(Cookie::getValue)
-                .orElse("");
+        String mode = CookieUtils.getCookie(request, HttpCookieOAuth2AuthorizationRequestRepository.MODE_PARAM_COOKIE_NAME).map(Cookie::getValue).orElse("");
 
         OAuth2UserPrincipal principal = getOAuth2UserPrincipal(authentication);
 
@@ -65,25 +61,22 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         if ("login".equalsIgnoreCase(mode)) {
             // TODO: DB 저장
-            log.info("email={}, name={}, nickname={}, accessToken={}",
-                    principal.getUserInfo().getEmail(),
-                    principal.getUserInfo().getName(),
-                    principal.getUserInfo().getNickname(),
-                    principal.getUserInfo().getAccessToken()
-            );
+            log.info("email={}, name={}, nickname={}, accessToken={}", principal.getUserInfo().getEmail(), principal.getUserInfo().getName(), principal.getUserInfo().getNickname(), principal.getUserInfo().getAccessToken());
             Account account = accountRepository.findByEmail(principal.getUserInfo().getEmail()).orElse(null);
+                HttpSession session = request.getSession(true);
             if (account == null) {
-                account = new Account();
-                account.setEmail(principal.getUserInfo().getEmail());
-                account.setName(principal.getUserInfo().getLastName() + principal.getUserInfo().getFirstName());
-                account.setOAuth(principal.getUserInfo().getProvider().getRegistrationId());
-                accountRepository.save(account);
+                AccountRequest accountRequest = new AccountRequest();
+                accountRequest.setEmail(principal.getUserInfo().getEmail());
+                accountRequest.setName(principal.getUserInfo().getLastName() + principal.getUserInfo().getFirstName());
+                accountRequest.setOAuth(principal.getUserInfo().getProvider().getRegistrationId());
+                session.setAttribute("accountRequest", accountRequest);
+                session.setMaxInactiveInterval(60 * 10); //60s * 10m
+                //accountRepository.save(account);
             }
-
-            HttpSession session = request.getSession(true);
-            session.setAttribute("account", account);
-            session.setMaxInactiveInterval(60 * 60 * 24); //60s * 60m * 24h
-
+            if (account != null) {
+                session.setAttribute("account", account);
+                session.setMaxInactiveInterval(60 * 60 * 24); //60s * 60m * 24h
+            }
 
             String accessToken = principal.getUserInfo().getAccessToken();
             //String refreshToken = "test_refresh_token";
