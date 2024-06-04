@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/default_layout}">
+>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Total Sales by Category</title>
+    <style>
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 18px;
+            text-align: left;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+
+    </style>
+</head>
+
+<th:block layout:fragment="content">
+    <body>
+    <h1>年度別総売上高</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>年度</th>
+            <th>総売上高</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="yearlySales : ${yearlySales}">
+            <td th:text="${yearlySales.key}"></td>
+            <td th:text="${#numbers.formatDecimal(yearlySales.value, 0, 0)}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <button onclick="location.href='/salesMain'">メイン画面に復帰</button>
+    <button onclick="location.href='/total-by-year-input'">年度を入力して総売上高検索</button>
+
+    </body>
+</th:block>
+</html>

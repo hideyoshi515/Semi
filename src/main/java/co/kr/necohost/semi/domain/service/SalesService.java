@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class SalesService {
@@ -38,20 +39,44 @@ public class SalesService {
         salesRepository.deleteById(salesRequest.getId());
     }
 
-    //カテゴリー別の総売上高を返還
-    public int getTotalSalesByCategory(int categoryId) {
-        List<Sales> allSales = salesRepository.findByCategory(categoryId);
+
+    public int getTotalSalesByCategory(int categoryId, int process) {
+        List<Sales> allSales = salesRepository.findByCategoryAndProcess(categoryId, process);
         int totalSales = 0;
         for (Sales sale : allSales) {
             totalSales += sale.getPrice() * sale.getQuantity();
         }
 
         return totalSales;
-
-
-
-
     }
+
+    public List<Sales> findByProcess(int process) {
+        return salesRepository.findByProcess(process);
+    }
+
+    public Map<Integer, Double> getYearlySalesByProcess() {
+        List<Sales> salesList = salesRepository.findYearlySalesByProcess();
+        return salesList.stream()
+                .collect(Collectors.groupingBy(
+                        s -> s.getDate().toInstant().atZone(java.time.ZoneId.systemDefault()).getYear(),
+                        Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
+                ));
+    }
+
+    public double getTotalSalesByYear(int year) {
+        List<Sales> salesList = salesRepository.findSalesByYearAndProcess(year);
+        return salesList.stream()
+                .mapToDouble(s -> s.getPrice() * s.getQuantity())
+                .sum();
+    }
+
+    public double getTotalSalesByYearAndCategory(int year, int category) {
+        List<Sales> salesList = salesRepository.findSalesByYearAndCategory(year, category);
+        return salesList.stream()
+                .mapToDouble(s -> s.getPrice() * s.getQuantity())
+                .sum();
+    }
+
 
 
 
