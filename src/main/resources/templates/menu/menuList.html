@@ -5,6 +5,11 @@
         layout:decorate="~{layout/default_layout}">
 >
 <head>
+    <script>
+        function update(pk) {
+            location.href="/menuUpdate?id=" + pk;
+        }
+    </script>
     <meta charset="UTF-8">
     <title>Title</title>
     <style>
@@ -36,6 +41,7 @@
 <th:block layout:fragment="content">
     <div class="menu-list-container">
         <div class="menu-list-bar">
+            <div> MenuList </div>
             <div> ID </div>
             <div> name </div>
             <div> price </div>
@@ -46,6 +52,7 @@
             <div> status </div>
         </div>
         <div class="menu-item" th:each="menu : ${menus}">
+            <div> <button th:onclick="'update('+${menu.id}+')'"> 수정하기 </button></div>
             <div th:text="${menu.id}"> </div>
             <div th:text="${menu.name}"> </div>
             <div th:text="${menu.price}"> </div>
@@ -55,7 +62,13 @@
             <div th:text="${menu.stock}"> </div>
             <div> status </div>
         </div>
+        <div>
+            <button onclick="location.href='/menuCreate'"> Add Menu </button>
+        </div>
     </div>
+
+
 </th:block>
 </body>
+
 </html>
