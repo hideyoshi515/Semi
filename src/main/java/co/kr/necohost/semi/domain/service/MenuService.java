@@ -14,8 +14,15 @@ public class MenuService {
         this.menuRepository = menuRepository;
     }
 
-        public List<Menu> getAllMenus() {
+    public List<Menu> getAllMenus() {
             return menuRepository.findAll();
-        }
+    }
 
+    public Menu getMenuById(Long id) {
+        return menuRepository.findById(id).orElse(null);
+    }
+
+    public Menu saveMenu(Menu menu) {
+        return menuRepository.save(menu);
+    }
 }
