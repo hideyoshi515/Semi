@@ -8,14 +8,14 @@ import java.util.List;
 
 @Service
 public class MenuService {
-    private final MenuRepository menuRepository;
+    private MenuRepository menuRepository;
 
     public MenuService(MenuRepository menuRepository) {
         this.menuRepository = menuRepository;
     }
 
-        public static List<Menu> getAllMenus() {
-            return
+        public List<Menu> getAllMenus() {
+            return menuRepository.findAll();
         }
 
 }

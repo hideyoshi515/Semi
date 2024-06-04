@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class MenuController {
-    static MenuService menuService;
+    private MenuService menuService;
     public MenuController(MenuService menuService) {
-        MenuController.menuService = menuService;
+        this.menuService = menuService;
     }
 
     @GetMapping("/MenuIndex")
@@ -20,7 +20,7 @@ public class MenuController {
 
     @GetMapping("/MenuList")
     public String MenuList(Model model) {
-        MenuService.getAllMenus();
+        menuService.getAllMenus();
         return "/menu/menuList.html";
     }
 }
