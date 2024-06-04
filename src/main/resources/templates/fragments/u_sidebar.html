@@ -13,7 +13,7 @@
                     </a>
                     <div class="collapse show" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                         <nav class="sb-sidenav-menu-nested nav" th:each="category : ${categories}">
-                            <a class="nav-link" th:href="|/menu?id=${category.id}|" th:text="${category.name}"></a>
+                            <a class="nav-link" th:href="|/order/menu?category=${category.id}|" th:text="${category.name}"></a>
                         </nav>
                     </div>
                 </div>

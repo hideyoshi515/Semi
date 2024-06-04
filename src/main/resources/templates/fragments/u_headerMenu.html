@@ -2,22 +2,34 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark" th:fragment="headerMenuFragment">
     <!-- Sidebar Toggle-->
-    <button class="btn btn-link btn-sm order-lg-0 ms-3 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
+    <button class="btn btn-link btn-sm order-lg-0 ms-3 me-4 me-lg-0" id="sidebarToggle" href="#!"><i
+            class="fas fa-bars"></i></button>
     <!-- for Margin-->
     <div class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
     </div>
     <!-- Navbar-->
     <ul class="navbar-nav d-none  d-md-inline-block ms-auto ms-md-0 me-3 me-lg-4">
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown"
+               aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                 <div th:if="${session.account} != null">
-                <span class="ms-3" th:text="|${session.account.name} 様|">Activity Log</span>
-                <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item" href="#!">設定</a></li>
-                <li><a class="dropdown-item text-danger" th:if="${session.account} != null" href="/logout">ログアウト</a></li>
+                    <span class="ms-3" th:text="|${session.account.name} 様|">Activity Log</span>
+                    <li>
+                        <hr class="dropdown-divider"/>
+                    </li>
+                    <li><a class="dropdown-item" href="#!">設定</a></li>
+                    <li><a class="dropdown-item text-danger"
+                           href="/logout">ログアウト</a></li>
                 </div>
-                <li><a class="dropdown-item text-primary" th:if="${session.account} == null" href="http://localhost:8080/oauth2/authorization/google?redirect_uri=http://localhost:8080/&mode=login">ログイン</a></li>
+                <div th:if="${session.account} == null">
+                    <li><a class="dropdown-item"
+                           href="/register">会員登録</a>
+                    </li>
+                    <li><a class="dropdown-item text-primary"
+                           href="http://localhost:8080/oauth2/authorization/google?redirect_uri=http://localhost:8080/&mode=login">ログイン</a>
+                    </li>
+                </div>
             </ul>
         </li>
     </ul>
