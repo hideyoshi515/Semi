@@ -48,7 +48,7 @@ public class MenuController {
 
     @PostMapping("/menuCreate")
     public String MenuCreate(Model model, @ModelAttribute("menuRequest") MenuRequest menuRequest) {
-        menuService.saveMenu(menuRequest.toEntity());
+        menuService.saveMenuWithImage(menuRequest, menuRequest.getImage());
         return "redirect:/MenuIndex";
     }
 
