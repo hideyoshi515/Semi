@@ -5,24 +5,28 @@
         layout:decorate="~{layout/default_layout}">
 >
 <head>
+    <style>
+        #menu-detail-image {
+            height: 100%;
+            width: 500px;
+        }
+    </style>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
 <body>
 <th:block layout:fragment="content">
-    <form action="/menuUpdate" method="post" th:object="${menuRequest}">
+    <form action="/menuUpdate" method="post" th:object="${menuRequest}" enctype="multipart/form-data">
+        <div> <img id="menu-detail-image" th:if="${menu.image} != null" th:src="${menu.image}"> </div>
         <div> id : <input th:field="${menu.id}" style="display: none"> <span th:text="${menu.id}"></span> </div>
         <div> name : <input th:field="${menu.name}"> </div>
         <div> price : <input th:field="${menu.price}"> </div>
         <div> category : <input th:field="${menu.category}"> </div>
-        <div> img : <input th:field="${menu.image}"> </div>
+        <div> img : <input type="file" th:field="${menu.image}"> </div>
         <div> desc : <input th:field="${menu.description}"> </div>
         <div> stock : <input th:field="${menu.stock}" style="display: none"> <span th:text="${menu.stock}"></span> </div>
-        <button> 수정하기 </button>
+        <button> 수정완료 </button>
     </form>
-
-
 </th:block>
-
 </body>
 </html>

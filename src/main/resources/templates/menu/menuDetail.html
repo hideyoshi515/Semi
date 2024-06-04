@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/default_layout}">
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        function update(pk) {
+            location.href="/menuUpdate?id=" + pk;
+        }
+
+        function deleteMenu(pk) {
+            let ok = confirm('지우시겠습니까?');
+            if (ok) {
+                location.href="/menuDelete?id=" + pk;
+            }
+        }
+
+    </script>
+    <style>
+        #menu-detail-image {
+            height: 100%;
+            width: 500px;
+        }
+    </style>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div> <img id="menu-detail-image" th:if="${menu.image} != null" th:src="${menu.image}"> </div>
+    <div> id : <span th:text="${menu.id}"></span> </div>
+    <div> name : <span th:text="${menu.name}"></span> </div>
+    <div> price : <span th:text="${menu.price}"></span> </div>
+    <div> category : <span th:text="${menu.category}"></span> </div>
+    <div> desc : <span th:text="${menu.description}"></span> </div>
+    <div> stock : <span th:text="${menu.stock}"></span> </div>
+    <div> <button th:onclick="'update('+${menu.id}+')'"> 수정하기 </button></div>
+    <div> <button th:onclick="'deleteMenu('+${menu.id}+')'"> 삭제하기 </button></div>
+    </th:block>
+</body>
+</html>

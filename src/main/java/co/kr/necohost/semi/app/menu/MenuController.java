@@ -62,9 +62,16 @@ public class MenuController {
     }
 
     @PostMapping("/menuUpdate")
-    public String MenuUpdate(Model model, MenuRequest menuRequest) {
-        menuService.saveMenu(menuRequest.toEntity());
-        return "redirect:/MenuList";
+    public String MenuUpdate(Model model, @ModelAttribute("menuRequest") MenuRequest menuRequest) {
+        menuService.saveMenuWithImage(menuRequest, menuRequest.getImage());
+        return "redirect:/menuList";
+    }
+
+    @GetMapping("/menuDetail")
+    public String detailMenu(Model model, @RequestParam Map<String, Object> params) {
+        Menu menu = menuService.getMenuById(Long.parseLong(params.get("id").toString()));
+        model.addAttribute("menu", menu);
+        return "/menu/menuDetail.html";
     }
 
     @GetMapping("/categoryManagement")
