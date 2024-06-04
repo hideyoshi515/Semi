@@ -22,6 +22,11 @@ public class AccountService {
        return check != null;
     }
 
+    public boolean isPhoneExit(AccountRequest accountRequest){
+        Account check = accountRepository.findByPhone(accountRequest.getPhone()).orElse(null);
+        return check != null;
+    }
+
     public Map<String, String> validateHandling(Errors errors){
         Map<String, String> errorMap = new HashMap<String, String>();
         for(FieldError fieldError : errors.getFieldErrors()){

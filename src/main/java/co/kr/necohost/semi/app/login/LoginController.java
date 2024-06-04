@@ -55,16 +55,53 @@ public class LoginController {
             }
             return "login/register.html";
         }
+        boolean errored = false;
         if (accountService.isExit(accountRequest)) {
-            canCreate = "既に存在するアカウントです";
-            model.addAttribute("canCreate", canCreate);
-            return "login/register_failed.html";
+            canCreate = "既に存在するメールアドレスです";
+            model.addAttribute("valid_email", canCreate);
+            errored = true;
+        }
+        if (accountService.isPhoneExit(accountRequest)) {
+            canCreate = "既に存在する携帯電話番号です";
+            model.addAttribute("valid_phone", canCreate);
+            errored = true;
+        }
+        if(errored){
+            return "login/register.html";
         }
         accountService.save(accountRequest);
         Account account = accountRepository.findByEmail(accountRequest.getEmail()).orElse(null);
         session.setAttribute("account", account);
         session.setMaxInactiveInterval(60 * 60 * 24); //60s * 60m * 24h
+        session.removeAttribute("accountRequest");
         return "redirect:/";
 
+    }
+
+    @RequestMapping(value = "/signin", method = RequestMethod.GET)
+    public String getSignin(Model model, HttpSession session, @RequestParam Map<String, Object> params) {
+        AccountRequest accountRequest = new AccountRequest();
+        model.addAttribute("accountRequest", accountRequest);
+        return "login/login.html";
+    }
+
+    @RequestMapping(value = "/signin", method = RequestMethod.POST)
+    public String postSignin(Model model, @ModelAttribute("accountRequest") AccountRequest accountRequest, HttpSession session, @RequestParam Map<String, Object> params) {
+        Account target = accountRepository.findByEmail(accountRequest.getEmail()).orElse(null);
+        String errorCode = "";
+        if (target != null) {
+            if (target.getPassword().equals(accountRequest.getPassword())) {
+                session.setAttribute("account", target);
+                session.setMaxInactiveInterval(60 * 60 * 24);
+                session.removeAttribute("accountRequest");
+                return "redirect:/";
+            } else {
+                errorCode = "パスワードが間違います";
+            }
+        } else {
+            errorCode = "存在しないアカウントです";
+        }
+        model.addAttribute("errorCode", errorCode);
+        return "/login/login.html";
     }
 }

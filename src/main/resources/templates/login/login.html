@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/user_layout}">
+>
+<th:block layout:fragment="content">
+    <div id="wrapper" class="align-content-center">
+        <div class="outerDiv">
+            <div class="text-center m-center">
+                <div id="layoutAuthentication">
+                    <div id="layoutAuthentication_content">
+                        <main>
+                            <div class="container">
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-7">
+                                        <div class="card shadow-lg border-0 rounded-lg mt-5">
+                                            <div class="card-header"><h3 class="text-center font-weight-light my-4">
+                                                ログイン</h3></div>
+                                            <div class="card-body">
+                                                <form th:object="${accountRequest}" method="post">
+                                                    <div class="row mb-3">
+                                                        <div style="text-align: start; margin: 6px 0;">メールアドレス <span class="text-danger" th:if="${errorCode} != null" th:text="${errorCode}"></span></div>
+                                                        <div class="mb-3 mb-md-0">
+                                                            <input class="form-control" th:field="*{email}"
+                                                                   type="text" placeholder="メールアドレス"/>
+                                                        </div>
+                                                        <div style="text-align: start; margin: 6px 0;">パスワード</div>
+                                                        <div class="mb-3 mb-md-0">
+                                                            <input class="form-control" th:field="*{password}"
+                                                                   type="password" placeholder="パスワード"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-4 mb-0">
+                                                        <div class="d-grid"><button class="btn btn-primary btn-block">ログイン</button>
+                                                        </div>
+                                                    </div>
+                                                    <input th:field="*{OAuth}" style="display: none">
+                                                </form>
+                                            </div>
+                                            <div class="card-footer text-center py-2">
+                                                <div class="text-primary pb-1">または</div>
+                                                <a href="http://localhost:8080/oauth2/authorization/google?redirect_uri=http://localhost:8080/register&mode=login"><img src="/img/web_light_rd_na@4x.png" style="width: 48px;height: 48px;"></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</html>
