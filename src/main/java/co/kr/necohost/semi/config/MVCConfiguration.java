@@ -1,5 +1,6 @@
 package co.kr.necohost.semi.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.server.ErrorPage;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
@@ -35,9 +36,13 @@ public class MVCConfiguration implements WebMvcConfigurer {
         return "redirected";
     }
 
+    @Value("${project.dir}")
+    private String projectDir;
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/**").addResourceLocations("classpath:/static/").setCachePeriod(3600);
+        String resourceLocation = "file://" + projectDir + "/src/main/resources/static/";
+        registry.addResourceHandler("/**").addResourceLocations(resourceLocation).setCachePeriod(3600);
     }
 
     @Bean
