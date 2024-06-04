@@ -5,7 +5,9 @@ import co.kr.necohost.semi.domain.model.entity.Sales;
 import co.kr.necohost.semi.domain.repository.SalesRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class SalesService {
@@ -34,6 +36,21 @@ public class SalesService {
     //delete
     public void deleteById(SalesRequest salesRequest) {
         salesRepository.deleteById(salesRequest.getId());
+    }
+
+    //カテゴリー別の総売上高を返還
+    public int getTotalSalesByCategory(int categoryId) {
+        List<Sales> allSales = salesRepository.findByCategory(categoryId);
+        int totalSales = 0;
+        for (Sales sale : allSales) {
+            totalSales += sale.getPrice() * sale.getQuantity();
+        }
+
+        return totalSales;
+
+
+
+
     }
 
 

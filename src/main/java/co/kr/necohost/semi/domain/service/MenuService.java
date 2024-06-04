@@ -27,6 +27,10 @@ public class MenuService {
         return menuRepository.findById(id).orElse(null);
     }
 
+    public List<Menu> getMenuByCategory(int category) {
+        return menuRepository.findByCategory(category);
+    }
+
     public Menu saveMenu(Menu menu) {
         return menuRepository.save(menu);
     }

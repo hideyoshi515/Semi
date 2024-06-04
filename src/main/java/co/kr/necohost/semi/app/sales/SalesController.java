@@ -5,12 +5,13 @@ import co.kr.necohost.semi.domain.model.entity.Sales;
 import co.kr.necohost.semi.domain.service.SalesService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+@RequestMapping
 @Controller
 public class SalesController {
 
@@ -29,13 +30,13 @@ public class SalesController {
     @GetMapping("/createSales")
     public String getSales(Model model) {
         model.addAttribute("salesRequest", new SalesRequest());
-        return "/sales/CreateSales.html";
+        return "/sales/createSales.html";
     }
 
     @PostMapping("/createSales")
     public String createSales(Model model, @ModelAttribute("salesRequest") SalesRequest salesRequest) {
         salesService.save(salesRequest);
-        return "/sales/CreateSales.html";
+        return "/sales/createSales.html";
     }
 
     @GetMapping("/readSales")
@@ -47,6 +48,27 @@ public class SalesController {
         model.addAttribute("salesRequest", new SalesRequest());
         return "/sales/Saleslist.html";
     }
+
+    //カテゴリー別の総売上高を返還
+
+    @GetMapping("/total-by-category")
+    public String getTotalSalesByCategory(Model model, @RequestParam List<Integer> categoryIds) {
+        Map<Integer, Integer> totalByCategory = new HashMap<>();
+        for (Integer categoryId : categoryIds) {
+            int totalSales = salesService.getTotalSalesByCategory(categoryId);
+            totalByCategory.put(categoryId, totalSales);
+        }
+        model.addAttribute("totalByCategory", totalByCategory);
+        return "/sales/SalesTotalByCategory.html";
+    }
+
+
+//    @GetMapping("/total-by-category")
+//    public String getTotalSalesByCategory(Model model, @RequestParam int categoryId) {
+//        int totalByCategory = salesService.getTotalSalesByCategory(categoryId);
+//         model.addAttribute("totalByCategory",salesService.getTotalSalesByCategory(categoryId));
+//        return "/sales/SalesTotalByCategory.html";
+//    }
 
 
 

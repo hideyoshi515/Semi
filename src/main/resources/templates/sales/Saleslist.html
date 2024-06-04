@@ -1,37 +1,66 @@
 <!DOCTYPE html>
-<html
-        xmlns:th="http://www.thymeleaf.org"
->
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
-<div th:each="sales : ${sales}">
+<h2>Sales Table</h2>
+<table>
+    <thead>
+    <tr>
+        <th scope="col">id</th>
+        <th scope="col">date</th>
+        <th scope="col">category</th>
+        <th scope="col">menu</th>
+        <th scope="col">price</th>
+        <th scope="col">quantity</th>
+        <th scope="col">device</th>
+        <th scope="col">deviceNum</th>
+        <th scope="col">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="sale : ${sales}">
+        <td th:text="${sale.id}"></td>
+        <td th:text="${sale.date}"></td>
+        <td th:text="${sale.category}"></td>
+        <td th:text="${sale.menu}"></td>
+        <td th:text="${sale.price}"></td>
+        <td th:text="${sale.quantity}"></td>
+        <td th:text="${sale.device}"></td>
+        <td th:text="${sale.deviceNum}"></td>
+        <td><button th:onclick="'update('+${sale.id}+')'">売り上げ修正</button></td>
+    </tr>
+    </tbody>
+</table>
 
-    <span th:text="${sales.id}"></span>
-    <span th:text="${sales.date}"></span>
-    <span th:text="${sales.category}"></span>
-    <span th:text="${sales.menu}"></span>
-    <span th:text="${sales.price}"></span>
-    <span th:text="${sales.quantity}"></span>
-    <span th:text="${sales.device}"></span>
-    <span th:text="${sales.deviceNum}"></span>
-    <button th:onclick="'update('+${sales.id}+')'">売り上げ修正</button>
-</div>
 <button onclick="location.href='/salesMain'">メイン画面に復帰</button>
-
-<!--<form th:object="${salesRequest}" method="post">-->
-<!--    id : <input th:field="*{id}"> <button>売り上げ削除</button>-->
-<!--</form>-->
-<!--<script>-->
-<!--    function update(id) {-->
-
-<!--        location.href = "/productUpdate?id=" +id;-->
-
-<!--    }-->
+<button onclick="location.href='/total-by-category?categoryIds=1'">カテゴリー1の総売上高</button>
+<button onclick="location.href='/total-by-category?categoryIds=2'">カテゴリー2の総売上高</button>
 
 
-<!--</script>-->
+
+
+
+<script>
+    function update(id) {
+        location.href = "/productUpdate?id=" + id;
+    }
+</script>
 </body>
 </html>
