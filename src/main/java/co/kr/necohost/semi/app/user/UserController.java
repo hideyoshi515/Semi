@@ -1,6 +1,7 @@
 package co.kr.necohost.semi.app.user;
 
 import co.kr.necohost.semi.domain.service.CategoryService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,8 +15,10 @@ public class UserController {
     }
 
     @RequestMapping("/")
-    public String index(Model model) {
+    public String index(Model model, HttpSession session) {
+        model.addAttribute("session", session);
         model.addAttribute("categories",categoryService.getAllCategories());
         return "user/home.html";
     }
+
 }

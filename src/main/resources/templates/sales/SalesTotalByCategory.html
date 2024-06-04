@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Total Sales by Category</title>
+    <style>
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 18px;
+            text-align: left;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+
+    </style>
+</head>
+<body>
+<h1>Total Sales by Category</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Category ID</th>
+        <th>Total Sales</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="totalByCategory : ${totalByCategory}">
+        <td th:text="${totalByCategory.key}"></td>
+        <td th:text="${totalByCategory.value}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
