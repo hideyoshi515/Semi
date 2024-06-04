@@ -24,6 +24,8 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
+*.main.iml
+
 # Package Files
 *.jar
 *.war

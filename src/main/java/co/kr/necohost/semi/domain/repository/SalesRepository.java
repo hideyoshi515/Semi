@@ -8,5 +8,4 @@ public interface SalesRepository extends JpaRepository<Sales, Long> {
 
     @Transactional
     void deleteById(Long id);
-
 }
