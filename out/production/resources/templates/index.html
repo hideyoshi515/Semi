@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/default_layout}">
+>
+<th:block layout:fragment="content">
+    <div id="wrapper">
+        <div class="outerDiv" style="height: 1520px !important;">
+            <div class="content-wrapper m-center" style="border: 1px solid black; border-width: 0px 1px 0px;">
+                <div th:text="${lang}"></div>
+                <a href="http://localhost:8080/oauth2/authorization/google?redirect_uri=http://localhost:8080/index&mode=login"><img src="/img/web_light_rd_SI@4x.png"></a>
+                <div th:text="${token}"></div>
+                <div th:if="${session.account} != null" th:text="${session.account.email}"></div>
+                <div th:if="${session.account} != null" th:text="${session.account.password}"></div>
+                <div th:if="${session.account} != null" th:text="${session.account.name}"></div>
+                <div th:if="${session.account} != null" th:text="${#temporals.format(session.account.birthday,'yyyy-MM-dd')}"></div>
+                <div th:if="${session.account} != null" th:text="${session.account.phone}"></div>
+                <div th:if="${session.account} != null" th:text="${session.account.msRank}"></div>
+                <div th:if="${session.account} != null" th:text="${session.account.msPoint}"></div>
+                <div th:if="${session.account} != null" th:text="${session.account.OAuth}"></div>
+
+            </div>
+        </div>
+    </div>
+</th:block>
+</html>

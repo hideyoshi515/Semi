@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/default_layout}">
+>
 <head>
     <meta charset="UTF-8">
     <title>Total Sales by Category</title>
@@ -22,6 +26,7 @@
     </style>
 </head>
 <body>
+<th:block layout:fragment="content">
 <h1>Total Sales by Category</h1>
 <table>
     <thead>
@@ -38,4 +43,5 @@
     </tbody>
 </table>
 </body>
+</th:block>
 </html>

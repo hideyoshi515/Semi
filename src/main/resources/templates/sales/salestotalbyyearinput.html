@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/default_layout}">
+>
+
+<th:block layout:fragment="content">
+<body>
+<h1>年度別の総売上高</h1>
+<form action="/total-by-year-input" method="get">
+    <label for="year">年度を入力:</label>
+    <input type="number" id="year" name="year">
+    <button type="submit">総売上高検索</button>
+</form>
+
+<div th:if="${year != null}">
+    <h3>年度別の結果: <span th:text="${year}"></span></h3>
+    <h3>総売上高: <span th:text="${#numbers.formatDecimal(totalSales, 0, 0)}"></span></h3>
+</div>
+<button onclick="location.href='/salesMain'">メイン画面に復帰</button>
+</body>
+
+</th:block>
+</html>
