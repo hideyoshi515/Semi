@@ -23,6 +23,10 @@ public class MenuService {
             return menuRepository.findAll();
     }
 
+    public void deleteMenuById(Long id){
+        menuRepository.deleteById(id);
+    }
+
     public Menu getMenuById(Long id) {
         return menuRepository.findById(id).orElse(null);
     }
@@ -49,6 +53,14 @@ public class MenuService {
         File saveTo = new File(path + fileName);
         // 서버 경로 업데이트. 서버에서 불러올 경로를 파일 이름과 결합하여 완성
         serverPath = serverPath + fileName;
+
+        Menu existingMenu = this.getMenuById(menuRequest.getId());
+        if (existingMenu != null && existingMenu.getImage() != null) {
+            File existingFile = new File(System.getProperty("user.dir") + "\\src\\main\\resources\\static\\" + existingMenu.getImage());
+            if (existingFile.exists()) {
+                existingFile.delete();
+            }
+        }
 
         try {
             // 업로드된 파일을 설정된 경로에 저장

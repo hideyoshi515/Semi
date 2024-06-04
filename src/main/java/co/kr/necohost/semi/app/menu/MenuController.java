@@ -73,6 +73,12 @@ public class MenuController {
         return "/menu/menuDetail.html";
     }
 
+    @GetMapping("/menuDelete")
+    public String menuDelete(Model model, @RequestParam Map<String, Object> params) {
+        menuService.deleteMenuById(Long.parseLong(params.get("id").toString()));
+        return "redirect:/menuList";
+    }
+
     @GetMapping("/categoryManagement")
     public String CategoryManagement(Model model) {
         List<Category> categories = categoryService.getAllCategories();
