@@ -19,6 +19,8 @@ public class SalesRequest {
     private int quantity;
     private int device;
     private int deviceNum;
+    private int orderNum;
+    private int process;
 
 
     public Sales toEntity() {
@@ -31,6 +33,8 @@ public class SalesRequest {
         sales.setQuantity(quantity);
         sales.setDevice(device);
         sales.setDeviceNum(deviceNum);
+        sales.setOrderNum(orderNum);
+        sales.setProcess(process);
 
         return sales;
 
