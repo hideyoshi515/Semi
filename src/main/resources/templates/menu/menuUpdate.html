@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/default_layout}">
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <form action="/menuUpdate" method="post" th:object="${menuRequest}">
+        <div> id : <input th:field="${menu.id}" style="display: none"> <span th:text="${menu.id}"></span> </div>
+        <div> name : <input th:field="${menu.name}"> </div>
+        <div> price : <input th:field="${menu.price}"> </div>
+        <div> category : <input th:field="${menu.category}"> </div>
+        <div> img : <input th:field="${menu.image}"> </div>
+        <div> desc : <input th:field="${menu.description}"> </div>
+        <div> stock : <input th:field="${menu.stock}" style="display: none"> <span th:text="${menu.stock}"></span> </div>
+        <button> 수정하기 </button>
+    </form>
+
+
+</th:block>
+
+</body>
+</html>
