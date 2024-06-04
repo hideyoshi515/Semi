@@ -11,4 +11,5 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     @Cacheable("cat_menus")
     List<Menu> findByCategory(int category);
+
  }
