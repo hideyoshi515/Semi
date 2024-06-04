@@ -19,13 +19,13 @@
     }
 </script>
 <th:block layout:fragment="content">
-<h1>メニュー</h1>
+    <h1>メニュー</h1>
     <div th:each="menu, iterStat : ${menus}">
-           메뉴이름 : <span th:text="${menu.name}"></span>
-           가격 : <span th:text="${menu.price}"></span>
-           남은수량 : <span  id="stock-[[${iterStat.index}]]" th:text="${menu.stock}"></span>
-            <button type="button" onclick="increaseStock([[${iterStat.index}]])">+</button>
-            <button type="button" onclick="decreaseStock([[${iterStat.index}]])">-</button>
+        메뉴이름 : <span th:text="${menu.name}"></span>
+        가격 : <span th:text="${menu.price}"></span>
+        남은수량 : <span  id="stock-[[${iterStat.index}]]" th:text="${menu.stock}"></span>
+        <button type="button" onclick="increaseStock([[${iterStat.index}]])">+</button>
+        <button type="button" onclick="decreaseStock([[${iterStat.index}]])">-</button>
     </div>
     <button>결제</button>
 </th:block>

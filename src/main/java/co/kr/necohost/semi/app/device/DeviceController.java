@@ -35,8 +35,8 @@ public class DeviceController {
     public String postOrder(DeviceRequest deviceRequest, Model model, @RequestParam Map<String, Object> params) {
         model.addAttribute("deviceRequest", deviceRequest);
 //        long device = Long.parseLong(params.get("device").toString());
-       List<Menu> menus = menuService.getAllMenus();
-       model.addAttribute("menus", menus);
+        List<Menu> menus = menuService.getAllMenus();
+        model.addAttribute("menus", menus);
         return "order/orderKioskInput.html";
     }
     @GetMapping("/orderPayment")

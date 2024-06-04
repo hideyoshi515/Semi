@@ -1,6 +1,6 @@
 :root {
-    --header-height: 55px;
-    --footer-height: 70px;
+    --header-height: 56px;
+    --footer-height: 0px;
 }
 
 /* header footer 레이아웃 잡기 */

@@ -10,8 +10,15 @@
 </head>
 <body>
 <th:block layout:fragment="content">
-asd
-
+    <form th:object="${menuRequest}" action="/menuCreate" method="post" enctype="multipart/form-data">
+    <div> name : <input th:field="*{name}"></div>
+    <div> price : <input th:field="*{price}"></div>
+    <div> category : <input th:field="*{category}"></div>
+    <div> image : <input type="file" th:field="*{image}"></div>
+    <div> description : <input th:field="*{description}"></div>
+    <div> stock : <input th:field="*{stock}"></div>
+        <button> 등록하기 </button>
+    </form>
   </th:block>
 </body>
 </html>

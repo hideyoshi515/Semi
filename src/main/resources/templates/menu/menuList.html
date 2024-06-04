@@ -6,8 +6,8 @@
 >
 <head>
     <script>
-        function update(pk) {
-            location.href="/menuUpdate?id=" + pk;
+        function detail(pk) {
+            location.href="/menuDetail?id=" + pk;
         }
     </script>
     <meta charset="UTF-8">
@@ -41,7 +41,7 @@
 <th:block layout:fragment="content">
     <div class="menu-list-container">
         <div class="menu-list-bar">
-            <div> MenuList </div>
+            <div> update&delete </div>
             <div> ID </div>
             <div> name </div>
             <div> price </div>
@@ -52,7 +52,7 @@
             <div> status </div>
         </div>
         <div class="menu-item" th:each="menu : ${menus}">
-            <div> <button th:onclick="'update('+${menu.id}+')'"> 수정하기 </button></div>
+            <div> <button th:onclick="'detail('+${menu.id}+')'"> 상세보기 </button></div>
             <div th:text="${menu.id}"> </div>
             <div th:text="${menu.name}"> </div>
             <div th:text="${menu.price}"> </div>
