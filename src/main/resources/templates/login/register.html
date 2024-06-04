@@ -18,21 +18,21 @@
                                             <div class="card-header"><h3 class="text-center font-weight-light my-4">
                                                 会員登録</h3></div>
                                             <div class="card-body">
-                                                <form>
+                                                <form th:object="${accountRequest}" method="post">
                                                     <div class="row mb-3">
                                                         <div style="text-align: start; margin: 6px 0;">名前</div>
                                                             <div class="mb-3 mb-md-0">
-                                                                <input class="form-control" id="inputFirstName"
+                                                                <input class="form-control" th:field="*{name}"
                                                                        type="text" placeholder="名前を入力してください"/>
                                                             </div>
                                                         <div style="text-align: start; margin: 6px 0;">メールアドレス</div>
                                                             <div class="mb-3 mb-md-0">
-                                                                <input class="form-control" id="inputLastName"
+                                                                <input class="form-control" th:field="*{email}"
                                                                        type="text" placeholder="メールアドレスを入力してください"/>
                                                             </div>
                                                         <div style="text-align: start; margin: 6px 0;">パスワード</div>
                                                             <div class="mb-3 mb-md-0">
-                                                                <input class="form-control" id="inputPassword"
+                                                                <input class="form-control" th:field="*{password}"
                                                                        type="password" placeholder="パスワードは半角英数字・記号のみ８文字以上入力してください"/>
                                                             </div>
                                                         <div style="text-align: start; margin: 6px 0;">パスワード確認</div>
@@ -42,12 +42,12 @@
                                                             </div>
                                                         <div style="text-align: start; margin: 6px 0;">携帯電話番号</div>
                                                             <div class="mb-3 mb-md-0">
-                                                                <input class="form-control" id="phone"
+                                                                <input class="form-control"  th:field="*{phone}"
                                                                        type="password" placeholder="メンバシップ用の携帯電話番号を入力してください"/>
                                                             </div>
                                                         <div style="text-align: start; margin: 6px 0;">暗証番号</div>
                                                             <div class="mb-3 mb-md-0">
-                                                                <input class="form-control" id="inputMSPassword"
+                                                                <input class="form-control" th:field="*{msPass}"
                                                                        type="password" placeholder="メンバシップ用の暗証番号を数字4文字入力してください"/>
                                                             </div>
                                                         <div style="text-align: start; margin: 6px 0;">暗証番号確認</div>
@@ -66,7 +66,7 @@
                                             </div>
                                             <div class="card-footer text-center py-2">
                                                 <div class="text-primary pb-1">または</div>
-                                                <a href="http://localhost:8080/oauth2/authorization/google?redirect_uri=http://localhost:8080/&mode=login"><img src="/img/web_light_rd_na@4x.png" style="width: 48px;height: 48px;"></a>
+                                                <a href="http://localhost:8080/oauth2/authorization/google?redirect_uri=http://localhost:8080/register&mode=login"><img src="/img/web_light_rd_na@4x.png" style="width: 48px;height: 48px;"></a>
                                             </div>
                                         </div>
                                     </div>

@@ -1,5 +1,6 @@
 package co.kr.necohost.semi.app.login;
 
+import co.kr.necohost.semi.domain.model.dto.AccountRequest;
 import co.kr.necohost.semi.domain.service.CategoryService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -20,7 +21,12 @@ public class LoginController {
 
     @RequestMapping(value = "/register", method = RequestMethod.GET)
     public String register(Model model, HttpSession session, @RequestParam Map<String, Object> params) {
+        AccountRequest accountRequest = new AccountRequest();
+        if(session.getAttribute("accountRequest") != null){
+            accountRequest = (AccountRequest) session.getAttribute("accountRequest");
+        }
         model.addAttribute("session", session);
+        model.addAttribute("accountRequest", accountRequest);
         model.addAttribute("categories", categoryService.getAllCategories());
         return "login/register.html";
     }

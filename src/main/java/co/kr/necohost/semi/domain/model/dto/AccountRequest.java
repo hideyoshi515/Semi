@@ -17,6 +17,7 @@ public class AccountRequest {
     private String phone;
     private int msRank;
     private int msPoint;
+    private String msPass;
     private String OAuth;
 
     public Account toEntity(){
@@ -29,6 +30,7 @@ public class AccountRequest {
         account.setPhone(phone);
         account.setMsRank(msRank);
         account.setMsPoint(msPoint);
+        account.setMsPass(msPass);
         account.setOAuth(OAuth);
         return account;
     }
