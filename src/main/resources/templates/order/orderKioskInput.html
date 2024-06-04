@@ -3,30 +3,38 @@
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{layout/default_layout}">
->
-<script>
-    function increaseStock(index) {
-        var stockElement = document.getElementById("stock-" + index);
-        var currentStock = parseInt(stockElement.textContent);
-        stockElement.textContent = currentStock + 1;
-    }
-    function  decreaseStock(index) {
-        var stockElement = document.getElementById("stock-" + index);
-        var currentStock = parseInt(stockElement.textContent);
-        if (currentStock > 0) {
-            stockElement.textContent = currentStock - 1;
-        }
-    }
-</script>
+<body>
 <th:block layout:fragment="content">
     <h1>メニュー</h1>
     <div th:each="menu, iterStat : ${menus}">
-        메뉴이름 : <span th:text="${menu.name}"></span>
-        가격 : <span th:text="${menu.price}"></span>
-        남은수량 : <span  id="stock-[[${iterStat.index}]]" th:text="${menu.stock}"></span>
-        <button type="button" onclick="increaseStock([[${iterStat.index}]])">+</button>
-        <button type="button" onclick="decreaseStock([[${iterStat.index}]])">-</button>
+        メニュー : <span th:text="${menu.name}"></span>
+        <br>
+        値段 : <span th:text="${menu.price}"></span>
+        <br>
+        残り : <span th:text="${menu.stock}"></span>
+        <br>
+        數量: <input type="number" th:id="'quantity-' + ${iterStat.index}" value="0" readonly/>
+        <button th:onclick="'increaseQuantity(' + ${iterStat.index} + ')'">+</button>
+        <button th:onclick="'decreaseQuantity(' + ${iterStat.index} + ')'">-</button>
+        <br>
+        <br>
     </div>
     <button>결제</button>
 </th:block>
+<script>
+    function increaseQuantity(menuIndex) {
+        var quantityInput = document.getElementById('quantity-' + menuIndex);
+        var currentValue = parseInt(quantityInput.value);
+        quantityInput.value = currentValue + 1;
+    }
+
+    function decreaseQuantity(menuIndex) {
+        var quantityInput = document.getElementById('quantity-' + menuIndex);
+        var currentValue = parseInt(quantityInput.value);
+        if (currentValue > 0) {
+            quantityInput.value = currentValue - 1;
+        }
+    }
+</script>
+</body>
 </html>
