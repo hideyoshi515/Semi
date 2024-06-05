@@ -8,6 +8,7 @@
     <title>Title</title>
 </head>
 <body>
+<th:block layout:fragment="content">
 <form th:object="${salesRequest}" method="post" action="/createSales">
 
 
@@ -24,5 +25,6 @@
     <button>売り上げ登録</button>
 </form>
 <button onclick="location.href='/salesMain'">メイン画面に復帰</button>
+</th:block>
 </body>
 </html>
