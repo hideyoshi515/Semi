@@ -3,8 +3,19 @@
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{layout/default_layout}">
->
 <th:block layout:fragment="content">
-
+    <h1>決済ページ</h1>
+    <div th:each="entry : ${orderedItems}">
+        メニュー : <span th:text="${entry.key.name}"></span>
+        <br>
+        値段 : <span th:text="${entry.key.price}"></span>
+        <br>
+        數量 : <span th:text="${entry.value}"></span>
+        <br>
+        總收量　: <span th:text="${entry.key.price * entry.value}"></span>
+        <br>
+        <br>
+    </div>
+    <h2>合計 : <span th:text="${totalPrice}"></span></h2>
 </th:block>
 </html>
