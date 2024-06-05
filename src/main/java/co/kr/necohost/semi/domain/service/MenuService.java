@@ -23,7 +23,7 @@ public class MenuService {
             return menuRepository.findAllByOrderByCategory();
     }
 
-    public void deleteMenuById(Long id){
+    public void deleteMenuById(Long id) {
         menuRepository.deleteById(id);
     }
 
@@ -69,8 +69,5 @@ public class MenuService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-
-
     }
 }

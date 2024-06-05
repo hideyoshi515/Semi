@@ -19,16 +19,17 @@ public class SalesService {
         this.SalesRepository = salesRepository;
         this.salesRepository = salesRepository;
     }
+
     //create
     public void save(SalesRequest salesRequest) {
         salesRepository.save(salesRequest.toEntity());
     }
 
-
     //read everything
     public List<Sales> findAll() {
         return salesRepository.findAll();
     }
+
     //read by id//update?
     public Sales findById(Long id) {
         return salesRepository.findById(id).orElse(null);
@@ -39,10 +40,11 @@ public class SalesService {
         salesRepository.deleteById(salesRequest.getId());
     }
 
-
     public int getTotalSalesByCategory(int categoryId, int process) {
         List<Sales> allSales = salesRepository.findByCategoryAndProcess(categoryId, process);
+
         int totalSales = 0;
+
         for (Sales sale : allSales) {
             totalSales += sale.getPrice() * sale.getQuantity();
         }
@@ -108,8 +110,4 @@ public class SalesService {
                 .mapToDouble(s -> s.getPrice() * s.getQuantity())
                 .sum();
     }
-
-
-
-
 }

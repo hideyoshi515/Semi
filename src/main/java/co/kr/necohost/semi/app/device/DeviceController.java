@@ -33,6 +33,7 @@ public class DeviceController {
         model.addAttribute("devices", device);
         return "order/orderInput.html";
     }
+
     @PostMapping("/order")
     public String postOrder(DeviceRequest deviceRequest, Model model, @RequestParam Map<String, Object> params) {
         model.addAttribute("deviceRequest", deviceRequest);
@@ -65,7 +66,4 @@ public class DeviceController {
 
         return "order/orderPaymentInput.html";
     }
-
-
-
 }
