@@ -3,7 +3,6 @@
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{layout/default_layout}">
->
 
 <head>
     <meta charset="UTF-8">
@@ -23,8 +22,8 @@
         th {
             background-color: #f2f2f2;
         }
-
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <th:block layout:fragment="content">
@@ -44,9 +43,49 @@
         </tr>
         </tbody>
     </table>
+
+    <!-- 차트를 그릴 캔버스 추가 -->
+    <canvas id="yearlySalesChart" width="400" height="200"></canvas>
+
     <button onclick="location.href='/salesMain'">メイン画面に復帰</button>
     <button onclick="location.href='/total-by-year-input'">年度を入力して総売上高検索</button>
 
+    <!-- Thymeleaf 변수를 JavaScript로 전달 -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var yearlySalesData = /*[[${yearlySales}]]*/ {};
+        /*]]>*/
+
+        var labels = Object.keys(yearlySalesData);
+        var data = Object.values(yearlySalesData);
+
+        // 차트를 그리는 함수
+        var ctx = document.getElementById('yearlySalesChart').getContext('2d');
+        var yearlySalesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '総売上高',
+                    data: data,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                animation: {
+                    duration: 2000, // 애니메이션 지속 시간 (밀리초 단위)
+                    easing: 'easeInOutBounce' // 애니메이션 이징 효과
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
     </body>
 </th:block>
 </html>
