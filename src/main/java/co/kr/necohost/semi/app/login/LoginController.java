@@ -5,6 +5,7 @@ import co.kr.necohost.semi.domain.model.entity.Account;
 import co.kr.necohost.semi.domain.repository.AccountRepository;
 import co.kr.necohost.semi.domain.service.AccountService;
 import co.kr.necohost.semi.domain.service.CategoryService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -30,12 +31,18 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.GET)
-    public String getRegister(Model model, HttpSession session, @RequestParam Map<String, Object> params) {
+    public String getRegister(Model model, HttpSession session, HttpServletRequest request,@RequestParam Map<String, Object> params) {
         AccountRequest accountRequest = new AccountRequest();
         model.addAttribute("session", session);
         model.addAttribute("categories", categoryService.getAllCategories());
+        String uri =  request.getHeader("Referer");
+        if(uri != null && !uri.contains("/register") && !uri.contains("/signin")){
+            session.setAttribute("prevpage", uri);
+        }else{
+            session.setAttribute("prevpage", "/");
+        }
         if (session.getAttribute("account") != null) {
-            return "redirect:/";
+            return "redirect:"+session.getAttribute("prevpage");
         }
         if (session.getAttribute("accountRequest") != null) {
             accountRequest = (AccountRequest) session.getAttribute("accountRequest");
@@ -74,17 +81,40 @@ public class LoginController {
         session.setAttribute("account", account);
         session.setMaxInactiveInterval(60 * 60 * 24); //60s * 60m * 24h
         session.removeAttribute("accountRequest");
-        return "redirect:/";
+        return "redirect:"+session.getAttribute("prevpage");
 
     }
 
     @RequestMapping(value = "/signin", method = RequestMethod.GET)
-    public String getSignin(Model model, HttpSession session, @RequestParam Map<String, Object> params) {
+    public String getSignin(Model model, HttpSession session, HttpServletRequest request, @RequestParam Map<String, Object> params) {
+        String uri = request.getHeader("Referer");
+        if (uri != null && !uri.contains("/register") && !uri.contains("/signin")) {
+            session.setAttribute("prevpage", uri);
+        } else {
+            session.setAttribute("prevpage", "/");
+        }
         AccountRequest accountRequest = new AccountRequest();
+        model.addAttribute("session", session);
+        model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("accountRequest", accountRequest);
         return "login/login.html";
     }
 
+/*    @RequestMapping(value = "/signin", method = RequestMethod.GET)
+    public String getSignin(Model model, HttpSession session, HttpServletRequest request, @RequestParam Map<String, Object> params) {
+        String uri = request.getHeader("Referer");
+        if(uri != null && !uri.contains("/register") && !uri.contains("/signin")){
+            session.setAttribute("prevpage", uri);
+        }else{
+            session.setAttribute("prevpage", "/");
+        }
+        AccountRequest accountRequest = new AccountRequest();
+        model.addAttribute("session", session);
+        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("accountRequest", accountRequest);
+        return "login/login.html";
+    }*/
+/*
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
     public String postSignin(Model model, @ModelAttribute("accountRequest") AccountRequest accountRequest, HttpSession session, @RequestParam Map<String, Object> params) {
         Account target = accountRepository.findByEmail(accountRequest.getEmail()).orElse(null);
@@ -94,7 +124,7 @@ public class LoginController {
                 session.setAttribute("account", target);
                 session.setMaxInactiveInterval(60 * 60 * 24);
                 session.removeAttribute("accountRequest");
-                return "redirect:/";
+                return "redirect:"+session.getAttribute("prevpage");
             } else {
                 errorCode = "パスワードが間違います";
             }
@@ -103,5 +133,21 @@ public class LoginController {
         }
         model.addAttribute("errorCode", errorCode);
         return "/login/login.html";
+    }*/
+
+
+    @RequestMapping(value = "/mypage",method = RequestMethod.GET)
+    public String getMypage(Model model, HttpSession session, @RequestParam Map<String, Object> params) {
+        Account account = (Account) session.getAttribute("account");
+        if(account==null){
+            model.addAttribute("account", null);
+            return "redirect:/signin";
+        }else{
+            model.addAttribute("account", account);
+        }
+
+        model.addAttribute("session", session);
+        model.addAttribute("categories", categoryService.getAllCategories());
+        return "user/mypage.html";
     }
 }
