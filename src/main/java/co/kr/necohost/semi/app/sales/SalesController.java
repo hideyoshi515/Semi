@@ -66,6 +66,7 @@ public class SalesController {
     public String getYearlySalesByProcess(Model model) {
         Map<Integer, Double> yearlySales = salesService.getYearlySalesByProcess();
         model.addAttribute("yearlySales", yearlySales);
+        System.out.println(yearlySales);
         return "/sales/salestotalbyyear.html";
     }
 
