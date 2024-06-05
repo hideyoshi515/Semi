@@ -20,7 +20,7 @@ public class MenuService {
     }
 
     public List<Menu> getAllMenus() {
-        return menuRepository.findAll();
+            return menuRepository.findAllByOrderByCategory();
     }
 
     public void deleteMenuById(Long id) {

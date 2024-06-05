@@ -2,16 +2,14 @@ package co.kr.necohost.semi.app.menu;
 
 
 import co.kr.necohost.semi.domain.model.dto.MenuRequest;
+import co.kr.necohost.semi.domain.model.dto.MenuWithCategoryRequest;
 import co.kr.necohost.semi.domain.model.entity.Category;
 import co.kr.necohost.semi.domain.model.entity.Menu;
 import co.kr.necohost.semi.domain.service.CategoryService;
 import co.kr.necohost.semi.domain.service.MenuService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +32,9 @@ public class MenuController {
     @GetMapping("/menuList")
     public String MenuList(Model model) {
         List<Menu> menus = menuService.getAllMenus();
+        List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("menus", menus);
+        model.addAttribute("categories", menus);
         return "/menu/menuList.html";
     }
 
@@ -67,10 +67,14 @@ public class MenuController {
     }
 
     @GetMapping("/menuDetail")
-    public String detailMenu(Model model, @RequestParam Map<String, Object> params) {
+    @ResponseBody
+    public MenuWithCategoryRequest detailMenu(Model model, @RequestParam Map<String, Object> params) {
         Menu menu = menuService.getMenuById(Long.parseLong(params.get("id").toString()));
-        model.addAttribute("menu", menu);
-        return "/menu/menuDetail.html";
+        Category category = categoryService.findById((int) menu.getCategory());
+        MenuWithCategoryRequest MWCR = new MenuWithCategoryRequest();
+        MWCR.setCategory(category);
+        MWCR.setMenu(menu);
+        return MWCR;
     }
 
     @GetMapping("/menuDelete")
