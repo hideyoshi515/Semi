@@ -9,5 +9,6 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account, Long> {
     @Cacheable("findByEmail")
     Optional<Account> findByEmail(String email);
+
     Optional<Account> findByPhone(String phone);
 }

@@ -11,11 +11,13 @@ public class DeviceRequest {
     private long device;
     private long deviceNum;
 
-    public Device toEntity(){
+    public Device toEntity() {
         Device device = new Device();
+
         device.setId(id);
         device.setDevice(this.device);
         device.setDeviceNum(deviceNum);
+
         return device;
     }
 }

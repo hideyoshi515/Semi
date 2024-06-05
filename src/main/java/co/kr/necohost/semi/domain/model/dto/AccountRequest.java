@@ -20,13 +20,13 @@ public class AccountRequest {
     private String email;
 
     @NotBlank(message = "パスワードを入力してください")
-    @Pattern(regexp="^[a-zA-Z0-9\\W]{8,45}$",
+    @Pattern(regexp = "^[a-zA-Z0-9\\W]{8,45}$",
             message = "パスワードは半角英数字・記号のみ８文字以上入力してください")
     private String password;
     private String name;
     private LocalDate birthday;
 
-    @Pattern(regexp = "^[0-9]{11}$",message = "携帯電話番号はハイフンを抜く入力してください")
+    @Pattern(regexp = "^[0-9]{11}$", message = "携帯電話番号はハイフンを抜く入力してください")
     private String phone;
     private int msRank;
     private int msPoint;
@@ -35,8 +35,9 @@ public class AccountRequest {
     private String msPass;
     private String OAuth;
 
-    public Account toEntity(){
+    public Account toEntity() {
         Account account = new Account();
+
         account.setId(id);
         account.setEmail(email);
         account.setPassword(password);
@@ -47,6 +48,7 @@ public class AccountRequest {
         account.setMsPoint(msPoint);
         account.setMsPass(msPass);
         account.setOAuth(OAuth);
+
         return account;
     }
 }

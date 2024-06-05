@@ -13,11 +13,9 @@ import lombok.Setter;
 @Setter
 
 public class Device {
-
-    private long device;
-    private long deviceNum;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    private long device;
+    private long deviceNum;
 }
