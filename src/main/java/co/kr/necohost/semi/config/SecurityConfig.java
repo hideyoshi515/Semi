@@ -7,6 +7,7 @@ import co.kr.necohost.semi.oauth2.handler.OAuth2AuthenticationFailureHandler;
 import co.kr.necohost.semi.oauth2.handler.OAuth2AuthenticationSuccessHandler;
 import co.kr.necohost.semi.oauth2.service.CustomOAuth2UserService;
 import co.kr.necohost.semi.oauth2.user.OAuth2UserUnlinkManager;
+import co.kr.necohost.semi.security.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

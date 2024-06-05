@@ -1,22 +1,20 @@
-package co.kr.necohost.semi.config;
+package co.kr.necohost.semi.security;
 
 import co.kr.necohost.semi.domain.model.entity.Account;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
 
+@Getter
 public class CustomUserDetails implements UserDetails {
 
     private final Account account;
 
     public CustomUserDetails(Account account) {
         this.account = account;
-    }
-
-    public Account getAccount() {
-        return account;
     }
 
     @Override

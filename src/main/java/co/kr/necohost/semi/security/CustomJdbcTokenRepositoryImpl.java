@@ -1,8 +1,7 @@
-package co.kr.necohost.semi.config;
+package co.kr.necohost.semi.security;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentRememberMeToken;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 import javax.sql.DataSource;
 import java.util.Date;
@@ -22,16 +21,11 @@ public class CustomJdbcTokenRepositoryImpl extends JdbcTokenRepositoryImpl {
 
     @Override
     public void createNewToken(PersistentRememberMeToken token) {
-        System.out.println("[I]username:"+token.getUsername());
-        System.out.println("[I]series:"+token.getSeries());
-        System.out.println("[I]tokenValue:"+token.getTokenValue());
         jdbcTemplate.update(INSERT_TOKEN_SQL, token.getUsername(), token.getSeries(), token.getTokenValue(), token.getDate());
     }
 
     @Override
     public void updateToken(String series, String tokenValue, Date lastUsed) {
-        System.out.println("[U]series:"+series);
-        System.out.println("[U]tokenValue:"+tokenValue);
         jdbcTemplate.update(UPDATE_TOKEN_SQL, tokenValue, lastUsed, series);
     }
 
@@ -44,9 +38,6 @@ public class CustomJdbcTokenRepositoryImpl extends JdbcTokenRepositoryImpl {
                     rs.getString("token"),
                     rs.getTimestamp("last_used")
             ), seriesId);
-            System.out.println("[S]username:"+result.getUsername());
-            System.out.println("[S]series:"+result.getSeries());
-            System.out.println("[S]tokenValue:"+result.getTokenValue());
             return result;
         } catch (Exception e) {
             return null;

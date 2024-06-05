@@ -1,7 +1,5 @@
-package co.kr.necohost.semi.config;
+package co.kr.necohost.semi.security;
 
-import ch.qos.logback.core.util.StringUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

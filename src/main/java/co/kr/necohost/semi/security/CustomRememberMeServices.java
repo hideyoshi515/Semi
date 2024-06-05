@@ -1,4 +1,4 @@
-package co.kr.necohost.semi.config;
+package co.kr.necohost.semi.security;
 
 import co.kr.necohost.semi.domain.model.entity.Account;
 import co.kr.necohost.semi.domain.repository.AccountRepository;
