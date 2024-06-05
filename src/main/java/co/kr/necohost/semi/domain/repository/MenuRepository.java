@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface MenuRepository extends JpaRepository<Menu, Long> {
     List<Menu> findAll();
+    List<Menu> findAllByOrderByCategory();
+
 
     @Cacheable("cat_menus")
     List<Menu> findByCategory(int category);

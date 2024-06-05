@@ -14,6 +14,10 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
+    public Category findById(int id) {
+        return categoryRepository.findById(id).get();
+    }
+
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }
