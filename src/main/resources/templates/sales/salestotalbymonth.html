@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>月別総売上高</title>
+</head>
+<th:block layout:fragment="content">
+  <body>
+  <h1>月別総売上高</h1>
+  <table>
+    <thead>
+    <tr>
+      <th>年月</th>
+      <th>総売上高</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="entry : ${monthlySales}">
+      <td th:text="${entry.key}"></td>
+      <td th:text="${#numbers.formatDecimal(entry.value, 0, 0)}"></td>
+    </tr>
+    </tbody>
+  </table>
+  <button onclick="location.href='/salesMain'">メイン画面に復帰</button>
+  <button onclick="location.href='/adminMain'">管理者メイン画面に復帰</button>
+  </body>
+</th:block>
+</html>

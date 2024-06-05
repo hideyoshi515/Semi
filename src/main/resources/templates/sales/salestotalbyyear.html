@@ -22,6 +22,16 @@
         th {
             background-color: #f2f2f2;
         }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+        }
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -45,12 +55,13 @@
     </table>
 
     <!-- 차트를 그릴 캔버스 추가 -->
-    <canvas id="yearlySalesChart" width="400" height="200"></canvas>
-
-    <button onclick="location.href='/salesMain'">メイン画面に復帰</button>
+    <div class="chart-container">
+        <canvas id="yearlySalesChart"></canvas>
+    </div>
+    <button onclick="location.href='/adminMain'">管理者メイン画面に復帰</button>
     <button onclick="location.href='/total-by-year-input'">年度を入力して総売上高検索</button>
 
-    <!-- Thymeleaf 변수를 JavaScript로 전달 -->
+    <!-- ThymeleafをJavaScriptに伝達 -->
     <script th:inline="javascript">
         /*<![CDATA[*/
         var yearlySalesData = /*[[${yearlySales}]]*/ {};
@@ -65,18 +76,33 @@
             type: 'bar',
             data: {
                 labels: labels,
-                datasets: [{
-                    label: '総売上高',
-                    data: data,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
+                datasets: [
+                    {
+                        label: '総売上高 (棒グラフ)',
+                        data: data,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: '総売上高 (折れ線グラフ)',
+                        data: data,
+                        type: 'line',
+                        borderColor: 'rgba(0, 0, 0, 1)',
+                        backgroundColor: 'rgba(0, 0, 0, 0)',
+                        borderWidth: 2,
+                        fill: false,
+                        yAxisID: 'y'
+                    }
+                ]
             },
             options: {
+                responsive: true,
+                maintainAspectRatio: false,
                 animation: {
-                    duration: 2000, // 애니메이션 지속 시간 (밀리초 단위)
-                    easing: 'easeInOutBounce' // 애니메이션 이징 효과
+                    duration: 500,
+                    easing: 'easeInOutBounce'
                 },
                 scales: {
                     y: {
