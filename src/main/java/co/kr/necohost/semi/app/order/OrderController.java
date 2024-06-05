@@ -87,16 +87,22 @@ public class OrderController {
         return "/order/orderDetail.html";
     }
 
-    @PostMapping("orderApproval")
-    public String postOrderApproval(Model model, @RequestParam Map<String, Object> params) {
+    @GetMapping("orderApproval")
+    public String getOrderApproval(Model model, @RequestParam Map<String, Object> params) {
+        long orderID = Long.parseLong(params.get("orderID").toString());
+        int orderQuantity = Integer.parseInt(params.get("orderQuantity").toString());
+        long menuID = Long.parseLong(params.get("menuID").toString());
+
+        orderService.updateOrderApproval(orderID, orderQuantity, menuID);
+
         return ("redirect:/orderList");
     }
 
     @GetMapping("orderDenial")
     public String getOrderDenial(Model model, @RequestParam Map<String, Object> params) {
-        long ordertID = Long.parseLong(params.get("orderID").toString());
+        long orderID = Long.parseLong(params.get("orderID").toString());
 
-        orderService.updateDenialProcess(ordertID);
+        orderService.updateDenialByProcess(orderID);
 
         return ("redirect:/orderList");
     }

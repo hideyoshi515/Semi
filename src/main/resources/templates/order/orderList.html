@@ -10,6 +10,9 @@
           th:value="${categoryName[orderStat.index]}"></span>
         <span id="orderMenu" th:text="${menuName[orderStat.index]}" th:value="${menuName[orderStat.index]}"></span>
         <span th:if="${menuStock[orderStat.index]} <= 0">매진</span>
+        <button th:if="${menuStock[orderStat.index]} <= 0"
+                th:onclick="|location.href='orderDenial?orderID=${order.id}'|">주문 취소
+        </button>
         <button th:if="${menuStock[orderStat.index]} > 0"
                 th:onclick="|location.href='orderDetail?orderID=${order.id}'|">상세 확인
         </button>
