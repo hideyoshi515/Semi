@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/default_layout}">
+<th:block layout:fragment="content">
+    <h1>決済ページ</h1>
+    <form th:object="${deviceRequest}" method="post" action="orderPayment">
+        <br>
+        <div th:each="entry : ${orderedItems}">
+            メニュー : <span th:text="${entry.key.name}"></span>
+            <br>
+            値段 : <span th:text="${entry.key.price}"></span>
+            <br>
+            數量 : <span th:text="${entry.value}"></span>
+            <br>
+            總收量　: <span th:text="${entry.key.price * entry.value}"></span>
+            <br>
+            <br>
+            <input type="hidden" th:field="*{quantities[__${entry.key.id}__]}" th:value="${entry.value}">
+        </div>
+        <input type="hidden" th:field="*{device}" th:value="${device}">
+        <input type="hidden" th:field="*{deviceNum}" th:value="${deviceNum}">
+        <input type="hidden" th:field="*{orderNum}" th:value="${orderNum}">
+        <h2>合計 : <span th:text="${totalPrice}"></span>￦</h2>
+        <br>
+        <div>
+            <button type="submit" name="paymentMethod" value="CASH">現金</button>
+            <button type="submit" name="paymentMethod" value="CARD">カード</button>
+            <button type="submit" name="paymentMethod" value="PAY">PAY</button>
+        </div>
+    </form>
+    <br>
+    <br>
+    <br>
+    <button onclick="location.href='/order'">取り消し</button>
+</th:block>
+</html>
