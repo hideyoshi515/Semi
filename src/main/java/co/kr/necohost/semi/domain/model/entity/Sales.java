@@ -26,8 +26,4 @@ public class Sales {
     private int deviceNum;
     private int orderNum;
     private int process;
-
-
-
-
 }

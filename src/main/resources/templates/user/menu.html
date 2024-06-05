@@ -11,7 +11,7 @@
                 <div class="d-flex justify-content-around my-5">
                     <div class="border text-center align-content-center" th:each="menu: ${menus}"
                          th:style="|width:200px !important;height:180px !important;|">
-                        <img th:src="|/img/${menu.image}|" th:style="|width:120px;height:90px;|">
+                        <img th:src="|/${menu.image}|" th:style="|width:120px;height:90px;|">
                         <div th:text="${menu.name}"></div>
                         <div th:text="${menu.price}"></div>
                     </div>

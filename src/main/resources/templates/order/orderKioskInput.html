@@ -22,7 +22,7 @@
     </form>
 </th:block>
 <script>
-    function updateQuantity(inputElement){
+    function updateQuantity(inputElement) {
         var newValue = parseInt(inputElement.value);
         if (isNaN(newValue) || newValue < 0) {
             inputElement.value = 0;

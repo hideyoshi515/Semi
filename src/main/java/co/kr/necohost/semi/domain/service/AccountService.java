@@ -13,30 +13,33 @@ import java.util.Map;
 @Service
 public class AccountService {
     AccountRepository accountRepository;
+
     public AccountService(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
 
-    public boolean isExit(AccountRequest accountRequest){
-       Account check = accountRepository.findByEmail(accountRequest.getEmail()).orElse(null);
-       return check != null;
+    public boolean isExit(AccountRequest accountRequest) {
+        Account check = accountRepository.findByEmail(accountRequest.getEmail()).orElse(null);
+        return check != null;
     }
 
-    public boolean isPhoneExit(AccountRequest accountRequest){
+    public boolean isPhoneExit(AccountRequest accountRequest) {
         Account check = accountRepository.findByPhone(accountRequest.getPhone()).orElse(null);
         return check != null;
     }
 
-    public Map<String, String> validateHandling(Errors errors){
+    public Map<String, String> validateHandling(Errors errors) {
         Map<String, String> errorMap = new HashMap<String, String>();
-        for(FieldError fieldError : errors.getFieldErrors()){
+
+        for (FieldError fieldError : errors.getFieldErrors()) {
             String validKeyName = String.format("valid_%s", fieldError.getField());
             errorMap.put(validKeyName, fieldError.getDefaultMessage());
         }
+
         return errorMap;
     }
 
-    public void save(AccountRequest accountRequest){
+    public void save(AccountRequest accountRequest) {
         accountRepository.save(accountRequest.toEntity());
     }
 }

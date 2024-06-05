@@ -15,13 +15,13 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Menu {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
     private String name;
     private int price;
     private long category;
     private int stock;
     private String image;
     private String description;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
 }

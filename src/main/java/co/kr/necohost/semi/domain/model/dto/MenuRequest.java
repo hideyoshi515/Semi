@@ -16,7 +16,7 @@ public class MenuRequest {
     private String description;
     private long id;
 
-    public Menu toEntity(){
+    public Menu toEntity() {
         Menu menu = new Menu();
         menu.setName(name);
         menu.setPrice(price);
@@ -27,8 +27,9 @@ public class MenuRequest {
         return menu;
     }
 
-    public Menu toEntity(String img){
+    public Menu toEntity(String img) {
         Menu menu = new Menu();
+
         menu.setName(name);
         menu.setPrice(price);
         menu.setCategory(category);
@@ -36,6 +37,7 @@ public class MenuRequest {
         menu.setImage(img);
         menu.setDescription(description);
         menu.setId(id);
+
         return menu;
     }
 }
