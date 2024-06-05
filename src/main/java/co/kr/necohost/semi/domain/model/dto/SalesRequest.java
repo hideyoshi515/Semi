@@ -22,7 +22,6 @@ public class SalesRequest {
     private int orderNum;
     private int process;
 
-
     public Sales toEntity() {
         Sales sales = new Sales();
 

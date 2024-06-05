@@ -13,14 +13,15 @@
         <br>
         残り : <span th:text="${menu.stock}"></span>
         <br>
-        數量: <input type="number" th:id="'quantity-' + ${iterStat.index}" value="0" min="0" onchange="updateQuantity(this)"/>
+        數量: <input type="number" th:id="'quantity-' + ${iterStat.index}" value="0" min="0"
+                     onchange="updateQuantity(this)"/>
         <br>
         <br>
     </div>
     <button>결제</button>
 </th:block>
 <script>
-    function updateQuantity(inputElement){
+    function updateQuantity(inputElement) {
         var newValue = parseInt(inputElement.value);
         if (isNaN(newValue) || newValue < 0) {
             inputElement.value = 0;

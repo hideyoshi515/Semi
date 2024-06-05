@@ -1,6 +1,5 @@
 package co.kr.necohost.semi.domain.model.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 

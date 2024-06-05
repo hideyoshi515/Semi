@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/default_layout}">
+>
+<th:block layout:fragment="content">
+    <div th:each="order : ${orderList}">
+        종류 : <span id="orderCategory" th:text="${categoryName[orderStat.index]}"
+                   th:value="${categoryName[orderStat.index]}"></span>
+        <br>
+        수량 : <span id="orderQuantity" th:text="${order.quantity}" th:value="${order.quantity}"></span>
+        <br>
+        메뉴 : <span id="orderMenu" th:text="${menuName[orderStat.index]}" th:value="${menuName[orderStat.index]}"></span>
+        <br>
+        단가 : <span id="orderPrice" th:text="${order.price}"
+                   th:value="${order.price}"></span>
+        <br>
+        총 가격 : <span id="orderTotalPrice" th:text="${order.quantity * order.price}"
+                     th:value="${order.quantity * order.price}"></span>
+        <br>
+        <button onclick="location.href='orderList'">주문 메인으로</button>
+        <button onclick="location.href='orderApproval'">주문 승인</button>
+        <button th:onclick="|location.href='orderDenial?orderID=${order.id}'|">주문 거부</button>
+    </div>
+</th:block>
+</html>
