@@ -6,19 +6,20 @@
 <body>
 <th:block layout:fragment="content">
     <h1>メニュー</h1>
-    <div th:each="menu, iterStat : ${menus}">
-        メニュー : <span th:text="${menu.name}"></span>
-        <br>
-        値段 : <span th:text="${menu.price}"></span>
-        <br>
-        残り : <span th:text="${menu.stock}"></span>
-        <br>
-        數量: <input type="number" th:id="'quantity-' + ${iterStat.index}" value="0" min="0"
-                     onchange="updateQuantity(this)"/>
-        <br>
-        <br>
-    </div>
-    <button>결제</button>
+    <form method="post" action="orderPayment">
+        <div th:each="menu, iterStat : ${menus}">
+            メニュー : <span th:text="${menu.name}"></span>
+            <br>
+            値段 : <span th:text="${menu.price}"></span>
+            <br>
+            残り : <span th:text="${menu.stock}"></span>
+            <br>
+            數量: <input type="number" th:name="'quantities[' + ${menu.id} + ']'" value="0" min="0" onchange="updateQuantity(this)"/>
+            <br>
+            <br>
+        </div>
+        <button type="submit">결제</button>
+    </form>
 </th:block>
 <script>
     function updateQuantity(inputElement) {

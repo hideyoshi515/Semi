@@ -1,5 +1,6 @@
 package co.kr.necohost.semi.app.device;
 
+import co.kr.necohost.semi.app.menu.MenuController;
 import co.kr.necohost.semi.domain.model.dto.DeviceRequest;
 import co.kr.necohost.semi.domain.model.entity.Device;
 import co.kr.necohost.semi.domain.model.entity.Menu;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,11 +43,27 @@ public class DeviceController {
         return "order/orderKioskInput.html";
     }
 
-    @GetMapping("/orderPayment")
-    public String orderPayment(Model model) {
-        model.addAttribute("deviceRequest", new DeviceRequest());
-        List<Menu> menus = menuService.getAllMenus();
-        model.addAttribute("menus", menus);
+    @PostMapping("/orderPayment")
+    public String checkout(@RequestParam Map<String, String> quantities, Model model) {
+        Map<Menu, Integer> orderedItems = new HashMap<>();
+        double totalPrice = 0;
+
+        for (Map.Entry<String, String> entry : quantities.entrySet()) {
+            if (entry.getKey().startsWith("quantities[")) {
+                String idStr = entry.getKey().substring(11, entry.getKey().length() - 2);
+                Long id = Long.parseLong(idStr);
+                Menu menu = menuService.getMenuById(id);
+                int quantity = Integer.parseInt(entry.getValue());
+                if (quantity > 0) {
+                    orderedItems.put(menu, quantity);
+                    totalPrice += menu.getPrice() * quantity;
+                }
+            }
+        }
+
+        model.addAttribute("orderedItems", orderedItems);
+        model.addAttribute("totalPrice", totalPrice);
+
         return "order/orderPaymentInput.html";
     }
 }

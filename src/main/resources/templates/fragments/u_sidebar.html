@@ -5,15 +5,19 @@
         <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
             <div class="sb-sidenav-menu">
                 <div class="nav">
-                    <div class="sb-sidenav-menu-heading">注文</div>
-                    <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                <a class="fs-6 sb-sidenav-menu-heading text-light text-decoration-none" href="/">ホーム</a>
+                    <div class="fs-6 sb-sidenav-menu-heading text-light">注文</div>
+                    <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts"
+                       aria-expanded="false" aria-controls="collapseLayouts">
                         <div class="sb-nav-link-icon"><i class="fas fa-table-list"></i></div>
                         メニュー
                         <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                     </a>
-                    <div class="collapse show" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                    <div class="collapse show" id="collapseLayouts" aria-labelledby="headingOne"
+                         data-bs-parent="#sidenavAccordion">
                         <nav class="sb-sidenav-menu-nested nav" th:each="category : ${categories}">
-                            <a class="nav-link" th:href="|/order/menu?category=${category.id}|" th:text="${category.name}"></a>
+                            <a class="nav-link" th:href="|/order/menu?category=${category.id}|"
+                               th:text="${category.name}"></a>
                         </nav>
                     </div>
                 </div>
