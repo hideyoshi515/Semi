@@ -14,9 +14,7 @@ public class DeviceService {
         this.deviceRepository = deviceRepository;
     }
 
-    public List<Device> findAll(){
+    public List<Device> findAll() {
         return deviceRepository.findAll();
     }
-
-
 }

@@ -20,10 +20,10 @@ public class MenuService {
     }
 
     public List<Menu> getAllMenus() {
-            return menuRepository.findAll();
+        return menuRepository.findAll();
     }
 
-    public void deleteMenuById(Long id){
+    public void deleteMenuById(Long id) {
         menuRepository.deleteById(id);
     }
 
@@ -69,8 +69,5 @@ public class MenuService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-
-
     }
 }
