@@ -5,6 +5,33 @@
 <head>
   <meta charset="UTF-8">
   <title>月別総売上高</title>
+  <style>
+    table {
+      width: 50%;
+      border-collapse: collapse;
+      margin: 25px 0;
+      font-size: 18px;
+      text-align: left;
+    }
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .chart-container {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+    }
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <th:block layout:fragment="content">
   <body>
@@ -23,8 +50,65 @@
     </tr>
     </tbody>
   </table>
-  <button onclick="location.href='/salesMain'">メイン画面に復帰</button>
+  <button onclick="location.href='/total-by-yearandmonth-input'">年度と月を入力して総売上高を検索</button>
   <button onclick="location.href='/adminMain'">管理者メイン画面に復帰</button>
+
+  <!-- 차트 짜보자 -->
+  <div class="chart-container">
+    <canvas id="monthlySalesChart"></canvas>
+  </div>
+  <!-- ThymeleafをJavaScriptに伝達 -->
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    var monthlySalesData = /*[[${monthlySales}]]*/ {};
+    /*]]>*/
+
+    // 날짜별 오름차순으로 정렬 (이미 서버에서 정렬됨)
+    var labels = Object.keys(monthlySalesData);
+    var data = Object.values(monthlySalesData);
+
+    // 차트를 그리는 함수
+    var ctx = document.getElementById('monthlySalesChart').getContext('2d');
+    var monthlySalesChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: '総売上高 (棒グラフ)',
+            data: data,
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1,
+            yAxisID: 'y'
+          },
+          {
+            label: '総売上高 (折れ線グラフ)',
+            data: data,
+            type: 'line',
+            borderColor: 'rgba(0, 0, 0, 1)',
+            backgroundColor: 'rgba(0, 0, 0, 0)',
+            borderWidth: 2,
+            fill: false,
+            yAxisID: 'y'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: {
+          duration: 500,
+          easing: 'easeInOutBounce'
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  </script>
   </body>
 </th:block>
 </html>

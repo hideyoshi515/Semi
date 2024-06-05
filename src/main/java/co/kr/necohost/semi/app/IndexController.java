@@ -11,7 +11,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class IndexController {
     @RequestMapping(value = "/index",method = RequestMethod.GET)
-    public String index(Model model, @RequestParam(name = "lang", required = false) String lang, HttpSession session) {
+    public String getIndex(Model model, @RequestParam(name = "lang", required = false) String lang, HttpSession session) {
+        model.addAttribute("session", session);
+        model.addAttribute("lang", lang);
+        return "index.html";
+    }
+
+    @RequestMapping(value = "/admin",method = RequestMethod.GET)
+    public String getAdmin(Model model, @RequestParam(name = "lang", required = false) String lang, HttpSession session) {
         model.addAttribute("session", session);
         model.addAttribute("lang", lang);
         return "index.html";
