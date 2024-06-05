@@ -1,5 +1,6 @@
 package co.kr.necohost.semi.oauth2.handler;
 
+import co.kr.necohost.semi.config.CustomRememberMeServices;
 import co.kr.necohost.semi.domain.model.dto.AccountRequest;
 import co.kr.necohost.semi.domain.model.entity.Account;
 import co.kr.necohost.semi.domain.repository.AccountRepository;
@@ -14,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -22,12 +24,20 @@ import java.io.IOException;
 import java.util.Optional;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private final OAuth2UserUnlinkManager oAuth2UserUnlinkManager;
     private final AccountRepository accountRepository;
+    private final CustomRememberMeServices rememberMeServices;
+
+    public OAuth2AuthenticationSuccessHandler(HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository, OAuth2UserUnlinkManager oAuth2UserUnlinkManager, AccountRepository accountRepository, CustomRememberMeServices rememberMeServices) {
+        this.httpCookieOAuth2AuthorizationRequestRepository = httpCookieOAuth2AuthorizationRequestRepository;
+        this.oAuth2UserUnlinkManager = oAuth2UserUnlinkManager;
+        this.accountRepository = accountRepository;
+        this.rememberMeServices = rememberMeServices;
+    }
+
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
@@ -76,6 +86,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             if (account != null) {
                 session.setAttribute("account", account);
                 session.setMaxInactiveInterval(60 * 60 * 24); //60s * 60m * 24h
+                rememberMeServices.loginSuccess(request, response, authentication);
             }
 
             String accessToken = principal.getUserInfo().getAccessToken();
