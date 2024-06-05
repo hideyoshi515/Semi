@@ -163,6 +163,14 @@ public class SalesController {
         return "/sales/salestotalbyyearandcategoryinput";
     }
 
+    //6월 5일 오후 6시
+    @GetMapping("/total-by-month")
+    public String getMonthlySalesByProcess(Model model) {
+        Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
+        model.addAttribute("monthlySales", monthlySales);
+        return "/sales/salestotalbymonth";
+    }
+
 
 
 

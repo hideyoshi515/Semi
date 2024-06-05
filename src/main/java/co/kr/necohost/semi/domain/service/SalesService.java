@@ -5,6 +5,8 @@ import co.kr.necohost.semi.domain.model.entity.Sales;
 import co.kr.necohost.semi.domain.repository.SalesRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,13 +86,7 @@ public class SalesService {
                 .sum();
     }
 
-    //作成中
-//    public double getTotalSalesByYearAndMonth(int year, int month) {
-//        List<Sales> salesList = salesRepository.findSalesByYearAndMonthAndProcess(year, month);
-//        return salesList.stream()
-//                .mapToDouble(s -> s.getPrice() * s.getQuantity())
-//                .sum();
-//    }
+
 
     public double getTotalSalesByYearAndMonth(int year, int month) {
         List<Sales> salesList = salesRepository.findSalesByYearAndMonthAndProcess(year, month);
@@ -110,4 +106,43 @@ public class SalesService {
                 .mapToDouble(s -> s.getPrice() * s.getQuantity())
                 .sum();
     }
+
+//6월 5일 5시
+//    public double getTotalSalesByYearAndMonth(int year, int month) {
+//        List<Sales> salesList = salesRepository.findSalesByYearAndMonthAndProcess(year, month);
+//        return salesList.stream()
+//                .mapToDouble(s -> s.getPrice() * s.getQuantity())
+//                .sum();
+//    }
+//6월 5일 5시
+    public Map<String, Double> getMonthlySalesByProcess() {
+        List<Sales> salesList = salesRepository.findYearlySalesByProcess();
+        return salesList.stream()
+                .collect(Collectors.groupingBy(
+                        s -> {
+                            LocalDate date = s.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                            return date.getYear() + "-" + String.format("%02d", date.getMonthValue());
+                        },
+                        Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
+                ));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

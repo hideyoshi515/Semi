@@ -52,5 +52,12 @@ public interface SalesRepository extends JpaRepository<Sales, Long> {
     @Query("SELECT s FROM Sales s WHERE s.process = 1 AND YEAR(s.date) = :year AND s.category = :category")
     List<Sales> findSalesByYearAndCategory(int year, int category);
 
+//6월 5일 오후 6시
+//    @Query("SELECT s FROM Sales s WHERE s.process = 1 AND YEAR(s.date) = :year AND MONTH(s.date) = :month")
+//    List<Sales> findSalesByYearAndMonthAndProcess(@Param("year") int year, @Param("month") int month);
+//6월 5일 오후 6시- 겹치니 주석처리
+//    @Query("SELECT s FROM Sales s WHERE s.process = 1")
+//    List<Sales> findYearlySalesByProcess();
+
 
 }

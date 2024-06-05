@@ -33,7 +33,7 @@
             });
         }
 
-        function update(){
+        function update() {
             location.href = "/menuUpdate?id=" + currentMenu;
         }
     </script>
@@ -66,6 +66,18 @@
         }
     </style>
     <div>
+        <div>
+            <select class="mt-3 ms-3" onchange="(location.href = this.value);" style="width: 180px;">
+                <option value="/menuList">전체</option>
+                <option th:each="category : ${categories}"
+                        th:value="|/menuList?category=${category.id}|"
+                        th:text="${category.name}"
+                        th:selected="${#strings.equals(param.category, category.id)}">
+                </option>
+
+            </select>
+        </div>
+
         <div class="mt-3 d-flex justify-content-around">
             <div class="border text-center align-content-center" th:id="${menu.id}" th:each="menu : ${menus}"
                  style="width: 180px; height: 240px;" th:onclick="|detail(${menu.id})|">
