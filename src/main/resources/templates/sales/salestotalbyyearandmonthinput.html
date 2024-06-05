@@ -21,7 +21,7 @@
     <h3><span th:text="${year}"></span>年<span th:text="${month}"></span>月の結果</h3>
     <h3>総売上高: <span th:text="${#numbers.formatDecimal(totalSales, 0, 0)}"></span>円</h3>
   </div>
-  <button onclick="location.href='/total-by-year'">年度及び月別の総売上高をチャートで閲覧</button>
+  <button onclick="location.href='/total-by-month'">年度及び月別の総売上高をチャートで閲覧</button>
   <button onclick="location.href='/adminMain'">管理者メイン画面に復帰</button>
   </body>
 </th:block>
