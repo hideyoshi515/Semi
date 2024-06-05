@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 @RequestMapping
 @Controller
@@ -19,6 +20,12 @@ public class SalesController {
 
     public SalesController(SalesService salesService) {
         this.salesService = salesService;
+    }
+
+    //店の管理者の初期画面
+    @GetMapping("/adminMain")
+    public String adminMain() {
+        return "/sales/adminmain.html";
     }
 
     //main화면
@@ -62,6 +69,26 @@ public class SalesController {
         return "/sales/salestotalbycategory.html";
     }
 
+//    @GetMapping("/total-by-category")
+//    public String getTotalSalesByCategory(Model model) {
+//        Map<Integer, Integer> totalByCategory = salesService.getTotalSalesByCategory(categoryId,1);
+//
+//        model.addAttribute("totalByCategory", totalByCategory);
+//        return "/sales/salestotalbycategory.html";
+//    }
+
+    @GetMapping("/total-by-category2")
+    public String getTotalSalesByCategory(Model model) {
+        Map<Integer, Double> totalByCategory = salesService.getTotalSalesByCategory();
+        model.addAttribute("totalByCategory", totalByCategory);
+        System.out.println(totalByCategory);
+        return "/sales/salestotalbycategory.html";
+    }
+
+
+
+
+
     @GetMapping("/total-by-year")
     public String getYearlySalesByProcess(Model model) {
         Map<Integer, Double> yearlySales = salesService.getYearlySalesByProcess();
@@ -98,6 +125,33 @@ public class SalesController {
         return "/sales/salestotalbyyearinput";
     }
 
+    //作成中
+//    @GetMapping("/total-by-yearandmonth-input")
+//    public String getTotalSalesByYearAndMonth(@RequestParam(value = "year", required = false) Integer year, @RequestParam(value="month", required = false) Integer month, Model model) {
+//        if (year != null && month != null) {
+//            double totalSles = salesService.getTotalSalesByYearAndMonth(year,month);
+//            model.addAttribute("year",year);
+//            model.addAttribute("month",month);
+//            model.addAttribute("totalSles", totalSles);
+//        }
+//        return "/sales/salestotalbyyearandmonthinput";
+//    }
+
+    @GetMapping("/total-by-yearandmonth-input")
+    public String getTotalSalesByYearAndMonth(@RequestParam(value = "year", required = false) Integer year,
+                                              @RequestParam(value="month", required = false) Integer month, Model model) {
+        if (year != null && month != null) {
+            double totalSales = salesService.getTotalSalesByYearAndMonth(year, month);
+            model.addAttribute("year", year);
+            model.addAttribute("month", month);
+            model.addAttribute("totalSales", totalSales);
+        }
+
+        return "/sales/salestotalbyyearandmonthinput";
+    }
+
+
+
     @GetMapping("/total-by-year-and-category-input")
     public String getTotalSalesByYearAndCategory(@RequestParam(value = "year", required = false) Integer year,
                                                  @RequestParam(value = "category", required = false) Integer category, Model model) {
@@ -109,6 +163,24 @@ public class SalesController {
         }
         return "/sales/salestotalbyyearandcategoryinput";
     }
+
+    //6월 5일 오후 6시
+//    @GetMapping("/total-by-month")
+//    public String getMonthlySalesByProcess(Model model) {
+//        Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
+//        model.addAttribute("monthlySales", monthlySales);
+//        return "/sales/salestotalbymonth";
+//    }
+//6월 5일 오후 6시 30분
+    @GetMapping("/total-by-month")
+    public String getMonthlySalesByProcess(Model model) {
+        Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
+        Map<String, Double> sortedMonthlySales = new TreeMap<>(monthlySales); // TreeMap을 사용하여 정렬
+        model.addAttribute("monthlySales", sortedMonthlySales);
+        return "/sales/salestotalbymonth";
+    }
+
+
 
 
 

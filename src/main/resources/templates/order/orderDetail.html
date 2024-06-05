@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/default_layout}">
+>
+<th:block layout:fragment="content">
+    <div th:each="order : ${orderList}">
+        종류 : <span id="orderCategory" th:text="${categoryName[orderStat.index]}"
+                   th:value="${categoryName[orderStat.index]}"></span>
+        <br>
+        남은 수량 : <span id="orderStock" th:text="${menuStock[orderStat.index]}" th:value="${menuStock[orderStat.index]}"></span>
+        <br>
+        주문 수량 : <span id="orderQuantity" th:text="${order.quantity}" th:value="${order.quantity}"></span>
+        <br>
+        메뉴 : <span id="orderMenu" th:text="${menuName[orderStat.index]}" th:value="${menuName[orderStat.index]}"></span>
+        <br>
+        단가 : <span id="orderPrice" th:text="${order.price}"
+                   th:value="${order.price}"></span>
+        <br>
+        총 가격 : <span id="orderTotalPrice" th:text="${order.quantity * order.price}"
+                     th:value="${order.quantity * order.price}"></span>
+        <br>
+        <button onclick="location.href='orderList'">주문 메인으로</button>
+        <button th:if="${menuStock[orderStat.index] - order.quantity} < 0" disabled>수량 부족</button>
+        <button th:if="${menuStock[orderStat.index] - order.quantity} >= 0"
+                th:onclick="|location.href='orderApproval?orderID=${order.id}&orderQuantity=${menuStock[orderStat.index] - order.quantity}&menuID=${order.menu}'|">
+            주문 승인
+        </button>
+        <button th:onclick="|location.href='orderDenial?orderID=${order.id}'|">주문 거부</button>
+    </div>
+</th:block>
+</html>

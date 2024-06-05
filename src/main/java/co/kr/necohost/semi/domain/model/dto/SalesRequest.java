@@ -22,9 +22,9 @@ public class SalesRequest {
     private int orderNum;
     private int process;
 
-
     public Sales toEntity() {
         Sales sales = new Sales();
+
         sales.setId(id);
         sales.setDate(date);
         sales.setCategory(category);
@@ -37,6 +37,5 @@ public class SalesRequest {
         sales.setProcess(process);
 
         return sales;
-
     }
 }

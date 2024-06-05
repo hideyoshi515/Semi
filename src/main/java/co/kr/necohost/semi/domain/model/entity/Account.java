@@ -3,6 +3,7 @@ package co.kr.necohost.semi.domain.model.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+
 import java.time.LocalDate;
 
 @Entity
@@ -13,6 +14,9 @@ import java.time.LocalDate;
 @ToString
 
 public class Account {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String email;
     private String password;
     private String name;
@@ -22,8 +26,4 @@ public class Account {
     private int msPoint;
     private String msPass;
     private String OAuth;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 }

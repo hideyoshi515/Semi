@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>月別総売上高</title>
+</head>
+<th:block layout:fragment="content">
+  <body>
+  <h1>月別総売上高 </h1>
+  <form action="/total-by-yearandmonth-input" method="get">
+    <label for="year">年度を入力:</label>
+    <input type="number" id="year" name="year">
+    <label for="month">月を入力:</label>
+    <input type="number" id="month" name="month">
+    <button type="submit">総売上高検索</button>
+  </form>
+
+  <div th:if="${year != null}">
+    <h3><span th:text="${year}"></span>年<span th:text="${month}"></span>月の結果</h3>
+    <h3>総売上高: <span th:text="${#numbers.formatDecimal(totalSales, 0, 0)}"></span>円</h3>
+  </div>
+  <button onclick="location.href='/total-by-month'">年度及び月別の総売上高をチャートで閲覧</button>
+  <button onclick="location.href='/adminMain'">管理者メイン画面に復帰</button>
+  </body>
+</th:block>
+</html>

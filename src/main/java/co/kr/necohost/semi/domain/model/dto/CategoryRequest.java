@@ -9,10 +9,12 @@ public class CategoryRequest {
     private long id;
     private String name;
 
-    public Category toEntity(){
+    public Category toEntity() {
         Category category = new Category();
+
         category.setId(id);
         category.setName(name);
+
         return category;
     }
 }
