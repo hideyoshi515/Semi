@@ -3,7 +3,6 @@
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{layout/default_layout}">
->
 <head>
     <meta charset="UTF-8">
     <title>Total Sales by Category</title>
@@ -22,26 +21,99 @@
         th {
             background-color: #f2f2f2;
         }
-
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+        }
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <th:block layout:fragment="content">
-<h1>Total Sales by Category</h1>
-<table>
-    <thead>
-    <tr>
-        <th>Category ID</th>
-        <th>Total Sales</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="totalByCategory : ${totalByCategory}">
-        <td th:text="${totalByCategory.key}"></td>
-        <td th:text="${totalByCategory.value}"></td>
-    </tr>
-    </tbody>
-</table>
-</body>
+    <h1>Total Sales by Category</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>Category ID</th>
+            <th>Total Sales</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="totalByCategory : ${totalByCategory}">
+            <td th:text="${totalByCategory.key}"></td>
+            <td th:text="${totalByCategory.value}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <button onclick="location.href='/salesMain'">メイン画面に復帰</button>
+    <div class="chart-container">
+        <canvas id="categorySalesChart"></canvas>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var categorySalesData = /*[[${totalByCategory}]]*/ {};
+        /*]]>*/
+
+        var labels = Object.keys(categorySalesData);
+        var data = Object.values(categorySalesData);
+
+        // 총합을 계산하여 퍼센테이지를 계산하기 위한 변수
+        var totalSales = data.reduce((a, b) => a + b, 0);
+
+        // 차트를 그리는 함수
+        var ctx = document.getElementById('categorySalesChart').getContext('2d');
+        var categorySalesChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Total Sales by Category',
+                    data: data,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                var value = tooltipItem.raw;
+                                var percentage = (value / totalSales * 100).toFixed(2);
+                                return tooltipItem.label + ': ' + value.toLocaleString() + ' (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 </th:block>
+</body>
 </html>

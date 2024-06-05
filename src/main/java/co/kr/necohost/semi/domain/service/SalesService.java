@@ -62,6 +62,18 @@ public class SalesService {
                         Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
                 ));
     }
+    //20240605確認中
+    public Map<Integer, Double> getTotalSalesByCategory() {
+        List<Sales> salesList = salesRepository.findAllSales();
+        return salesList.stream()
+                .collect(Collectors.groupingBy(
+                        Sales::getCategory,
+                        Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
+                ));
+    }
+
+
+
 
     public double getTotalSalesByYear(int year) {
         List<Sales> salesList = salesRepository.findSalesByYearAndProcess(year);
@@ -69,6 +81,26 @@ public class SalesService {
                 .mapToDouble(s -> s.getPrice() * s.getQuantity())
                 .sum();
     }
+
+    //作成中
+//    public double getTotalSalesByYearAndMonth(int year, int month) {
+//        List<Sales> salesList = salesRepository.findSalesByYearAndMonthAndProcess(year, month);
+//        return salesList.stream()
+//                .mapToDouble(s -> s.getPrice() * s.getQuantity())
+//                .sum();
+//    }
+
+    public double getTotalSalesByYearAndMonth(int year, int month) {
+        List<Sales> salesList = salesRepository.findSalesByYearAndMonthAndProcess(year, month);
+        return salesList.stream()
+                .mapToDouble(s -> s.getPrice() * s.getQuantity())
+                .sum();
+    }
+
+
+
+
+
 
     public double getTotalSalesByYearAndCategory(int year, int category) {
         List<Sales> salesList = salesRepository.findSalesByYearAndCategory(year, category);

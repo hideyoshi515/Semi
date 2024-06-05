@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/default_layout}">
+>
+<head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>16 Buttons</title>
+        <style>
+            .button-container {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .button-container button {
+                width: 150px;
+                height: 70px;
+                margin: 5px;
+                font-size: 16px;
+                box-sizing: border-box;
+            }
+            .button-row {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+            }
+        </style>
+    </head>
+    <body>
+    <th:block layout:fragment="content">
+
+        <div class="button-container">
+            <div class="button-row">
+                <button onclick="location.href='/total-by-year-input'">年度別売上</button>
+                <button onclick="location.href='/total-by-yearandmonth-input'">月次売上</button>
+                <button onclick="location.href='/total-by-category2'">カテゴリー別売上</button>
+                <button>メニュー別の売上</button>
+            </div>
+            <div class="button-row">
+                <button>時間帯別の売上現況(決済)</button>
+                <button>時間帯別の売上現況(注文)</button>
+                <button>在庫管理</button>
+                <button>従業員管理</button>
+            </div>
+            <div class="button-row">
+                <button onclick="location.href='/total-by-year'">２１～２４年の総売上高(テスト用)</button>
+                <button>Button 10</button>
+                <button>Button 11</button>
+                <button>Button 12</button>
+            </div>
+            <div class="button-row">
+                <button>Button 13</button>
+                <button>Button 14</button>
+                <button>Button 15</button>
+                <button>Button 16</button>
+            </div>
+        </div>
+    </th:block>
+    </body>
+</html>

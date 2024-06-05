@@ -4,6 +4,7 @@ import co.kr.necohost.semi.domain.model.entity.Sales;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -29,9 +30,24 @@ public interface SalesRepository extends JpaRepository<Sales, Long> {
     List<Sales> findYearlySalesByProcess();
 
 
-//確認中
+    //20240605確認中
+    @Query("SELECT s FROM Sales s")
+    List<Sales> findAllSales();
+
+
+
+
+
     @Query("SELECT s FROM Sales s WHERE s.process = 1 AND YEAR(s.date) = :year")
     List<Sales> findSalesByYearAndProcess(int year);
+    //作成中
+//    @Query("SELECT s FROM Sales s WHERE s.process = 1 AND YEAR(s.date) =:year And MONTH(s.date) =:month")
+//    List<Sales> findSalesByYearAndMonthAndProcess(int year, int month);
+    //作成中
+    @Query("SELECT s FROM Sales s WHERE s.process = 1 AND FUNCTION('YEAR', s.date) = :year AND FUNCTION('MONTH', s.date) = :month")
+    List<Sales> findSalesByYearAndMonthAndProcess(@Param("year") int year, @Param("month") int month);
+
+
 
     @Query("SELECT s FROM Sales s WHERE s.process = 1 AND YEAR(s.date) = :year AND s.category = :category")
     List<Sales> findSalesByYearAndCategory(int year, int category);
