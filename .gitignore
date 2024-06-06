@@ -48,3 +48,6 @@ replay_pid*
 
 ### VS Code ###
 .vscode/
+
+.idea/modules/Semi.main.iml
+.idea/gradle.xml
