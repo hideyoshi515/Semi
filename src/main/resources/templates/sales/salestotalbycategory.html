@@ -46,7 +46,7 @@
         <tbody>
         <tr th:each="totalByCategory : ${totalByCategory}">
             <td th:text="${totalByCategory.key}"></td>
-            <td th:text="${#numbers.formatInteger(totalByCategory.value,3,'COMMA')}"></td>
+            <td th:text="${#numbers.formatInteger(totalByCategory.value,1,'COMMA')}"></td>
         </tr>
         </tbody>
     </table>

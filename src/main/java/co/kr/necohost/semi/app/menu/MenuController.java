@@ -72,6 +72,8 @@ public class MenuController {
         Menu menu = menuService.getMenuById(Long.parseLong(params.get("id").toString()));
         model.addAttribute("menu", menu);
         MenuRequest menuRequest = new MenuRequest();
+        List<Category> categories = categoryService.getAllCategories();
+        model.addAttribute("categories", categories);
         model.addAttribute("menuRequest", menuRequest);
         return "/menu/menuUpdate.html";
     }
