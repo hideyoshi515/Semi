@@ -5,21 +5,65 @@
         layout:decorate="~{layout/default_layout}">
 >
 <th:block layout:fragment="content">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <div id="wrapper">
         <div class="outerDiv" style="height: 1520px !important;">
             <div class="m-center" style="border: 1px solid black; border-width: 0px 1px 0px;">
-                <div th:text="${lang}"></div>
-                <a href="http://localhost:8080/oauth2/authorization/google?redirect_uri=http://localhost:8080/index&mode=login"><img src="/img/web_light_rd_SI@4x.png"></a>
-                <div th:text="${token}"></div>
-                <div th:if="${session.account} != null" th:text="${session.account.email}"></div>
-                <div th:if="${session.account} != null" th:text="${session.account.password}"></div>
-                <div th:if="${session.account} != null" th:text="${session.account.name}"></div>
-                <div th:if="${session.account} != null" th:text="${#temporals.format(session.account.birthday,'yyyy-MM-dd')}"></div>
-                <div th:if="${session.account} != null" th:text="${session.account.phone}"></div>
-                <div th:if="${session.account} != null" th:text="${session.account.msRank}"></div>
-                <div th:if="${session.account} != null" th:text="${session.account.msPoint}"></div>
-                <div th:if="${session.account} != null" th:text="${session.account.OAuth}"></div>
+                <div class="ms-3 mt-3 text-center" style="width: 500px; height: auto;">
+                    <div>금일 판매 현황</div>
+                    <div class="chart-container" style="width: 480px; height: 240px;">
+                        <canvas id="todaySalesChart"></canvas>
+                    </div>
+                </div>
+                <script th:inline="javascript">
+                    /*<![CDATA[*/
+                    var todaySalesData = /*[[${todaySales}]]*/ {};
+                    /*]]>*/
 
+                    var labels = Object.keys(todaySalesData);
+                    var data = Object.values(todaySalesData);
+
+                    // 차트를 그리는 함수
+                    var ctx = document.getElementById('todaySalesChart').getContext('2d');
+                    var yearlySalesChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    label: '総売上高 (棒グラフ)',
+                                    data: data,
+                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                    borderColor: 'rgba(75, 192, 192, 1)',
+                                    borderWidth: 1,
+                                    yAxisID: 'y'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            animation: {
+                                duration: 500,
+                                easing: 'easeInOutBounce'
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    },
+                                    suggestedMax: 10
+                                }
+                            }
+                        }
+                    });
+                </script>
             </div>
         </div>
     </div>

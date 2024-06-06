@@ -1,13 +1,15 @@
 package co.kr.necohost.semi.domain.service;
 
 import co.kr.necohost.semi.domain.model.dto.SalesRequest;
+import co.kr.necohost.semi.domain.model.entity.Menu;
 import co.kr.necohost.semi.domain.model.entity.Sales;
+import co.kr.necohost.semi.domain.repository.MenuRepository;
 import co.kr.necohost.semi.domain.repository.SalesRepository;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -15,11 +17,11 @@ import java.util.stream.Collectors;
 @Service
 public class SalesService {
     private final SalesRepository salesRepository;
-    SalesRepository SalesRepository;
+    MenuRepository menuRepository;
 
-    public SalesService(SalesRepository salesRepository) {
-        this.SalesRepository = salesRepository;
+    public SalesService(SalesRepository salesRepository, MenuRepository menuRepository) {
         this.salesRepository = salesRepository;
+        this.menuRepository = menuRepository;
     }
 
     //create
@@ -57,6 +59,23 @@ public class SalesService {
     public List<Sales> findByProcess(int process) {
         return salesRepository.findByProcess(process);
     }
+
+    public Map<String, Long> findSalesByToday(){
+
+        LocalDate localDate = LocalDate.now();
+        Date today = Date.valueOf(localDate);
+        List<Sales> salesList = salesRepository.findSalesByToday(today);
+        List<Menu> menuList = menuRepository.findAll();
+        Map<Long, String> menuMap = menuList.stream()
+                .collect(Collectors.toMap(Menu::getId, Menu::getName));
+        Map<String, Long>  result = salesList.stream()
+                .collect(Collectors.groupingBy(
+                        sales -> menuMap.get(Long.parseLong(String.valueOf(sales.getMenu()))),
+                        Collectors.counting()
+                ));
+        return result;
+    }
+
 
     public Map<Integer, Double> getYearlySalesByProcess() {
         List<Sales> salesList = salesRepository.findYearlySalesByProcess();
