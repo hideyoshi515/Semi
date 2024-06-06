@@ -53,3 +53,4 @@ replay_pid*
 .idea/gradle.xml
 
 src/main/resources/static/img
+out/
