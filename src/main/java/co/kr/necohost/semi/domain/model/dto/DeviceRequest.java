@@ -14,6 +14,8 @@ public class DeviceRequest {
     private long deviceNum;
     private Map<Long, Integer> quantities;
     private long orderNum;
+    private String phoneNum;
+    private String pass;
 
     public Device toEntity() {
         Device device = new Device();
@@ -26,6 +28,6 @@ public class DeviceRequest {
     }
     public String toString(){
         return "DeviceRequest [id=" + id + ", device=" + device + ", deviceNum=" + deviceNum
-                + ", quantities=" + quantities + ", orderNum=" + orderNum + "]";
+                + ", quantities=" + quantities + ", orderNum=" + orderNum +  ", phoneNum=" + phoneNum + ", pass=" + pass + "]";
     }
 }

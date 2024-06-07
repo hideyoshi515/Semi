@@ -9,7 +9,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class MenuService {
@@ -78,5 +80,10 @@ public class MenuService {
         }else{
             menuRepository.save(menuRequest.toEntity(menuRepository.findById(menuRequest.getId()).get().getImage()));
         }
+    }
+
+    public Map<Long, List<Menu>> getCategorizedMenus() {
+        List<Menu> menus = menuRepository.findAll();
+        return menus.stream().collect(Collectors.groupingBy(Menu::getCategory));
     }
 }

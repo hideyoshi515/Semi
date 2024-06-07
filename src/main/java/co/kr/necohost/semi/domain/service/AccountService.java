@@ -44,4 +44,11 @@ public class AccountService {
     public void save(AccountRequest accountRequest) {
         accountRepository.save(accountRequest.toEntity());
     }
+
+    public Account getAccountByid(long id) {
+        return accountRepository.findById(id).orElse(null);
+    }
+    public  Account getAccountByPhone(String phone) {
+        return accountRepository.findByPhone(phone).orElse(null);
+    }
 }
