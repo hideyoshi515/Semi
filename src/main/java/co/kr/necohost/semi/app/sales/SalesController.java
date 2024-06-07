@@ -21,70 +21,43 @@ public class SalesController {
         this.salesService = salesService;
     }
 
-
+    // 관리자 판매 메뉴 페이지를 반환하는 메서드
     @RequestMapping(value = "/adminSalesMenu", method=RequestMethod.GET)
     public String getAdminSalesMenu() {
         return "/sales/adminSalesMenu.html";
     }
 
-
+    // 판매 데이터베이스 컨트롤러 메뉴 페이지를 반환하는 메서드
     @RequestMapping(value = "/salesDataBaseControllerMenu", method=RequestMethod.GET)
     public String getSalesDataBaseControllerMenu() {
         return "/sales/salesDataBaseControllerMenu.html";
     }
 
-    @RequestMapping(value="createSales", method=RequestMethod.GET)
+    // 판매 생성 페이지를 반환하는 메서드 (GET 요청)
+    @RequestMapping(value="/createSales", method=RequestMethod.GET)
     public String getCreateSales(Model model) {
         model.addAttribute("salesRequest", new SalesRequest());
         return "/sales/createSales.html";
     }
 
-
-    @RequestMapping(value="createSales", method=RequestMethod.POST)
+    // 새로운 판매를 생성하는 메서드 (POST 요청)
+    @RequestMapping(value="/createSales", method=RequestMethod.POST)
     public String postCreateSales(Model model, @ModelAttribute("salesRequest") SalesRequest salesRequest) {
         salesService.save(salesRequest);
         return "/sales/createSales.html";
     }
 
-
+    // 판매 데이터를 읽어오는 메서드
     @RequestMapping(value="/readSales", method=RequestMethod.GET)
     public String getReadSales(Model model) {
         List<Sales> sales = salesService.findByProcess(1);
-        //값 뿌려주기
         model.addAttribute("sales", sales);
-        //매출삭제용으로 pk값 받기용
         model.addAttribute("salesRequest", new SalesRequest());
         return "/sales/readSales.html";
     }
 
-    //カテゴリー別の総売上高を返還
-
-    //6월 7일 11시 5분
-    //@GetMapping("/total-by-category")
-    @RequestMapping(value = "/totalSalesByCategory", method = RequestMethod.GET)
-    public String getTotalSalesByCategory(Model model, @RequestParam List<Integer> categoryIds) {
-        Map<Integer, Integer> totalByCategory = new HashMap<>();
-        for (Integer categoryId : categoryIds) {
-            int totalSales = salesService.getTotalSalesByCategory(categoryId, 1);
-            totalByCategory.put(categoryId, totalSales);
-        }
-        model.addAttribute("totalByCategory", totalByCategory);
-        return "/sales/totalSalesByCategory.html";
-        //return "/sales/totalSalesByCategory.html";
-    }
-
-//    @GetMapping("/total-by-category")
-//    public String getTotalSalesByCategory(Model model) {
-//        Map<Integer, Integer> totalByCategory = salesService.getTotalSalesByCategory(categoryId,1);
-//
-//        model.addAttribute("totalByCategory", totalByCategory);
-//        return "/sales/totalSalesByCategory.html";
-//    }
-
-    //기능 확인하고 이름 바꾸겠습니다.
-
-    @GetMapping("/totalSalesbyCategory2")
-
+    // 각 카테고리별 총 판매액을 반환하는 메서드
+    @RequestMapping(value = "/totalSalesbyCategory", method = RequestMethod.GET)
     public String getTotalSalesByCategory(Model model) {
         Map<Integer, Double> totalByCategory = salesService.getTotalSalesByCategory();
         model.addAttribute("totalByCategory", totalByCategory);
@@ -92,71 +65,30 @@ public class SalesController {
         return "/sales/totalSalesByCategory.html";
     }
 
-
-    @GetMapping("/total-by-year")
-    public String getYearlySalesByProcess(Model model) {
+    // 연도별 총 판매액을 반환하는 메서드
+    @RequestMapping(value= "/totalSalesByYear", method = RequestMethod.GET)
+    public String getTotalSalesByYear(Model model) {
         Map<Integer, Double> yearlySales = salesService.getYearlySalesByProcess();
         model.addAttribute("yearlySales", yearlySales);
         System.out.println(yearlySales);
-        return "/sales/salestotalbyyear.html";
+        return "/sales/totalSalesByYear.html";
     }
 
-//    @GetMapping("/total-by-year")
-//    public String getTotalSalesByYear(@RequestParam(value = "year", required = false) Integer year, Model model) {
-//        if (year != null) {
-//            double totalSales = salesService.getTotalSalesByYear(year);
-//            model.addAttribute("year", year);
-//            model.addAttribute("totalSales", totalSales);
-//        }
-//        return "/sales/salestotalbyyear";
-//    }
-
-//    @GetMapping("/total-by-year-input")
-//    public String getTotalSalesByYear(@RequestParam("year") int year, Model model) {
-//        double totalSales = salesService.getTotalSalesByYear(year);
-//        model.addAttribute("year", year);
-//        model.addAttribute("totalSales", totalSales);
-//        return "/sales/salestotalbyyearinput";
-//    }
-
-    @GetMapping("/total-by-year-input")
-    public String getTotalSalesByYear(@RequestParam(value = "year", required = false) Integer year, Model model) {
+    // 입력된 연도의 총 판매액을 반환하는 메서드
+    @RequestMapping(value= "/totalSalesByYearInput", method = RequestMethod.GET)
+    public String getTotalSalesByYearInput(@RequestParam(value = "year", required = false) Integer year, Model model) {
         if (year != null) {
             double totalSales = salesService.getTotalSalesByYear(year);
             model.addAttribute("year", year);
             model.addAttribute("totalSales", totalSales);
         }
-        return "/sales/salestotalbyyearinput";
+        return "/sales/totalSalesByYearInput";
     }
 
-    //作成中
-//    @GetMapping("/total-by-yearandmonth-input")
-//    public String getTotalSalesByYearAndMonth(@RequestParam(value = "year", required = false) Integer year, @RequestParam(value="month", required = false) Integer month, Model model) {
-//        if (year != null && month != null) {
-//            double totalSles = salesService.getTotalSalesByYearAndMonth(year,month);
-//            model.addAttribute("year",year);
-//            model.addAttribute("month",month);
-//            model.addAttribute("totalSles", totalSles);
-//        }
-//        return "/sales/salestotalbyyearandmonthinput";
-//    }
-
-    //    @GetMapping("/total-by-yearandmonth-input")
-//    public String getTotalSalesByYearAndMonth(@RequestParam(value = "year", required = false) Integer year,
-//                                              @RequestParam(value="month", required = false) Integer month, Model model) {
-//        if (year != null && month != null) {
-//            double totalSales = salesService.getTotalSalesByYearAndMonth(year, month);
-//            model.addAttribute("year", year);
-//            model.addAttribute("month", month);
-//            model.addAttribute("totalSales", totalSales);
-//        }
-//
-//        return "/sales/salestotalbyyearandmonthinput";
-//    }
-    //6월 7일 기능추가중
-    @GetMapping("/total-by-yearandmonth-input")
-    public String getTotalSalesByYearAndMonth(@RequestParam(value = "year", required = false) Integer year,
-                                              @RequestParam(value = "month", required = false) Integer month, Model model) {
+    // 입력된 연도와 월의 총 판매액 및 성장률을 반환하는 메서드
+    @RequestMapping(value="/totalSalesByYearAndMonthInput" , method = RequestMethod.GET)
+    public String getTotalSalesByYearAndMonthInput(@RequestParam(value = "year", required = false) Integer year,
+                                                   @RequestParam(value = "month", required = false) Integer month, Model model) {
         if (year != null && month != null) {
             double totalSales = salesService.getTotalSalesByYearAndMonth(year, month);
             double growthRate = salesService.getMonthlySalesGrowthRate(year, month);
@@ -165,46 +97,28 @@ public class SalesController {
             model.addAttribute("totalSales", totalSales);
             model.addAttribute("growthRate", growthRate);
         }
-
-        return "/sales/salestotalbyyearandmonthinput";
+        return "/sales/totalSalesByYearAndMonthInput";
     }
 
-
-    @GetMapping("/total-by-year-and-category-input")
-    public String getTotalSalesByYearAndCategory(@RequestParam(value = "year", required = false) Integer year,
-                                                 @RequestParam(value = "category", required = false) Integer category, Model model) {
+    // 입력된 연도와 카테고리의 총 판매액을 반환하는 메서드
+    @RequestMapping(value="/totalSalesByYearAndCategoryInput" , method = RequestMethod.GET)
+    public String getTotalSalesByYearAndCategoryInput(@RequestParam(value = "year", required = false) Integer year,
+                                                      @RequestParam(value = "category", required = false) Integer category, Model model) {
         if (year != null && category != null) {
             double totalSales = salesService.getTotalSalesByYearAndCategory(year, category);
             model.addAttribute("year", year);
             model.addAttribute("category", category);
             model.addAttribute("totalSales", totalSales);
         }
-        return "/sales/salestotalbyyearandcategoryinput";
+        return "sales/totalSalesByYearAndCategoryInput";
     }
 
-    //6월 5일 오후 6시
-//    @GetMapping("/total-by-month")
-//    public String getMonthlySalesByProcess(Model model) {
-//        Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
-//        model.addAttribute("monthlySales", monthlySales);
-//        return "/sales/salestotalbymonth";
-//    }
-//6월 5일 오후 6시 30분
-    @GetMapping("/total-by-month")
-    public String getMonthlySalesByProcess(Model model) {
+    // 월별 총 판매액을 반환하는 메서드
+    @RequestMapping(value="/totalSalesByMonth" , method = RequestMethod.GET)
+    public String getTotalSalesByMonth(Model model) {
         Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
         Map<String, Double> sortedMonthlySales = new TreeMap<>(monthlySales); // TreeMap을 사용하여 정렬
         model.addAttribute("monthlySales", sortedMonthlySales);
-        return "/sales/salestotalbymonth";
+        return "sales/totalSalesByMonth";
     }
-
-
 }
-
-
-
-
-
-
-
-
