@@ -64,8 +64,8 @@ public class SalesService {
     public Map<String, Long> findSalesByToday() {
 
         LocalDate localDate = LocalDate.now();
-        Date today = Date.valueOf(localDate);
-        List<Sales> salesList = salesRepository.findSalesByToday(today);
+        System.out.println(localDate);
+        List<Sales> salesList = salesRepository.findSalesByToday(localDate);
         List<Menu> menuList = menuRepository.findAll();
         Map<Long, String> menuMap = menuList.stream()
                 .collect(Collectors.toMap(Menu::getId, Menu::getName));
