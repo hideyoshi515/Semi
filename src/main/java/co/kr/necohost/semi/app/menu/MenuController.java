@@ -11,6 +11,7 @@ import co.kr.necohost.semi.domain.service.CategoryService;
 import co.kr.necohost.semi.domain.service.MenuService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -126,6 +127,8 @@ public class MenuController {
     public String getCategoryList(Model model) {
         List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories);
+        CategoryRequest categoryRequest = new CategoryRequest();
+        model.addAttribute("categoryRequest", categoryRequest);
         return "/menu/categoryList.html";
     }
 
@@ -142,5 +145,21 @@ public class MenuController {
     public String postCategoryCreate(Model model, @ModelAttribute("categoryRequest") CategoryRequest categoryRequest) {
         categoryService.saveCategory(categoryRequest);
         return "redirect:/categoryList";
+    }
+    
+    // 카테고리 수정을 위해 pk와 새 카테고리명을 받아서 작업 후 리스트 반환
+    @RequestMapping(value = "/categoryUpdate", method = RequestMethod.POST)
+    @ResponseBody
+    public void postCategoryUpdate(Model model, @RequestParam Map<String, Object> params) {
+        CategoryRequest categoryRequest = new CategoryRequest();
+        categoryRequest.setName((String) params.get("name"));
+        categoryRequest.setId(Long.parseLong((String) params.get("id")));
+        categoryService.saveCategory(categoryRequest);
+    }
+
+    @RequestMapping(value = "/CategoryDelete", method = RequestMethod.POST)
+    @ResponseBody
+    public void getCategoryDelete(Model model, @RequestParam Map<String, Object> params) {
+        categoryService.deleteCategory(Integer.parseInt((String)params.get("id")));
     }
 }

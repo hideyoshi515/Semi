@@ -5,9 +5,6 @@
         layout:decorate="~{layout/default_layout}">
 >
 <th:block layout:fragment="content">
-    <script>
-
-    </script>
     <style>
         .menu-list-container {
             display: flex;
@@ -36,13 +33,64 @@
             border-bottom: 1px solid #ccc; /* 항목들 사이의 구분선 */
         }
     </style>
+
+    <script>
+        function deleteCategory(pk) {
+            let ok = confirm("本当にカテゴリーを削除してもいいですか")
+            if(ok) {
+                $.ajax({
+                    url: '/CategoryDelete',
+                    type: 'POST',
+                    data: {
+                        id: pk
+                    },
+                    success: function (response) {
+                        alert('カテゴリーの削除が成功しました。')
+                        location.href='/categoryList';
+                    },
+                    error: function () {
+                        alert('カテゴリーの削除が失敗しました。')
+                    }
+                })
+            }
+        }
+
+        function updateCategory(pk) {
+            let currentName = $("#"+pk+"_name").val();
+            let newName = prompt("新しいカテゴリー名を入力してください。", currentName)
+            if (newName != null && newName !== "" && newName !== currentName) {
+                $.ajax({
+                    url: '/categoryUpdate',
+                    type: 'POST',
+                    data: {
+                        id: pk,
+                        name: newName
+                    },
+                    success: function (response) {
+                        alert('カテゴリー名の変更が成功しました。')
+                        location.href='/categoryList';
+                    },
+                    error: function () {
+                        alert('カテゴリー名の変更が失敗しました。')
+                    }
+                })
+            } else {
+                alert('入力間違い又は元カテゴリー名と一致しています。')
+            }
+        }
+
+    </script>
+
     <div>
         <div class="mt-3 d-flex justify-content-around">
             <div class="border border-dark text-center align-content-center" th:each="category : ${categories}"
-                 style="width: 150px; height: 80px;">
+                 style="width: 250px; height: 80px;">
                 <div class="user-select-none">
                     <div class="user-select-none" th:text="${category.name}"></div>
                 </div>
+                <button th:onclick="|updateCategory(${category.id})|"> カテゴリー名変更 </button>
+                <input th:id="|${category.id}_name|" th:value="${category.name}" style="display: none">
+                <button th:onclick="|deleteCategory(${category.id})|"> 削除 </button>
             </div>
         </div>
         <div class="mt-5 text-center">
