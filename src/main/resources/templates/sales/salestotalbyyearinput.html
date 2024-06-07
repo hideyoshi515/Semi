@@ -16,7 +16,7 @@
 
 <div th:if="${year != null}">
     <h3>年度別の結果: <span th:text="${year}"></span>年</h3>
-    <h3>総売上高: <span th:text="${#numbers.formatDecimal(totalSales, 0, 0)}"></span>円</h3>
+    <h3>総売上高: <span th:text="${#numbers.formatDecimal(totalSales, 0, 0)}"></span></h3>
 </div>
 <button onclick="location.href='/total-by-year'">年度別の総売上高をチャートで閲覧</button>
 <button onclick="location.href='/adminMain'">管理者メイン画面に復帰</button>
