@@ -14,7 +14,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -102,7 +101,7 @@ public class MenuController {
         return "redirect:/menuList";
     }
 
-    // 메뉴 상세 정보를 반환
+    // 메뉴 상세 정보를 반환. JSON 형태로 반환받기 위해 ResponseBody 사용
     @RequestMapping(value = "/menuDetail", method = RequestMethod.GET)
     @ResponseBody
     public MenuWithCategoryRequest getDetailMenu(Model model, @RequestParam Map<String, Object> params) {
@@ -122,10 +121,10 @@ public class MenuController {
     }
 
     // 카테고리 관리 페이지를 반환
-    @RequestMapping(value = "/categoryManagement", method = RequestMethod.GET)
-    public String getCategoryManagement(Model model) {
+    @RequestMapping(value = "/categoryList", method = RequestMethod.GET)
+    public String getCategoryList(Model model) {
         List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories);
-        return "/menu/categoryManagement.html";
+        return "/menu/categoryList.html";
     }
 }
