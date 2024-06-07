@@ -5,6 +5,7 @@ import co.kr.necohost.semi.domain.model.dto.MenuRequest;
 import co.kr.necohost.semi.domain.model.dto.MenuWithCategoryRequest;
 import co.kr.necohost.semi.domain.model.entity.Category;
 import co.kr.necohost.semi.domain.model.entity.Menu;
+import co.kr.necohost.semi.domain.repository.SalesRepository;
 import co.kr.necohost.semi.domain.service.CategoryService;
 import co.kr.necohost.semi.domain.service.MenuService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,14 +17,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 @Controller
 public class MenuController {
     private final MenuService menuService;
     private final CategoryService categoryService;
+    private final SalesRepository salesRepository;
 
-    public MenuController(MenuService menuService, CategoryService categoryService) {
+    public MenuController(MenuService menuService, CategoryService categoryService, SalesRepository salesRepository) {
         this.menuService = menuService;
         this.categoryService = categoryService;
+        this.salesRepository = salesRepository;
     }
 
     // 메뉴 인덱스 페이지를 반환
@@ -42,6 +48,13 @@ public class MenuController {
         } else {
             menus = menuService.getAllMenus();
         }
+        Map<Menu, Integer> salesCount = menus.stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        m -> salesRepository.getCountByMenuAfterDaysAgo(m.getId(), 3)
+                ));
+
+        model.addAttribute("salesCount", salesCount);
         model.addAttribute("menus", menus);
         model.addAttribute("categories", categories);
         return "/menu/menuList.html";

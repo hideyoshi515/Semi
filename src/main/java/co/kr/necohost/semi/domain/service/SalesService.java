@@ -139,6 +139,10 @@ public class SalesService {
                 ));
     }
 
+    public int getCountByMenuAfterDaysAgo(long menuId,int days){
+        return salesRepository.getCountByMenuAfterDaysAgo(menuId, days);
+    }
+
     // 현재 월과 전월의 매출을 계산하여 전월대비 매출 상승률을 계산 6월 7일 추가중
     public double getMonthlySalesGrowthRate(int year, int month) {
         // 현재 월 매출

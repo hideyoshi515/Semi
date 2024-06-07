@@ -53,4 +53,8 @@ public interface SalesRepository extends JpaRepository<Sales, Long> {
     // 연도와 카테고리별로 프로세스가 1인 판매 기록을 조회 (연도 및 카테고리별 총 판매량 계산에 사용)
     @Query("SELECT s FROM Sales s WHERE s.process = 1 AND YEAR(s.date) = :year AND s.category = :category")
     List<Sales> findSalesByYearAndCategory(@Param("year") int year, @Param("category") int category);
+
+    @Query(value = "SELECT COUNT(s.id) FROM Sales s WHERE s.process = 1 AND s.menu = :menuID AND s.date > DATE_SUB(NOW(), INTERVAL :days DAY)", nativeQuery = true)
+    int getCountByMenuAfterDaysAgo(@Param("menuID") long menuID, @Param("days") int days);
+
 }
