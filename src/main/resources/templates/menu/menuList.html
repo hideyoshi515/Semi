@@ -84,7 +84,7 @@
                 <div class="user-select-none">
                     <img th:src="${menu.image}" style="width: 75px; height: 75px;">
                     <div class="user-select-none" th:text="${menu.name}"></div>
-                    <div class="user-select-none" th:text="|${#numbers.formatInteger(menu.price,3,'COMMA')} 원|"></div>
+                    <div class="user-select-none" th:text="|${#numbers.formatInteger(menu.price,1,'COMMA')} 원|"></div>
                     <div class="user-select-none" th:text="|카테고리 : ${category.name}|"
                          th:if="${category.id == menu.category}" th:each="category : ${categories}"></div>
                     <div class="user-select-none" th:text="|재고 : ${menu.stock}|" th:if="${menu.stock > 0}"></div>
@@ -93,7 +93,7 @@
             </div>
         </div>
         <div class="mt-5 text-center">
-            <button onclick="location.href='/menuCreate'"> Add Menu</button>
+            <button class="btn btn-primary" onclick="location.href='/menuCreate'">메뉴 추가</button>
         </div>
     </div>
 

@@ -5,28 +5,74 @@
         layout:decorate="~{layout/default_layout}">
 >
 <head>
-    <style>
-        #menu-detail-image {
-            height: 100%;
-            width: 500px;
-        }
-    </style>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
 <body>
 <th:block layout:fragment="content">
-    <form action="/menuUpdate" method="post" th:object="${menuRequest}" enctype="multipart/form-data">
-        <div> <img id="menu-detail-image" th:if="${menu.image} != null" th:src="${menu.image}"> </div>
-        <div> id : <input th:field="${menu.id}" style="display: none"> <span th:text="${menu.id}"></span> </div>
-        <div> name : <input th:field="${menu.name}"> </div>
-        <div> price : <input th:field="${menu.price}"> </div>
-        <div> category : <input th:field="${menu.category}"> </div>
-        <div> img : <input type="file" th:field="${menu.image}"> </div>
-        <div> desc : <input th:field="${menu.description}"> </div>
-        <div> stock : <input th:field="${menu.stock}" style="display: none"> <span th:text="${menu.stock}"></span> </div>
-        <button> 수정완료 </button>
-    </form>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="card shadow-lg border-0 rounded-lg mt-5">
+                    <div class="card-body">
+                        <form action="/menuUpdate" method="post" th:object="${menuRequest}" enctype="multipart/form-data">
+                            <div class="d-flex justify-content-center"> <img id="menu-detail-image" th:if="${menu.image} != null" th:src="${menu.image}" style="width: 33%; height: auto;"> </div>
+                            <input th:field="${menu.id}" style="display: none">
+                            <div class="row mb-3">
+                                <div style="text-align: start; margin: 6px 0;">상품 이름</div>
+                                <div class="mb-3 mb-md-0">
+                                    <input class="form-control" th:field="${menu.name}"
+                                           type="text" placeholder="상품 이름">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div style="text-align: start; margin: 6px 0;">상품 가격</div>
+                                <div class="mb-3 mb-md-0">
+                                    <input class="form-control" th:field="${menu.price}"
+                                           type="number" min="0" placeholder="상품 가격">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div style="text-align: start; margin: 6px 0;">카테고리</div>
+                                <div class="mb-3 mb-md-0">
+                                    <select class="form-control" th:field="${menu.category}" placeholder="카테고리">
+                                        <option th:each="category : ${categories}" th:value="${category.id}"
+                                                th:text="${category.name}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div style="text-align: start; margin: 6px 0;">상품 이미지</div>
+                                <div class="mb-3 mb-md-0">
+                                    <input class="form-control" th:field="${menu.image}"
+                                           type="file" min="0" placeholder="상품 이미지">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div style="text-align: start; margin: 6px 0;">상품 설명</div>
+                                <div class="mb-3 mb-md-0">
+                                    <input class="form-control" th:field="${menu.description}"
+                                           type="text" placeholder="상품 설명">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div style="text-align: start; margin: 6px 0;">재고</div>
+                                <div class="mb-3 mb-md-0">
+                                    <input class="form-control" th:field="${menu.stock}"
+                                           type="number" min="0" placeholder="재고">
+                                </div>
+                            </div>
+                            <div class="mt-4 mb-0">
+                                <div class="d-grid">
+                                    <button class="btn btn-primary btn-block">수정</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </th:block>
 </body>
 </html>

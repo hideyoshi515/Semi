@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 @RequestMapping
 @Controller
@@ -164,12 +165,22 @@ public class SalesController {
     }
 
     //6월 5일 오후 6시
+//    @GetMapping("/total-by-month")
+//    public String getMonthlySalesByProcess(Model model) {
+//        Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
+//        model.addAttribute("monthlySales", monthlySales);
+//        return "/sales/salestotalbymonth";
+//    }
+//6월 5일 오후 6시 30분
     @GetMapping("/total-by-month")
     public String getMonthlySalesByProcess(Model model) {
         Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
-        model.addAttribute("monthlySales", monthlySales);
+        Map<String, Double> sortedMonthlySales = new TreeMap<>(monthlySales); // TreeMap을 사용하여 정렬
+        model.addAttribute("monthlySales", sortedMonthlySales);
         return "/sales/salestotalbymonth";
     }
+
+
 
 
 
