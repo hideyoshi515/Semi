@@ -60,7 +60,7 @@ public class SalesService {
         return salesRepository.findByProcess(process);
     }
 
-    public Map<String, Long> findSalesByToday(){
+    public Map<String, Long> findSalesByToday() {
 
         LocalDate localDate = LocalDate.now();
         Date today = Date.valueOf(localDate);
@@ -68,7 +68,7 @@ public class SalesService {
         List<Menu> menuList = menuRepository.findAll();
         Map<Long, String> menuMap = menuList.stream()
                 .collect(Collectors.toMap(Menu::getId, Menu::getName));
-        Map<String, Long>  result = salesList.stream()
+        Map<String, Long> result = salesList.stream()
                 .collect(Collectors.groupingBy(
                         sales -> menuMap.get(Long.parseLong(String.valueOf(sales.getMenu()))),
                         Collectors.counting()
@@ -81,10 +81,11 @@ public class SalesService {
         List<Sales> salesList = salesRepository.findYearlySalesByProcess();
         return salesList.stream()
                 .collect(Collectors.groupingBy(
-                        s -> s.getDate().toInstant().atZone(java.time.ZoneId.systemDefault()).getYear(),
+                        s -> s.getDate().atZone(java.time.ZoneId.systemDefault()).getYear(),
                         Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
                 ));
     }
+
     //20240605確認中
     public Map<Integer, Double> getTotalSalesByCategory() {
         List<Sales> salesList = salesRepository.findAllSales();
@@ -96,15 +97,12 @@ public class SalesService {
     }
 
 
-
-
     public double getTotalSalesByYear(int year) {
         List<Sales> salesList = salesRepository.findSalesByYearAndProcess(year);
         return salesList.stream()
                 .mapToDouble(s -> s.getPrice() * s.getQuantity())
                 .sum();
     }
-
 
 
     public double getTotalSalesByYearAndMonth(int year, int month) {
@@ -115,10 +113,6 @@ public class SalesService {
     }
 
 
-
-
-
-
     public double getTotalSalesByYearAndCategory(int year, int category) {
         List<Sales> salesList = salesRepository.findSalesByYearAndCategory(year, category);
         return salesList.stream()
@@ -126,7 +120,7 @@ public class SalesService {
                 .sum();
     }
 
-//6월 5일 5시
+    //6월 5일 5시
 //    public double getTotalSalesByYearAndMonth(int year, int month) {
 //        List<Sales> salesList = salesRepository.findSalesByYearAndMonthAndProcess(year, month);
 //        return salesList.stream()
@@ -139,29 +133,12 @@ public class SalesService {
         return salesList.stream()
                 .collect(Collectors.groupingBy(
                         s -> {
-                            LocalDate date = s.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                            LocalDate date = s.getDate().atZone(ZoneId.systemDefault()).toLocalDate();
                             return date.getYear() + "-" + String.format("%02d", date.getMonthValue());
                         },
                         Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
                 ));
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

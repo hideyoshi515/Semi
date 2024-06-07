@@ -5,7 +5,7 @@
         layout:decorate="~{layout/default_layout}">
 <th:block layout:fragment="content">
     <h1>決済ページ</h1>
-    <form th:object="${deviceRequest}" method="post" action="orderPayment">
+    <form th:object="${deviceRequest}" method="post" action="orderPaymentSelect">
         <br>
         <div th:each="entry : ${orderedItems}">
             メニュー : <span th:text="${entry.key.name}"></span>
