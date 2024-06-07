@@ -1,12 +1,15 @@
 package co.kr.necohost.semi.app.device;
 
 import co.kr.necohost.semi.app.menu.MenuController;
+import co.kr.necohost.semi.domain.model.dto.AccountRequest;
 import co.kr.necohost.semi.domain.model.dto.DeviceRequest;
 import co.kr.necohost.semi.domain.model.dto.SalesRequest;
+import co.kr.necohost.semi.domain.model.entity.Account;
 import co.kr.necohost.semi.domain.model.entity.Device;
 import co.kr.necohost.semi.domain.model.entity.Menu;
 import co.kr.necohost.semi.domain.model.entity.Sales;
 import co.kr.necohost.semi.domain.repository.MenuRepository;
+import co.kr.necohost.semi.domain.service.AccountService;
 import co.kr.necohost.semi.domain.service.MenuService;
 import co.kr.necohost.semi.domain.service.DeviceService;
 import co.kr.necohost.semi.domain.service.SalesService;
@@ -31,12 +34,17 @@ public class DeviceController {
     private final DeviceService deviceService;
     private final SalesService salesService;
     private final MenuRepository menuRepository;
+    private final AccountService accountService;
 
-    public DeviceController(MenuService menuService, DeviceService deviceService, SalesService salesService, MenuRepository menuRepository) {
+    public DeviceController(MenuService menuService, DeviceService deviceService, SalesService salesService, MenuRepository menuRepository, AccountService accountService ) {
         this.menuService = menuService;
         this.deviceService = deviceService;
         this.salesService = salesService;
         this.menuRepository = menuRepository;
+        this.accountService = accountService;
+    }
+    private int calculatePoints(long price){
+        return (int)(price * 0.01);
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
@@ -51,6 +59,8 @@ public class DeviceController {
     public String postOrder(DeviceRequest deviceRequest, Model model, @RequestParam Map<String, Object> params) {
         model.addAttribute("deviceRequest", deviceRequest);
 //        long device = Long.parseLong(params.get("device").toString());
+        Map<Long, List<Menu>> categorizedMenus = menuService.getCategorizedMenus();
+        model.addAttribute("categorizedMenus", categorizedMenus);
         List<Menu> menus = menuService.getAllMenus();
         model.addAttribute("menus", menus);
         return "order/orderMenuSelect.html";
@@ -81,14 +91,21 @@ public class DeviceController {
     }
 
     @RequestMapping(value = "/orderPaymentSelect",method = RequestMethod.POST)
-    public String OrderPaymentSelect(@ModelAttribute DeviceRequest deviceRequest, @RequestParam String paymentMethod, Model model,SalesRequest salesRequest) {
+    public String OrderPaymentSelect(@ModelAttribute DeviceRequest deviceRequest, @RequestParam String paymentMethod, Model model, SalesRequest salesRequest, AccountRequest accountRequest) {
         System.out.println("DeviceRequest: " + deviceRequest);
         Map<Long, Integer> quantities = deviceRequest.getQuantities();
         long totalPrice = 0;
+        String phone = deviceRequest.getPhoneNum();
+        String pass = deviceRequest.getPass();
+
+
+
+
         for (Map.Entry<Long, Integer> entry : quantities.entrySet()) {
             Long menuId = entry.getKey();
             Integer quantity = entry.getValue();
             Menu menu = menuService.getMenuById(menuId);
+            Account account = accountService.getAccountByPhone(phone);
 
             if (quantity != null && quantity > 0 && quantity <= menu.getStock()) {
                 totalPrice += menu.getPrice() * quantity;
@@ -96,6 +113,8 @@ public class DeviceController {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String formattedDateTime = localDate.format(formatter);
 
+
+                accountRequest = new AccountRequest();
                 salesRequest = new SalesRequest();
                 salesRequest.setCategory((int) menu.getCategory());
                 salesRequest.setDate(LocalDateTime.parse(formattedDateTime, formatter));
@@ -110,6 +129,17 @@ public class DeviceController {
 
                 menu.setStock(menu.getStock() - quantity);
                 menuService.saveMenu(menu);
+
+
+
+                int pointsEarned = calculatePoints(menu.getPrice() * quantity);
+                if (phone.equals(phone)){
+                    account.setMsPoint(account.getMsPoint() + pointsEarned);
+                    accountService.save(accountRequest);
+                }else {
+                   return "order/orderPoint.html";
+                }
+
 
             }
         }

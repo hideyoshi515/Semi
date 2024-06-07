@@ -24,6 +24,11 @@
         <input type="hidden" th:field="*{orderNum}" th:value="${orderNum}">
         <h2>合計 : <span th:text="${totalPrice}"></span>￦</h2>
         <br>
+        <br>
+        <div>
+            メンバーシップポイントを貯める<input type="text" placeholder="携帯番号" th:field="*{phoneNum}" pattern="\d*">
+            <input type="text" placeholder="pass" th:field="*{pass}">
+        </div>
         <div>
             <button type="submit" name="paymentMethod" value="CASH">現金</button>
             <button type="submit" name="paymentMethod" value="CARD">カード</button>
