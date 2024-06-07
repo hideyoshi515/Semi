@@ -27,7 +27,7 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @GetMapping("orderList")
+    @GetMapping("/orderList")
     public String getProductOredr(Model model) {
         List<Object[]> orderList = orderService.findSalesByProcess(0);
 
@@ -53,10 +53,10 @@ public class OrderController {
         model.addAttribute("categoryName", categoryNames);
         model.addAttribute("orderRequest", new SalesRequest());
 
-        return "/order/orderList.html";
+        return "order/orderList.html";
     }
 
-    @GetMapping("orderDetail")
+    @GetMapping("/orderDetail")
     public String getOrderDetail(Model model, @RequestParam Map<String, Object> params) {
         long ordertID = Long.parseLong(params.get("orderID").toString());
 
@@ -84,10 +84,10 @@ public class OrderController {
         model.addAttribute("categoryName", categoryNames);
         model.addAttribute("orderRequest", new SalesRequest());
 
-        return "/order/orderDetail.html";
+        return "order/orderDetail.html";
     }
 
-    @GetMapping("orderApproval")
+    @GetMapping("/orderApproval")
     public String getOrderApproval(Model model, @RequestParam Map<String, Object> params) {
         long orderID = Long.parseLong(params.get("orderID").toString());
         int orderQuantity = Integer.parseInt(params.get("orderQuantity").toString());
@@ -98,7 +98,7 @@ public class OrderController {
         return ("redirect:/orderList");
     }
 
-    @GetMapping("orderDenial")
+    @GetMapping("/orderDenial")
     public String getOrderDenial(Model model, @RequestParam Map<String, Object> params) {
         long orderID = Long.parseLong(params.get("orderID").toString());
 
