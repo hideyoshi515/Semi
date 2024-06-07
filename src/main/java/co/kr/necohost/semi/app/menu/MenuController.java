@@ -48,12 +48,16 @@ public class MenuController {
         } else {
             menus = menuService.getAllMenus();
         }
+
+        //최근 days일 간의 판매량
+        int days = 7;
         Map<Menu, Integer> salesCount = menus.stream()
                 .collect(Collectors.toMap(
                         Function.identity(),
-                        m -> salesRepository.getCountByMenuAfterDaysAgo(m.getId(), 3)
+                        m -> salesRepository.getCountByMenuAfterDaysAgo(m.getId(), days)
                 ));
 
+        model.addAttribute("salesDays", days);
         model.addAttribute("salesCount", salesCount);
         model.addAttribute("menus", menus);
         model.addAttribute("categories", categories);
