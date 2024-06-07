@@ -89,7 +89,7 @@
                          th:if="${category.id == menu.category}" th:each="category : ${categories}"></div>
                     <div class="user-select-none" th:text="|재고 : ${menu.stock}|" th:if="${menu.stock > 0}"></div>
                     <div class="user-select-none" th:text="|재고 : 매진|" th:if="${menu.stock <= 0}"></div>
-                    <div class="user-select-none" th:text="|3일간 판매량 : ${sale.value}|" th:if="${sale.key.id == menu.id}" th:each="sale : ${salesCount}"></div>
+                    <div class="user-select-none" th:text="|${salesDays}일간 판매량 : ${sale.value}|" th:if="${sale.key.id == menu.id}" th:each="sale : ${salesCount}"></div>
                 </div>
             </div>
         </div>

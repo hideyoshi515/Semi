@@ -4,6 +4,7 @@ import co.kr.necohost.semi.domain.model.dto.AccountRequest;
 import co.kr.necohost.semi.domain.model.entity.Account;
 import co.kr.necohost.semi.domain.repository.AccountRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 
@@ -39,6 +40,7 @@ public class AccountService {
         return errorMap;
     }
 
+    @Transactional
     public void save(AccountRequest accountRequest) {
         accountRepository.save(accountRequest.toEntity());
     }

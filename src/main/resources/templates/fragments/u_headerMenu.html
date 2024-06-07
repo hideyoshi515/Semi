@@ -14,11 +14,12 @@
                aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                 <div th:if="${session.account} != null">
-                    <span class="ms-3" th:text="|${session.account.name} 様|">Activity Log</span>
+                    <div class="ms-3" th:text="|${session.account.name} 様|"></div>
+                    <div class="ms-3" th:text="|${session.account.msPoint} Point|"></div>
                     <li>
                         <hr class="dropdown-divider"/>
                     </li>
-                    <li><a class="dropdown-item" href="/mypage">マイページ</a></li>
+                    <li><a class="dropdown-item" href="/mypage">情報修正</a></li>
                     <li><a class="dropdown-item text-danger"
                            href="/logout">ログアウト</a></li>
                 </div>

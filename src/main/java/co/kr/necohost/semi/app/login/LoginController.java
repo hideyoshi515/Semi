@@ -31,18 +31,18 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.GET)
-    public String getRegister(Model model, HttpSession session, HttpServletRequest request,@RequestParam Map<String, Object> params) {
+    public String getRegister(Model model, HttpSession session, HttpServletRequest request, @RequestParam Map<String, Object> params) {
         AccountRequest accountRequest = new AccountRequest();
         model.addAttribute("session", session);
         model.addAttribute("categories", categoryService.getAllCategories());
-        String uri =  request.getHeader("Referer");
-        if(uri != null && !uri.contains("/register") && !uri.contains("/login")){
+        String uri = request.getHeader("Referer");
+        if (uri != null && !uri.contains("/register") && !uri.contains("/login")) {
             session.setAttribute("prevpage", uri);
-        }else{
+        } else {
             session.setAttribute("prevpage", "/");
         }
         if (session.getAttribute("account") != null) {
-            return "redirect:"+session.getAttribute("prevpage");
+            return "redirect:" + session.getAttribute("prevpage");
         }
         if (session.getAttribute("accountRequest") != null) {
             accountRequest = (AccountRequest) session.getAttribute("accountRequest");
@@ -73,7 +73,7 @@ public class LoginController {
             model.addAttribute("valid_phone", canCreate);
             errored = true;
         }
-        if(errored){
+        if (errored) {
             return "login/register.html";
         }
         accountService.save(accountRequest);
@@ -81,7 +81,7 @@ public class LoginController {
         session.setAttribute("account", account);
         session.setMaxInactiveInterval(60 * 60 * 24); //60s * 60m * 24h
         session.removeAttribute("accountRequest");
-        return "redirect:"+session.getAttribute("prevpage");
+        return "redirect:" + session.getAttribute("prevpage");
 
     }
 
@@ -100,54 +100,48 @@ public class LoginController {
         return "login/login.html";
     }
 
-/*    @RequestMapping(value = "/signin", method = RequestMethod.GET)
-    public String getSignin(Model model, HttpSession session, HttpServletRequest request, @RequestParam Map<String, Object> params) {
-        String uri = request.getHeader("Referer");
-        if(uri != null && !uri.contains("/register") && !uri.contains("/signin")){
-            session.setAttribute("prevpage", uri);
-        }else{
-            session.setAttribute("prevpage", "/");
-        }
-        AccountRequest accountRequest = new AccountRequest();
-        model.addAttribute("session", session);
-        model.addAttribute("categories", categoryService.getAllCategories());
-        model.addAttribute("accountRequest", accountRequest);
-        return "login/login.html";
-    }*/
-/*
-    @RequestMapping(value = "/signin", method = RequestMethod.POST)
-    public String postSignin(Model model, @ModelAttribute("accountRequest") AccountRequest accountRequest, HttpSession session, @RequestParam Map<String, Object> params) {
-        Account target = accountRepository.findByEmail(accountRequest.getEmail()).orElse(null);
-        String errorCode = "";
-        if (target != null) {
-            if (target.getPassword().equals(accountRequest.getPassword())) {
-                session.setAttribute("account", target);
-                session.setMaxInactiveInterval(60 * 60 * 24);
-                session.removeAttribute("accountRequest");
-                return "redirect:"+session.getAttribute("prevpage");
-            } else {
-                errorCode = "パスワードが間違います";
-            }
-        } else {
-            errorCode = "存在しないアカウントです";
-        }
-        model.addAttribute("errorCode", errorCode);
-        return "/login/login.html";
-    }*/
-
-
-    @RequestMapping(value = "/mypage",method = RequestMethod.GET)
+    @RequestMapping(value = "/mypage", method = RequestMethod.GET)
     public String getMypage(Model model, HttpSession session, @RequestParam Map<String, Object> params) {
         Account account = (Account) session.getAttribute("account");
-        if(account==null){
+        if (account == null) {
             model.addAttribute("account", null);
             return "redirect:/login";
-        }else{
+        } else {
             model.addAttribute("account", account);
         }
 
+        AccountRequest accountRequest = account.toAccountRequest();
+
+        model.addAttribute("accountRequest", accountRequest);
         model.addAttribute("session", session);
         model.addAttribute("categories", categoryService.getAllCategories());
         return "user/mypage.html";
+    }
+
+    @RequestMapping(value = "/mypage", method = RequestMethod.POST)
+    public String postMypage(Model model, HttpSession session, @ModelAttribute("accountRequest") AccountRequest accountRequest, @RequestParam Map<String, Object> params) {
+        Account account = (Account) session.getAttribute("account");
+        AccountRequest newRequest = account.toAccountRequest();
+        boolean changed = false;
+        System.out.println("passEdit"+params.get("passEdit"));
+        System.out.println("phoneEdit"+params.get("phoneEdit"));
+        System.out.println("msPassEdit"+params.get("msPassEdit"));
+        if (params.get("passEdit") != null && params.get("passEdit").toString().equals("edit")) {
+            newRequest.setPassword(accountRequest.getPassword());
+            changed = true;
+        }
+        if (params.get("phoneEdit") != null && params.get("phoneEdit").toString().equals("edit")) {
+            newRequest.setPhone(accountRequest.getPhone());
+            changed = true;
+        }
+        if (params.get("msPassEdit") != null && params.get("msPassEdit").toString().equals("edit")) {
+            newRequest.setMsPass(accountRequest.getMsPass());
+            changed = true;
+        }
+        if (changed) {
+            accountService.save(newRequest);
+            session.setAttribute("account", newRequest.toEntity());
+        }
+        return "redirect:/";
     }
 }
