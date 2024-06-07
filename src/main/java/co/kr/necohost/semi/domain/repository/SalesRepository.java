@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -34,9 +36,8 @@ public interface SalesRepository extends JpaRepository<Sales, Long> {
     @Query("SELECT s FROM Sales s")
     List<Sales> findAllSales();
 
-
-
-
+    @Query("SELECT s FROM Sales s WHERE s.process = 1 AND s.date = :today")
+    List<Sales> findSalesByToday(@Param("today") Date today);
 
     @Query("SELECT s FROM Sales s WHERE s.process = 1 AND YEAR(s.date) = :year")
     List<Sales> findSalesByYearAndProcess(int year);
