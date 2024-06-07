@@ -36,7 +36,7 @@ public class LoginController {
         model.addAttribute("session", session);
         model.addAttribute("categories", categoryService.getAllCategories());
         String uri =  request.getHeader("Referer");
-        if(uri != null && !uri.contains("/register") && !uri.contains("/signin")){
+        if(uri != null && !uri.contains("/register") && !uri.contains("/login")){
             session.setAttribute("prevpage", uri);
         }else{
             session.setAttribute("prevpage", "/");
@@ -85,10 +85,10 @@ public class LoginController {
 
     }
 
-    @RequestMapping(value = "/signin", method = RequestMethod.GET)
-    public String getSignin(Model model, HttpSession session, HttpServletRequest request, @RequestParam Map<String, Object> params) {
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public String getLogin(Model model, HttpSession session, HttpServletRequest request, @RequestParam Map<String, Object> params) {
         String uri = request.getHeader("Referer");
-        if (uri != null && !uri.contains("/register") && !uri.contains("/signin")) {
+        if (uri != null && !uri.contains("/register") && !uri.contains("/login")) {
             session.setAttribute("prevpage", uri);
         } else {
             session.setAttribute("prevpage", "/");
@@ -141,7 +141,7 @@ public class LoginController {
         Account account = (Account) session.getAttribute("account");
         if(account==null){
             model.addAttribute("account", null);
-            return "redirect:/signin";
+            return "redirect:/login";
         }else{
             model.addAttribute("account", account);
         }

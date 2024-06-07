@@ -14,15 +14,14 @@
         <script src="/js/bootstrap.js"></script>
         <script src="/js/bootstrap.bundle.js"></script>
         <script src="/js/sidebar.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <!-- 폰트 -->
         <link rel="stylesheet" href="http://fonts.googleapis.com/earlyaccess/notosansjp.css">
         <link rel="stylesheet" href="http://fonts.googleapis.com/earlyaccess/notosanskr.css">
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     </head>
     <body>
-        <!-- <header>
-             <th:block th:replace="~{fragments/header :: headerFragment}"></th:block>
-         </header>-->
 
         <th:block th:replace="~{fragments/u_headerMenu :: headerMenuFragment}"></th:block>
         <th:block th:replace="~{fragments/u_sidebar :: sidebarFragment}"></th:block>
@@ -30,11 +29,7 @@
         <main>
             <th:block layout:fragment="content"></th:block>
         </main>
-            <!--<th:block th:replace="~{fragments/footer :: footerFragment}"></th:block>-->
         </div>
         </div>
-        <!--<footer>
-            <th:block th:replace="~{fragments/footer :: footerFragment}"></th:block>
-        </footer>-->
     </body>
 </html>
