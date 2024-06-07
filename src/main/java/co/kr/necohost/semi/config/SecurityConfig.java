@@ -61,12 +61,14 @@ public class SecurityConfig {
                         requests
                                 .requestMatchers(antMatcher("/api/admin/**")).hasRole("ADMIN")
                                 .requestMatchers(antMatcher("/api/user/**")).hasRole("USER")
+                                .requestMatchers(antMatcher("/login")).permitAll()
                                 .requestMatchers(antMatcher("/h2-console/**")).permitAll()
                                 .anyRequest().permitAll())
                 .sessionManagement(sessions ->
                         sessions.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2Login(configure ->
                         configure
+                                .loginPage("/login")
                                 .authorizationEndpoint(config ->
                                         config.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
                                 .userInfoEndpoint(config ->
@@ -75,7 +77,7 @@ public class SecurityConfig {
                                 .failureHandler(oAuth2AuthenticationFailureHandler))
                 .formLogin(formLogin ->
                         formLogin
-                                .loginPage("/signin")
+                                .loginPage("/login")
                                 .usernameParameter("email")
                                 .passwordParameter("password")
                                 .permitAll()
