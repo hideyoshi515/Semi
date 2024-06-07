@@ -27,14 +27,14 @@ public class MenuController {
     }
 
     // 메뉴 인덱스 페이지를 반환
-    @GetMapping("/menuIndex")
-    public String MenuIndex(Model model) {
+    @RequestMapping(value = "/MenuIndex", method = RequestMethod.GET)
+    public String getMenuIndex(Model model) {
         return "/menu/menuIndex.html";
     }
 
     // 메뉴 리스트를 가져와서 보여줌
-    @GetMapping("/menuList")
-    public String MenuList(Model model, @RequestParam Map<String, String> params) {
+    @RequestMapping(value = "/menuList", method = RequestMethod.GET)
+    public String getMenuList(Model model, @RequestParam Map<String, String> params) {
         List<Menu> menus;
         List<Category> categories = categoryService.getAllCategories();
         if (params.get("category") != null) {
@@ -48,8 +48,8 @@ public class MenuController {
     }
 
     // 메뉴 생성 페이지를 반환
-    @GetMapping("/menuCreate")
-    public String MenuCreate(Model model, HttpServletRequest request, HttpSession session) {
+    @RequestMapping(value = "/menuCreate", method = RequestMethod.GET)
+    public String getMenuCreate(Model model, HttpServletRequest request, HttpSession session) {
         MenuRequest menuRequest = new MenuRequest();
         String uri = request.getHeader("referer");
         session.setAttribute("prevpage", uri);
@@ -60,15 +60,15 @@ public class MenuController {
     }
 
     // 메뉴 생성 요청을 처리
-    @PostMapping("/menuCreate")
-    public String MenuCreate(Model model, @ModelAttribute("menuRequest") MenuRequest menuRequest, HttpSession session) {
+    @RequestMapping(value = "/menuCreate", method = RequestMethod.POST)
+    public String postMenuCreate(Model model, @ModelAttribute("menuRequest") MenuRequest menuRequest, HttpSession session) {
         menuService.saveMenuWithImage(menuRequest, menuRequest.getImage());
         return "redirect:" + session.getAttribute("prevpage");
     }
 
     // 메뉴 업데이트 페이지를 반환
-    @GetMapping("/menuUpdate")
-    public String MenuUpdate(Model model, @RequestParam Map<String, Object> params) {
+    @RequestMapping(value = "/menuUpdate", method = RequestMethod.GET)
+    public String getMenuUpdate(Model model, @RequestParam Map<String, Object> params) {
         Menu menu = menuService.getMenuById(Long.parseLong(params.get("id").toString()));
         model.addAttribute("menu", menu);
         MenuRequest menuRequest = new MenuRequest();
@@ -79,16 +79,16 @@ public class MenuController {
     }
 
     // 메뉴 업데이트 요청을 처리
-    @PostMapping("/menuUpdate")
-    public String MenuUpdate(Model model, @ModelAttribute("menuRequest") MenuRequest menuRequest) {
+    @RequestMapping(value = "/menuUpdate", method = RequestMethod.POST)
+    public String postMenuUpdate(Model model, @ModelAttribute("menuRequest") MenuRequest menuRequest) {
         menuService.saveMenuWithImage(menuRequest, menuRequest.getImage());
         return "redirect:/menuList";
     }
 
     // 메뉴 상세 정보를 반환
-    @GetMapping("/menuDetail")
+    @RequestMapping(value = "/menuDetail", method = RequestMethod.GET)
     @ResponseBody
-    public MenuWithCategoryRequest detailMenu(Model model, @RequestParam Map<String, Object> params) {
+    public MenuWithCategoryRequest getDetailMenu(Model model, @RequestParam Map<String, Object> params) {
         Menu menu = menuService.getMenuById(Long.parseLong(params.get("id").toString()));
         Category category = categoryService.findById((int) menu.getCategory());
         MenuWithCategoryRequest MWCR = new MenuWithCategoryRequest();
@@ -98,15 +98,15 @@ public class MenuController {
     }
 
     // 메뉴 삭제 요청을 처리
-    @GetMapping("/menuDelete")
-    public String menuDelete(Model model, @RequestParam Map<String, Object> params) {
+    @RequestMapping(value = "/menuDelete", method = RequestMethod.GET)
+    public String getMenuDelete(Model model, @RequestParam Map<String, Object> params) {
         menuService.deleteMenuById(Long.parseLong(params.get("id").toString()));
         return "redirect:/menuList";
     }
 
     // 카테고리 관리 페이지를 반환
-    @GetMapping("/categoryManagement")
-    public String CategoryManagement(Model model) {
+    @RequestMapping(value = "/categoryManagement", method = RequestMethod.GET)
+    public String getCategoryManagement(Model model) {
         List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories);
         return "/menu/categoryManagement.html";
