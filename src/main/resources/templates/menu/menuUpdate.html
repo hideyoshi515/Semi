@@ -7,6 +7,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script>
+        function deleteMenuObject(pk) {
+            let ok = confirm('지우시겠습니까?');
+            if (ok) {
+                location.href="/menuDelete?id=" + pk;
+            }
+        }
+    </script>
 </head>
 <body>
 <th:block layout:fragment="content">
@@ -36,7 +44,7 @@
                             <div class="row mb-3">
                                 <div style="text-align: start; margin: 6px 0;">카테고리</div>
                                 <div class="mb-3 mb-md-0">
-                                    <select class="form-control" th:field="${menu.category}" placeholder="카테고리">
+                                    <select class="form-control" th:field="${menu.category}">
                                         <option th:each="category : ${categories}" th:value="${category.id}"
                                                 th:text="${category.name}"></option>
                                     </select>
@@ -64,8 +72,9 @@
                                 </div>
                             </div>
                             <div class="mt-4 mb-0">
-                                <div class="d-grid">
-                                    <button class="btn btn-primary btn-block">수정</button>
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-primary btn-block col-9 me-2">수정</button>
+                                    <button type="button" th:onclick="|deleteMenuObject(${menu.id})|" class="btn btn-danger btn-block col-3">삭제</button>
                                 </div>
                             </div>
                         </form>

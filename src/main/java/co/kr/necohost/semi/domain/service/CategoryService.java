@@ -1,5 +1,6 @@
 package co.kr.necohost.semi.domain.service;
 
+import co.kr.necohost.semi.domain.model.dto.CategoryRequest;
 import co.kr.necohost.semi.domain.model.entity.Category;
 import co.kr.necohost.semi.domain.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -20,5 +21,9 @@ public class CategoryService {
 
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
+    }
+
+    public void saveCategory(CategoryRequest categoryRequest) {
+        categoryRepository.save(categoryRequest.toEntity());
     }
 }
