@@ -3,6 +3,8 @@ package co.kr.necohost.semi.domain.service;
 import co.kr.necohost.semi.domain.model.dto.CategoryRequest;
 import co.kr.necohost.semi.domain.model.entity.Category;
 import co.kr.necohost.semi.domain.repository.CategoryRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,11 +21,18 @@ public class CategoryService {
         return categoryRepository.findById(id).get();
     }
 
+    @Cacheable(value = "categories")
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }
 
+    @CacheEvict(value = "categories", allEntries = true)
     public void saveCategory(CategoryRequest categoryRequest) {
         categoryRepository.save(categoryRequest.toEntity());
+    }
+
+    @CacheEvict(value = "categories", allEntries = true)
+    public void deleteCategory(int id) {
+        categoryRepository.deleteById(id);
     }
 }
