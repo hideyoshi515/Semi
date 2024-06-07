@@ -1,6 +1,7 @@
 package co.kr.necohost.semi.app.menu;
 
 
+import co.kr.necohost.semi.domain.model.dto.CategoryRequest;
 import co.kr.necohost.semi.domain.model.dto.MenuRequest;
 import co.kr.necohost.semi.domain.model.dto.MenuWithCategoryRequest;
 import co.kr.necohost.semi.domain.model.entity.Category;
@@ -126,5 +127,20 @@ public class MenuController {
         List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories);
         return "/menu/categoryList.html";
+    }
+
+    // 카테고리 추가 페이지 반환
+    @RequestMapping(value = "/categoryCreate", method = RequestMethod.GET)
+    public String getCategoryCreate(Model model) {
+        CategoryRequest categoryRequest = new CategoryRequest();
+        model.addAttribute("categoryRequest", categoryRequest);
+        return "menu/categoryCreate.html";
+    }
+    
+    // 카테고리 추가 작업 후 리스트 반환
+    @RequestMapping(value = "/categoryCreate", method = RequestMethod.POST)
+    public String postCategoryCreate(Model model, @ModelAttribute("categoryRequest") CategoryRequest categoryRequest) {
+        categoryService.saveCategory(categoryRequest);
+        return "redirect:/categoryList";
     }
 }
