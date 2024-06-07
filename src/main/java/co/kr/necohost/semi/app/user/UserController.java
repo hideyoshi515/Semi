@@ -33,6 +33,11 @@ public class UserController {
     @RequestMapping("/order/menu")
     public String orderMenu(Model model, HttpSession session, @RequestParam Map<String, Object> params) {
         int category = Integer.parseInt(params.get("category").toString());
+        if(params.get("kiosk") != null && !params.get("kiosk").toString().isEmpty()){
+            model.addAttribute("isKiosk","true");
+        }else{
+            model.addAttribute("isKiosk","false");
+        }
         model.addAttribute("session", session);
         model.addAttribute("menus",menuService.getMenuByCategory(category));
         model.addAttribute("categories", categoryService.getAllCategories());

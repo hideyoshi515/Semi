@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -39,8 +40,8 @@ public interface SalesRepository extends JpaRepository<Sales, Long> {
     List<Sales> findAllSales();
 
     // 오늘 날짜의 판매 기록을 조회
-    @Query("SELECT s FROM Sales s WHERE s.process = 1 AND s.date = :today")
-    List<Sales> findSalesByToday(@Param("today") Date today);
+    @Query(value = "SELECT * FROM Sales s WHERE s.process = 1 AND DATE(s.date) = :today", nativeQuery = true)
+    List<Sales> findSalesByToday(@Param("today") LocalDate today);
 
     // 연도별로 프로세스가 1인 판매 기록을 조회 (연간 총 판매량 계산에 사용)
     @Query("SELECT s FROM Sales s WHERE s.process = 1 AND YEAR(s.date) = :year")
