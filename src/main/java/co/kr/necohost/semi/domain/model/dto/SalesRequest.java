@@ -5,14 +5,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 public class SalesRequest {
     private Long id;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date date;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime date;
     private int category;
     private int menu;
     private int price;

@@ -6,7 +6,7 @@
 <body>
 <th:block layout:fragment="content">
     <h1>メニュー</h1>
-    <form method="post" action="orderPaymentSelect">
+    <form method="post" action="orderPayment">
         <div th:each="menu, iterStat : ${menus}">
             メニュー : <span th:text="${menu.name}"></span>
             <br>
@@ -14,7 +14,7 @@
             <br>
             在庫 : <span th:text="${menu.stock}"></span>
             <br>
-            數量: <input type="number" th:name="'quantities[' + ${menu.id} + ']'" value="0" min="0" th:max="${menu.stock}" onchange="updateQuantity(this, [[${menu.stock}]])"/>
+            數量: <input type="number" th:name="'quantities[' + ${menu.id} + ']'" value="0" min="0" th:max="${menu.stock}" onchange="updateQuantity(this, [[${menu.stock}]])">
             <br>
             <br>
         </div>
@@ -22,10 +22,12 @@
     </form>
 </th:block>
 <script>
-    function updateQuantity(inputElement) {
+    function updateQuantity(inputElement, maxStock) {
         var newValue = parseInt(inputElement.value);
         if (isNaN(newValue) || newValue < 0) {
             inputElement.value = 0;
+        } else if (newValue > maxStock) {
+            inputElement.value = maxStock;
         }
     }
 </script>

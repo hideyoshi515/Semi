@@ -1,28 +1,39 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/default_layout}">
 <head>
+  <title>Total Sales by Year and Month</title>
   <meta charset="UTF-8">
-  <title>月別総売上高</title>
+  <script>
+    function formatGrowthRate() {
+      const growthRateElement = document.getElementById('growthRate');
+      if (growthRateElement) {
+        const growthRate = parseFloat(growthRateElement.innerText);
+        growthRateElement.innerText = growthRate.toFixed(2);
+      }
+    }
+    window.onload = formatGrowthRate;
+  </script>
 </head>
-<th:block layout:fragment="content">
-  <body>
-  <h1>月別総売上高 </h1>
+<body>
+<div layout:fragment="content">
+  <h1>年度別および月別の総売上高</h1>
   <form action="/total-by-yearandmonth-input" method="get">
     <label for="year">年度を入力:</label>
     <input type="number" id="year" name="year">
     <label for="month">月を入力:</label>
     <input type="number" id="month" name="month">
-    <button type="submit">総売上高検索</button>
+    <button type="submit">総売上高閲覧</button>
   </form>
 
-  <div th:if="${year != null}">
-    <h3><span th:text="${year}"></span>年<span th:text="${month}"></span>月の結果</h3>
-    <h3>総売上高: <span th:text="${#numbers.formatDecimal(totalSales, 0, 0)}"></span>円</h3>
+  <div th:if="${year != null && month != null}">
+    <h3>年度: <span th:text="${year}"></span> 月: <span th:text="${month}"></span></h3>
+    <h3>総売上高: <span th:text="${totalSales}"></span></h3>
+    <h3>前月比売上高成長率: <span id="growthRate" th:text="${growthRate}"></span>%</h3>
   </div>
-  <button onclick="location.href='/total-by-month'">年度及び月別の総売上高をチャートで閲覧</button>
-  <button onclick="location.href='/adminMain'">管理者メイン画面に復帰</button>
-  </body>
-</th:block>
+  <button onclick="location.href='/adminMain'">管理者画面に復帰</button>
+  <button onclick="location.href='/total-by-month'">月次第の総売上高閲覧</button>
+
+</div>
+</body>
 </html>
