@@ -16,11 +16,12 @@
                 <div class="card shadow-lg border-0 rounded-lg mt-5">
                     <div class="card-body">
                         <form action="/menuUpdate" method="post" th:object="${menuRequest}" enctype="multipart/form-data">
-                            <div class="d-flex justify-content-center"> <img id="menu-detail-image" th:if="${menu.image} != null" th:src="${menu.image}" style="width: 33%; height: auto;"> </div>
-                            <input th:field="${menu.id}" style="display: none">
-                            <div class="row mb-3">
-                                <div style="text-align: start; margin: 6px 0;">상품 이름</div>
-                                <div class="mb-3 mb-md-0">
+                            <div class="d-flex justify-content-center">
+                                <img id="menu-detail-image" th:if="${menu.image} != null" th:src="${menu.image}" style="width: 33%; height: auto;"> </div>
+                                <input th:field="${menu.id}" style="display: none">
+                                <div class="row mb-3">
+                                    <div style="text-align: start; margin: 6px 0;">상품 이름</div>
+                                    <div class="mb-3 mb-md-0">
                                     <input class="form-control" th:field="${menu.name}"
                                            type="text" placeholder="상품 이름">
                                 </div>
