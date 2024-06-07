@@ -51,6 +51,13 @@ public interface SalesRepository extends JpaRepository<Sales, Long> {
     @Query("SELECT s FROM Sales s WHERE s.process = 1 AND FUNCTION('YEAR', s.date) = :year AND FUNCTION('MONTH', s.date) = :month")
     List<Sales> findSalesByYearAndMonthAndProcess(@Param("year") int year, @Param("month") int month);
 
+    // 연-월-일과 프로세스를 기준으로 판매 데이터를 찾는 메서드
+    @Query("SELECT s FROM Sales s WHERE YEAR(s.date) = :year AND MONTH(s.date) = :month AND DAY(s.date) = :day AND s.process = 1")
+    List<Sales> findSalesByDayAndProcess(@Param("year") int year, @Param("month") int month, @Param("day") int day);
+    //6월 7일 작업중
+    @Query("SELECT s FROM Sales s WHERE s.date BETWEEN :startOfWeek AND :endOfWeek AND s.process = 1")
+    List<Sales> findSalesByDateRange(@Param("startOfWeek") LocalDateTime startOfWeek, @Param("endOfWeek") LocalDateTime endOfWeek);
+
     // 연도와 카테고리별로 프로세스가 1인 판매 기록을 조회 (연도 및 카테고리별 총 판매량 계산에 사용)
     @Query("SELECT s FROM Sales s WHERE s.process = 1 AND YEAR(s.date) = :year AND s.category = :category")
     List<Sales> findSalesByYearAndCategory(@Param("year") int year, @Param("category") int category);

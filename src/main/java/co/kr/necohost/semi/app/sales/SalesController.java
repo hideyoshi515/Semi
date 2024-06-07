@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +66,15 @@ public class SalesController {
         return "/sales/totalSalesByCategory.html";
     }
 
+    // 각 메뉴별 총 판매액을 반환하는 메서드. 6월 7일 오후 5시 작업중
+    @RequestMapping(value = "/totalSalesbyMenu", method = RequestMethod.GET)
+    public String getTotalSalesByMenu(Model model) {
+        Map<Integer, Double> totalByMenu = salesService.getTotalSalesByMenu();
+        model.addAttribute("totalByMenu", totalByMenu);
+
+        return "/sales/totalSalesByMenu.html";
+    }
+
     // 연도별 총 판매액을 반환하는 메서드
     @RequestMapping(value= "/totalSalesByYear", method = RequestMethod.GET)
     public String getTotalSalesByYear(Model model) {
@@ -100,6 +110,49 @@ public class SalesController {
         return "/sales/totalSalesByYearAndMonthInput";
     }
 
+    //입력된 날짜(연-월-일)의 총 판매액을 반환하는 메서드
+    @RequestMapping(value = "/totalSalesByDayInput", method = RequestMethod.GET)
+    public String getTotalSalesByDay(@RequestParam(value="year", required = false) Integer year,
+                                     @RequestParam(value="month", required = false) Integer month,
+                                     @RequestParam(value="day", required = false) Integer day,
+                                     Model model) {
+
+        if (year != null && month != null && day != null) {
+            double totalSales = salesService.getTotalSalesByDay(year, month, day);
+            model.addAttribute("year", year);
+            model.addAttribute("month", month);
+            model.addAttribute("day", day);
+            model.addAttribute("totalSales", totalSales);
+        }
+        return "/sales/totalSalesByDayInput.html";
+    }
+
+
+    // 입력된 날짜(연-월-일)가 속한 주의 주별 매출(1주간 총매출, 요일별 매출)을 반환하는 메서드
+    @RequestMapping(value = "/totalWeeklySalesByDayInput", method = RequestMethod.GET)
+    public String getTotalWeeklySalesByDay(@RequestParam(value="year", required = false) Integer year,
+                                           @RequestParam(value="month", required = false) Integer month,
+                                           @RequestParam(value="day", required = false) Integer day,
+                                           Model model) {
+
+        if (year != null && month != null && day != null) {
+            Map<LocalDate, Double> weeklySales = salesService.getWeeklySalesByDay(year, month, day);
+            double totalWeeklySales = weeklySales.values().stream().mapToDouble(Double::doubleValue).sum();
+
+            model.addAttribute("year", year);
+            model.addAttribute("month", month);
+            model.addAttribute("day", day);
+            model.addAttribute("weeklySales", weeklySales);
+            model.addAttribute("totalWeeklySales", totalWeeklySales);
+        }
+        return "/sales/totalWeeklySalesByDayInput";
+    }
+
+
+
+
+
+
     // 입력된 연도와 카테고리의 총 판매액을 반환하는 메서드
     @RequestMapping(value="/totalSalesByYearAndCategoryInput" , method = RequestMethod.GET)
     public String getTotalSalesByYearAndCategoryInput(@RequestParam(value = "year", required = false) Integer year,
@@ -121,4 +174,6 @@ public class SalesController {
         model.addAttribute("monthlySales", sortedMonthlySales);
         return "sales/totalSalesByMonth";
     }
+
+
 }

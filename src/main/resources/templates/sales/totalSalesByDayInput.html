@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+  <title>Total Sales by Year and Month</title>
+  <meta charset="UTF-8">
+  <script>
+    function formatGrowthRate() {
+      const growthRateElement = document.getElementById('growthRate');
+      if (growthRateElement) {
+        const growthRate = parseFloat(growthRateElement.innerText);
+        growthRateElement.innerText = growthRate.toFixed(2);
+      }
+    }
+
+    function redirectToWeeklySales() {
+      const year = document.getElementById('year').value;
+      const month = document.getElementById('month').value;
+      const day = document.getElementById('day').value;
+      if (year && month && day) {
+        const url = '/totalWeeklySalesByDayInput?year=' + year + '&month=' + month + '&day=' + day;
+        window.location.href = url;
+      } else {
+        alert('연도, 월, 일을 모두 입력해주세요.');
+      }
+    }
+
+    window.onload = formatGrowthRate;
+  </script>
+</head>
+<body>
+<div layout:fragment="content">
+  <h1>日商</h1>
+  <form action="/totalSalesByDayInput" method="get">
+    <label for="year">年度を入力:</label>
+    <input type="number" id="year" name="year" th:value="${year}">
+    <label for="month">月を入力:</label>
+    <input type="number" id="month" name="month" th:value="${month}">
+    <label for="day">日を入力:</label>
+    <input type="number" id="day" name="day" th:value="${day}">
+
+    <button type="submit">日商閲覧</button>
+  </form>
+
+  <div th:if="${year != null && month != null && day != null}">
+    <h3>年度: <span th:text="${year}"></span>
+      月: <span th:text="${month}"></span>
+      日: <span th:text="${day}"></span>
+    </h3>
+    <h3>総売上高: <span th:text="${totalSales}"></span>円</h3>
+  </div>
+
+  <button type="button" onclick="redirectToWeeklySales()">その日が属している一週間の総売上高</button>
+  <button type="button" onclick="location.href='/adminSalesMenu'">管理者画面に復帰</button>
+</div>
+</body>
+</html>

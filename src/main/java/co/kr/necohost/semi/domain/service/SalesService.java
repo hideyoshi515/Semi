@@ -8,10 +8,13 @@ import co.kr.necohost.semi.domain.repository.SalesRepository;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
-import java.util.Map;
+import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.WeekFields;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,6 +64,7 @@ public class SalesService {
         return salesRepository.findByProcess(process);
     }
 
+    // 오늘 날짜의 판매 기록을 조회
     public Map<String, Long> findSalesByToday() {
 
         LocalDate localDate = LocalDate.now();
@@ -96,6 +100,16 @@ public class SalesService {
                 ));
     }
 
+    // 각 메뉴별 총 판매액을 계산. 6월 7일 오후 5시 작업중
+    public Map<Integer, Double> getTotalSalesByMenu() {
+        List<Sales> salesList = salesRepository.findAllSales();
+        return salesList.stream()
+                .collect(Collectors.groupingBy(
+                        Sales::getMenu,
+                        Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
+                ));
+    }
+
 
 
     // 연도별 총 판매량을 계산
@@ -113,6 +127,36 @@ public class SalesService {
         return salesList.stream()
                 .mapToDouble(s -> s.getPrice() * s.getQuantity())
                 .sum();
+    }
+
+    // 입력된 날짜(연-월일)의  총 판매량을 계산
+    public double getTotalSalesByDay(int year, int month, int day) {
+        List<Sales> salesList = salesRepository.findSalesByDayAndProcess(year, month, day);
+        return salesList.stream()
+                .mapToDouble(s -> s.getPrice() * s.getQuantity())
+                .sum();
+    }
+
+    //입력된 날짜(연-월-일)가 속한 주의 주별 매출(1주간 총매출, 요일별 매출)을 반환하는 메서드
+    public Map<LocalDate, Double> getWeeklySalesByDay(int year, int month, int day) {
+        LocalDate date = LocalDate.of(year, month, day);
+        LocalDate startOfWeek = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+        LocalDate endOfWeek = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
+
+        // Adjust to LocalDateTime for querying
+        LocalDateTime startOfWeekDateTime = startOfWeek.atStartOfDay();
+        LocalDateTime endOfWeekDateTime = endOfWeek.atTime(23, 59, 59);
+
+        List<Sales> salesList = salesRepository.findSalesByDateRange(startOfWeekDateTime, endOfWeekDateTime);
+        Map<LocalDate, Double> weeklySales = new TreeMap<>();
+
+        for (Sales sales : salesList) {
+            LocalDate salesDate = sales.getDate().toLocalDate(); // Convert LocalDateTime to LocalDate
+            double salesAmount = sales.getPrice() * sales.getQuantity();
+            weeklySales.put(salesDate, weeklySales.getOrDefault(salesDate, 0.0) + salesAmount);
+        }
+
+        return weeklySales;
     }
 
 
