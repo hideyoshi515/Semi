@@ -37,7 +37,7 @@
     <script>
         function deleteCategory(pk) {
             let ok = confirm("本当にカテゴリーを削除してもいいですか")
-            if(ok) {
+            if (ok) {
                 $.ajax({
                     url: '/CategoryDelete',
                     type: 'POST',
@@ -46,7 +46,7 @@
                     },
                     success: function (response) {
                         alert('カテゴリーの削除が成功しました。')
-                        location.href='/categoryList';
+                        location.href = '/categoryList';
                     },
                     error: function () {
                         alert('カテゴリーの削除が失敗しました。')
@@ -56,7 +56,7 @@
         }
 
         function updateCategory(pk) {
-            let currentName = $("#"+pk+"_name").val();
+            let currentName = $("#" + pk + "_name").val();
             let newName = prompt("新しいカテゴリー名を入力してください。", currentName)
             if (newName != null && newName !== "" && newName !== currentName) {
                 $.ajax({
@@ -68,7 +68,7 @@
                     },
                     success: function (response) {
                         alert('カテゴリー名の変更が成功しました。')
-                        location.href='/categoryList';
+                        location.href = '/categoryList';
                     },
                     error: function () {
                         alert('カテゴリー名の変更が失敗しました。')
@@ -88,9 +88,9 @@
                 <div class="user-select-none">
                     <div class="user-select-none" th:text="${category.name}"></div>
                 </div>
-                <button th:onclick="|updateCategory(${category.id})|"> カテゴリー名変更 </button>
+                <button th:onclick="|updateCategory(${category.id})|"> カテゴリー名変更</button>
                 <input th:id="|${category.id}_name|" th:value="${category.name}" style="display: none">
-                <button th:onclick="|deleteCategory(${category.id})|"> 削除 </button>
+                <button th:onclick="|deleteCategory(${category.id})|"> 削除</button>
             </div>
         </div>
         <div class="mt-5 text-center">
