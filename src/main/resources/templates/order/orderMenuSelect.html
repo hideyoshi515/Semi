@@ -15,17 +15,29 @@
 
     <div class="">
         <div class="row" id="menuContainer">
-            <div class="col-5 col-md-3 mb-3" th:each="menu : ${menus}" th:attr="data-category=${menu.category}">
-                <a th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}">
-                    <div class="card rounded rounded-3" style="width: 12rem;">
+            <div class="mb-3" th:each="menu : ${menus}" th:attr="data-category=${menu.category}" style="width: 200px">
+                <a th:if="${menu.stock} > 0"
+                   th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ウォン'}">
+                    <div class="card rounded rounded-3" style="width: 180px;">
                         <div class="card-body text-center">
-                            <img th:src="${menu.image}" style="width: 8rem; height: auto;">
+                            <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'"
+                                 style="width: 8rem; height: auto;">
                             <h5 class="card-title" th:text="${menu.name}"></h5>
                             <p class="card-text mb-0"><span
                                     th:text="${#numbers.formatInteger(menu.price, 1, 'COMMA')}+ウォン"></span></p>
                         </div>
                     </div>
                 </a>
+                <div class="card rounded rounded-3" style="width: 180px;" th:if="${menu.stock} <= 0">
+                    <div class="rounded-3 w-100 h-100" style="background: rgba(0, 0, 0, 0.7); position: absolute;">
+                    </div>
+                        <div class="card-body text-center">
+                            <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'"
+                                 style="width: 8rem; height: auto;">
+                            <h5 class="card-title" th:text="${menu.name}"></h5>
+                            <p class="card-text mb-0" style="color: darkred; font-weight: bold; z-index: 100000;">売れ切り</p>
+                        </div>
+                </div>
             </div>
         </div>
     </div>
@@ -38,18 +50,28 @@
                     <h5 class="modal-title" id="menuModalLabel"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body text-center">
+                    <img id="modalImage" style="width: 180px; height: auto;">
                     <form id="quantityForm">
                         <div class="mb-3">
+                            <div id="modalDesc" class="">説明</div>
+                            <div id="modalPrice" class="">価格</div>
                             <label for="quantityInput" class="form-label">数量</label>
-                            <input type="number" class="form-control" id="quantityInput" name="quantity" min="0">
+                            <div class="input-group">
+                                <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(-1)">-
+                                </button>
+                                <input type="number" class="form-control text-center" id="quantityInput" name="quantity"
+                                       value="1" min="1">
+                                <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(1)">+
+                                </button>
+                            </div>
                         </div>
                         <input type="hidden" id="menuIdInput" name="menuId">
                     </form>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="saveToSession()">追加</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
-                    <button type="button" class="btn btn-primary" onclick="saveToSession()">保存</button>
                 </div>
             </div>
         </div>
@@ -66,14 +88,24 @@
             var menuName = button.getAttribute('data-menu-name');
             var menuId = button.getAttribute('data-menu-id');
             var menuStock = button.getAttribute('data-menu-stock');
+            var menuImage = button.getAttribute('data-menu-image');
+            var menuDesc = button.getAttribute('data-menu-desc');
+            var menuPrice = button.getAttribute('data-menu-price');
 
             var modalTitle = document.getElementById('menuModalLabel');
             var quantityInput = document.getElementById('quantityInput');
             var menuIdInput = document.getElementById('menuIdInput');
+            var modalImage = document.getElementById('modalImage');
+            var modalDesc = document.getElementById('modalDesc');
+            var modalPrice = document.getElementById('modalPrice');
 
             modalTitle.textContent = menuName;
+            modalDesc.textContent = menuDesc;
+            modalPrice.textContent = menuPrice;
+            quantityInput.value = '1';
             quantityInput.setAttribute('max', menuStock);
             menuIdInput.value = menuId;
+            modalImage.setAttribute('src', menuImage)
         });
 
         function saveToSession() {
@@ -106,6 +138,21 @@
                     item.style.display = 'none';
                 }
             });
+        }
+
+
+        function changeQuantity(amount) {
+            var quantityInput = document.getElementById('quantityInput');
+            var currentQuantity = parseInt(quantityInput.value);
+            var newQuantity = currentQuantity + amount;
+            if (newQuantity < 1) {
+                newQuantity = 1;
+            }
+            var maxQuantity = parseInt(quantityInput.getAttribute('max'));
+            if (newQuantity > maxQuantity) {
+                newQuantity = maxQuantity;
+            }
+            quantityInput.value = newQuantity;
         }
     </script>
 </th:block>
