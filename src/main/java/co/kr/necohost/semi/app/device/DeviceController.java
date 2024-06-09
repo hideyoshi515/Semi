@@ -4,15 +4,9 @@ import co.kr.necohost.semi.app.menu.MenuController;
 import co.kr.necohost.semi.domain.model.dto.AccountRequest;
 import co.kr.necohost.semi.domain.model.dto.DeviceRequest;
 import co.kr.necohost.semi.domain.model.dto.SalesRequest;
-import co.kr.necohost.semi.domain.model.entity.Account;
-import co.kr.necohost.semi.domain.model.entity.Device;
-import co.kr.necohost.semi.domain.model.entity.Menu;
-import co.kr.necohost.semi.domain.model.entity.Sales;
+import co.kr.necohost.semi.domain.model.entity.*;
 import co.kr.necohost.semi.domain.repository.MenuRepository;
-import co.kr.necohost.semi.domain.service.AccountService;
-import co.kr.necohost.semi.domain.service.MenuService;
-import co.kr.necohost.semi.domain.service.DeviceService;
-import co.kr.necohost.semi.domain.service.SalesService;
+import co.kr.necohost.semi.domain.service.*;
 import lombok.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -35,13 +29,15 @@ public class DeviceController {
     private final SalesService salesService;
     private final MenuRepository menuRepository;
     private final AccountService accountService;
+    private final CategoryService categoryService;
 
-    public DeviceController(MenuService menuService, DeviceService deviceService, SalesService salesService, MenuRepository menuRepository, AccountService accountService ) {
+    public DeviceController(MenuService menuService, DeviceService deviceService, SalesService salesService, MenuRepository menuRepository, AccountService accountService, CategoryService categoryService) {
         this.menuService = menuService;
         this.deviceService = deviceService;
         this.salesService = salesService;
         this.menuRepository = menuRepository;
         this.accountService = accountService;
+        this.categoryService = categoryService;
     }
     private int calculatePoints(long price){
         return (int)(price * 0.01);
@@ -62,7 +58,9 @@ public class DeviceController {
         Map<Long, List<Menu>> categorizedMenus = menuService.getCategorizedMenus();
         model.addAttribute("categorizedMenus", categorizedMenus);
         List<Menu> menus = menuService.getAllMenus();
+        List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("menus", menus);
+        model.addAttribute("categories", categories);
         return "order/orderMenuSelect.html";
     }
 
