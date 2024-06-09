@@ -9,7 +9,6 @@ import java.util.Map;
 
 @Service
 public class DiscordNotificationService {
-
     @Value("${discord.webhook.url}")
     private String discordWebhookUrl;
 

@@ -13,11 +13,13 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private MenuRepository menuRepository;
     private final DiscordNotificationService discordNotificationService;
+    private final DiscordBotService discordBotService;
 
-    public OrderService(OrderRepository orderRepository, MenuRepository menuRepository, DiscordNotificationService discordNotificationService) {
+    public OrderService(OrderRepository orderRepository, MenuRepository menuRepository, DiscordNotificationService discordNotificationService, DiscordBotService discordBotService) {
         this.orderRepository = orderRepository;
         this.menuRepository = menuRepository;
         this.discordNotificationService = discordNotificationService;
+        this.discordBotService = discordBotService;
     }
 
     public List<Sales> findByProcess(int process) {
@@ -49,7 +51,9 @@ public class OrderService {
     public void approveOrder(long orderId) {
         Sales order = orderRepository.findById(orderId);
         if (order != null) {
+            System.out.println("주문승인");
             discordNotificationService.sendOrderNotification(orderId);
+            discordBotService.sendOrderNotification(orderId);
         }
     }
 }
