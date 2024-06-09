@@ -2,9 +2,7 @@ package co.kr.necohost.semi.app.order;
 
 import co.kr.necohost.semi.domain.model.dto.SalesRequest;
 import co.kr.necohost.semi.domain.model.entity.Sales;
-import co.kr.necohost.semi.domain.service.CategoryService;
-import co.kr.necohost.semi.domain.service.MenuService;
-import co.kr.necohost.semi.domain.service.OrderService;
+import co.kr.necohost.semi.domain.service.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,14 +15,18 @@ import java.util.stream.Collectors;
 
 @Controller
 public class OrderController {
-    private CategoryService categoryService;
-    private MenuService menuService;
-    private OrderService orderService;
+    private final CategoryService categoryService;
+    private final MenuService menuService;
+    private final OrderService orderService;
+    private final DiscordNotificationService discordNotificationService;
+    private final DiscordBotService discordBotService;
 
-    public OrderController(CategoryService categoryService, MenuService menuService, OrderService orderService) {
+    public OrderController(CategoryService categoryService, MenuService menuService, OrderService orderService, DiscordNotificationService discordNotificationService, DiscordBotService discordBotService) {
         this.categoryService = categoryService;
         this.menuService = menuService;
         this.orderService = orderService;
+        this.discordNotificationService = discordNotificationService;
+        this.discordBotService = discordBotService;
     }
 
     @GetMapping("/orderList")
@@ -93,6 +95,9 @@ public class OrderController {
         int orderQuantity = Integer.parseInt(params.get("orderQuantity").toString());
         long menuID = Long.parseLong(params.get("menuID").toString());
 
+        orderService.approveOrder(orderID);
+        discordNotificationService.sendOrderNotification(orderID);
+        discordBotService.sendOrderNotification(orderID);
         orderService.updateOrderApproval(orderID, orderQuantity, menuID);
 
         return ("redirect:/orderList");
