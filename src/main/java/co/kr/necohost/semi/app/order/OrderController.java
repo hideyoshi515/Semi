@@ -18,14 +18,12 @@ public class OrderController {
     private final CategoryService categoryService;
     private final MenuService menuService;
     private final OrderService orderService;
-    private final DiscordNotificationService discordNotificationService;
     private final DiscordBotService discordBotService;
 
-    public OrderController(CategoryService categoryService, MenuService menuService, OrderService orderService, DiscordNotificationService discordNotificationService, DiscordBotService discordBotService) {
+    public OrderController(CategoryService categoryService, MenuService menuService, OrderService orderService, DiscordBotService discordBotService) {
         this.categoryService = categoryService;
         this.menuService = menuService;
         this.orderService = orderService;
-        this.discordNotificationService = discordNotificationService;
         this.discordBotService = discordBotService;
     }
 
@@ -95,9 +93,9 @@ public class OrderController {
         int orderQuantity = Integer.parseInt(params.get("orderQuantity").toString());
         long menuID = Long.parseLong(params.get("menuID").toString());
 
-        orderService.approveOrder(orderID);
-        discordNotificationService.sendOrderNotification(orderID);
-        discordBotService.sendOrderNotification(orderID);
+        String message = "주문 번호 " + orderID + "가 승인되었습니다.";
+
+        orderService.approveOrder(orderID, message);
         orderService.updateOrderApproval(orderID, orderQuantity, menuID);
 
         return ("redirect:/orderList");
@@ -107,6 +105,9 @@ public class OrderController {
     public String getOrderDenial(Model model, @RequestParam Map<String, Object> params) {
         long orderID = Long.parseLong(params.get("orderID").toString());
 
+        String message = "주문 번호 " + orderID + "가 취소되었습니다.";
+
+        orderService.approveOrder(orderID, message);
         orderService.updateDenialByProcess(orderID);
 
         return ("redirect:/orderList");

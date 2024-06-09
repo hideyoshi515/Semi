@@ -12,12 +12,12 @@ import java.util.List;
 public class OrderService {
     private final OrderRepository orderRepository;
     private MenuRepository menuRepository;
-    private final DiscordNotificationService discordNotificationService;
+    private final DiscordBotService discordBotService;
 
-    public OrderService(OrderRepository orderRepository, MenuRepository menuRepository, DiscordNotificationService discordNotificationService) {
+    public OrderService(OrderRepository orderRepository, MenuRepository menuRepository, DiscordBotService discordBotService) {
         this.orderRepository = orderRepository;
         this.menuRepository = menuRepository;
-        this.discordNotificationService = discordNotificationService;
+        this.discordBotService = discordBotService;
     }
 
     public List<Sales> findByProcess(int process) {
@@ -46,10 +46,12 @@ public class OrderService {
     }
 
     @Transactional
-    public void approveOrder(long orderId) {
+    public void approveOrder(long orderId, String message) {
         Sales order = orderRepository.findById(orderId);
+
         if (order != null) {
-            discordNotificationService.sendOrderNotification(orderId);
+            System.out.println("주문승인");
+            discordBotService.sendOrderNotification(message);
         }
     }
 }

@@ -10,7 +10,6 @@ import javax.annotation.PostConstruct;
 
 @Service
 public class DiscordBotService {
-
     @Value("${discord.bot.token}")
     private String botToken;
 
@@ -23,14 +22,13 @@ public class DiscordBotService {
     public void init() {
         try {
             jda = JDABuilder.createDefault(botToken).build();
-            jda.awaitReady(); // JDA가 완전히 초기화될 때까지 대기
+            jda.awaitReady();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void sendOrderNotification(long orderId) {
-        String message = "주문 번호 " + orderId + "가 승인되었습니다.";
+    public void sendOrderNotification(String message) {
         MessageChannel channel = jda.getChannelById(MessageChannel.class, channelId);
         if (channel != null) {
             channel.sendMessage(message).queue();
