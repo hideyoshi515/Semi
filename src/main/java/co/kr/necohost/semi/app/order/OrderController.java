@@ -2,11 +2,13 @@ package co.kr.necohost.semi.app.order;
 
 import co.kr.necohost.semi.domain.model.dto.SalesRequest;
 import co.kr.necohost.semi.domain.model.entity.Sales;
-import co.kr.necohost.semi.domain.service.*;
+import co.kr.necohost.semi.domain.service.CategoryService;
+import co.kr.necohost.semi.domain.service.MenuService;
+import co.kr.necohost.semi.domain.service.OrderService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -18,36 +20,24 @@ public class OrderController {
     private final CategoryService categoryService;
     private final MenuService menuService;
     private final OrderService orderService;
-    private final DiscordNotificationService discordNotificationService;
-    private final DiscordBotService discordBotService;
 
-    public OrderController(CategoryService categoryService, MenuService menuService, OrderService orderService, DiscordNotificationService discordNotificationService, DiscordBotService discordBotService) {
+    public OrderController(CategoryService categoryService, MenuService menuService, OrderService orderService) {
         this.categoryService = categoryService;
         this.menuService = menuService;
         this.orderService = orderService;
-        this.discordNotificationService = discordNotificationService;
-        this.discordBotService = discordBotService;
     }
 
-    @GetMapping("/orderList")
+    @RequestMapping(value = "/orderList", method = RequestMethod.GET)
     public String getProductOredr(Model model) {
         List<Object[]> orderList = orderService.findSalesByProcess(0);
 
-        List<Sales> sales = orderList.stream()
-                .map(objects -> (Sales) objects[0])
-                .collect(Collectors.toList());
+        List<Sales> sales = orderList.stream().map(objects -> (Sales) objects[0]).collect(Collectors.toList());
 
-        List<String> menuNames = orderList.stream()
-                .map(objects -> (String) objects[1])
-                .collect(Collectors.toList());
+        List<String> menuNames = orderList.stream().map(objects -> (String) objects[1]).collect(Collectors.toList());
 
-        List<String> categoryNames = orderList.stream()
-                .map(objects -> (String) objects[2])
-                .collect(Collectors.toList());
+        List<String> categoryNames = orderList.stream().map(objects -> (String) objects[2]).collect(Collectors.toList());
 
-        List<Integer> menuStocks = orderList.stream()
-                .map(objects -> (Integer) objects[3])
-                .collect(Collectors.toList());
+        List<Integer> menuStocks = orderList.stream().map(objects -> (Integer) objects[3]).collect(Collectors.toList());
 
         model.addAttribute("menuStock", menuStocks);
         model.addAttribute("orderList", sales);
@@ -58,27 +48,19 @@ public class OrderController {
         return "order/orderList.html";
     }
 
-    @GetMapping("/orderDetail")
+    @RequestMapping(value = "/orderDetail", method = RequestMethod.GET)
     public String getOrderDetail(Model model, @RequestParam Map<String, Object> params) {
         long ordertID = Long.parseLong(params.get("orderID").toString());
 
         List<Object[]> productOrder = orderService.findSalesById(ordertID);
 
-        List<Sales> sales = productOrder.stream()
-                .map(objects -> (Sales) objects[0])
-                .collect(Collectors.toList());
+        List<Sales> sales = productOrder.stream().map(objects -> (Sales) objects[0]).collect(Collectors.toList());
 
-        List<String> menuNames = productOrder.stream()
-                .map(objects -> (String) objects[1])
-                .collect(Collectors.toList());
+        List<String> menuNames = productOrder.stream().map(objects -> (String) objects[1]).collect(Collectors.toList());
 
-        List<String> categoryNames = productOrder.stream()
-                .map(objects -> (String) objects[2])
-                .collect(Collectors.toList());
+        List<String> categoryNames = productOrder.stream().map(objects -> (String) objects[2]).collect(Collectors.toList());
 
-        List<Integer> menuStocks = productOrder.stream()
-                .map(objects -> (Integer) objects[3])
-                .collect(Collectors.toList());
+        List<Integer> menuStocks = productOrder.stream().map(objects -> (Integer) objects[3]).collect(Collectors.toList());
 
         model.addAttribute("menuStock", menuStocks);
         model.addAttribute("orderList", sales);
@@ -89,21 +71,18 @@ public class OrderController {
         return "order/orderDetail.html";
     }
 
-    @GetMapping("/orderApproval")
+    @RequestMapping(value = "/orderApproval", method = RequestMethod.GET)
     public String getOrderApproval(Model model, @RequestParam Map<String, Object> params) {
         long orderID = Long.parseLong(params.get("orderID").toString());
         int orderQuantity = Integer.parseInt(params.get("orderQuantity").toString());
         long menuID = Long.parseLong(params.get("menuID").toString());
 
-        orderService.approveOrder(orderID);
-        discordNotificationService.sendOrderNotification(orderID);
-        discordBotService.sendOrderNotification(orderID);
         orderService.updateOrderApproval(orderID, orderQuantity, menuID);
 
         return ("redirect:/orderList");
     }
 
-    @GetMapping("/orderDenial")
+    @RequestMapping(value = "/orderDenial", method = RequestMethod.GET)
     public String getOrderDenial(Model model, @RequestParam Map<String, Object> params) {
         long orderID = Long.parseLong(params.get("orderID").toString());
 
