@@ -15,7 +15,8 @@
 
     <div class="">
         <div class="row" id="menuContainer">
-            <div class="mb-3 menuItem" th:each="menu : ${menus}" th:attr="data-category=${menu.category}" style="width: 200px">
+            <div class="mb-3 menuItem" th:each="menu : ${menus}" th:attr="data-category=${menu.category}"
+                 style="width: 200px">
                 <a th:if="${menu.stock} > 0"
                    th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ウォン'}">
                     <div class="card rounded rounded-3" style="width: 180px;">
@@ -31,12 +32,13 @@
                 <div class="card rounded rounded-3" style="width: 180px;" th:if="${menu.stock} <= 0">
                     <div class="rounded-3 w-100 h-100" style="background: rgba(0, 0, 0, 0.7); position: absolute;">
                     </div>
-                        <div class="card-body text-center">
-                            <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'"
-                                 style="width: 8rem; height: auto;">
-                            <h5 class="card-title" th:text="${menu.name}"></h5>
-                            <p class="card-text mb-0" style="color: darkred; font-weight: bold; z-index: 100000;">売れ切り</p>
-                        </div>
+                    <div class="card-body text-center">
+                        <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'"
+                             style="width: 8rem; height: auto;">
+                        <h5 class="card-title" th:text="${menu.name}"></h5>
+                        <p class="card-text mb-0" style="color: darkred; font-weight: bold; z-index: 100000;">
+                            売れ切り</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -82,6 +84,31 @@
         <button type="submit" class="btn btn-success">결제</button>
     </form>
 
+    <!-- Cart Modal -->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cartModal">
+        장바구니 열기
+    </button>
+    <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cartModalLabel">장바구니</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="cartItemsContainer">
+                        <!-- 장바구니 아이템들이 여기에 동적으로 추가됩니다 -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    <button type="button" class="btn btn-primary" onclick="checkout()">결제하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         document.getElementById('menuModal').addEventListener('show.bs.modal', function (event) {
             var button = event.relatedTarget;
@@ -110,19 +137,30 @@
 
         function saveToSession() {
             var menuId = document.getElementById('menuIdInput').value;
-            var quantity = document.getElementById('quantityInput').value;
+            var quantity = parseInt(document.getElementById('quantityInput').value);
 
             if (quantity < 0) {
                 alert("数量は0以上にしてください。");
                 return;
             }
 
-            var orders = JSON.parse(sessionStorage.getItem('orders')) || {};
-            orders[menuId] = quantity;
-            sessionStorage.setItem('orders', JSON.stringify(orders));
+            // AJAX 요청을 통해 서버로 데이터 전송
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/addToSession", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    alert("상품이 장바구니에 추가되었습니다.");
+                    document.getElementById('menuModal').querySelector('.btn-close').click();
+                } else if (xhr.readyState === 4) {
+                    alert("오류가 발생했습니다: " + xhr.status);
+                }
+            };
 
-            document.getElementById('menuModal').querySelector('.btn-close').click();
+            var data = JSON.stringify({"menuId": menuId, "quantity": quantity});
+            xhr.send(data);
         }
+
 
         document.getElementById('orderForm').addEventListener('submit', function (event) {
             var orders = sessionStorage.getItem('orders');
@@ -154,6 +192,106 @@
             }
             quantityInput.value = newQuantity;
         }
+
+        function loadCart() {
+            // AJAX 요청을 통해 장바구니 데이터를 가져옴
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/getCartItems", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var cartItems = JSON.parse(xhr.responseText);
+                    displayCartItems(cartItems);
+                }
+            };
+            xhr.send();
+        }
+
+        function displayCartItems(cartItems) {
+            var container = document.getElementById('cartItemsContainer');
+            container.innerHTML = '';
+            for (var menuId in cartItems) {
+                var item = cartItems[menuId];
+                var formattedPrice = item.price.toLocaleString();
+                var itemHtml = `
+            <div class="d-flex mb-3 align-items-center" data-menu-id="${menuId}" style="gap: 10px;">
+                <div style="flex: 1;">${item.name}</div>
+                <div style="width: 120px;">${formattedPrice} ウォン</div>
+                <div style="width: 120px;">
+                    <div class="input-group">
+                        <button type="button" class="btn btn-outline-secondary" onclick="changeCartQuantity(${menuId}, ${item.stock}, -1)">-</button>
+                        <input type="number" class="form-control text-center" id="quantity-${menuId}" value="${item.quantity}" readonly>
+                        <button type="button" class="btn btn-outline-secondary" onclick="changeCartQuantity(${menuId}, ${item.stock}, 1)">+</button>
+                    </div>
+                </div>
+                <div style="width: 60px;">
+                    <button type="button" class="btn btn-danger" onclick="deleteCartItem(${menuId})">삭제</button>
+                </div>
+            </div>
+        `;
+                container.insertAdjacentHTML('beforeend', itemHtml);
+            }
+        }
+
+        function changeCartQuantity(menuId, stock, amount) {
+            var quantityInput = document.getElementById('quantity-' + menuId);
+            var currentQuantity = parseInt(quantityInput.value);
+            var newQuantity = currentQuantity + amount;
+
+            if (newQuantity < 1) {
+                newQuantity = 1;
+            } else if (newQuantity > stock) {
+                newQuantity = stock;
+            }
+
+            // AJAX 요청을 통해 서버로 데이터 전송
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/updateCartQuantity", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    quantityInput.value = newQuantity;
+                } else if (xhr.readyState === 4) {
+                    alert("오류가 발생했습니다: " + xhr.status);
+                }
+            };
+
+            var data = JSON.stringify({"menuId": menuId, "quantity": newQuantity});
+            xhr.send(data);
+        }
+
+        function checkout() {
+            // 결제하기 버튼 클릭 시 동작하는 함수
+            window.location.href = '/orderPayment';
+        }
+
+        // 장바구니 모달을 열 때 장바구니 데이터를 로드
+        document.getElementById('cartModal').addEventListener('show.bs.modal', function () {
+            loadCart();
+        });
+
+        function deleteCartItem(menuId) {
+            // AJAX 요청을 통해 서버로 데이터 전송
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/deleteCartItem", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // 성공적으로 삭제되면 장바구니에서 항목 제거
+                    var itemRow = document.querySelector(`[data-menu-id="${menuId}"]`);
+                    if (itemRow) {
+                        itemRow.remove();
+                    }
+                } else if (xhr.readyState === 4) {
+                    alert("오류가 발생했습니다: " + xhr.status);
+                }
+            };
+
+            var data = JSON.stringify({"menuId": menuId});
+            xhr.send(data);
+        }
+
+
     </script>
 </th:block>
 </body>

@@ -4,6 +4,7 @@ import co.kr.necohost.semi.domain.model.entity.Sales;
 import co.kr.necohost.semi.domain.repository.MenuRepository;
 import co.kr.necohost.semi.domain.repository.OrderRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -11,10 +12,12 @@ import java.util.List;
 public class OrderService {
     private final OrderRepository orderRepository;
     private MenuRepository menuRepository;
+    private final DiscordBotService discordBotService;
 
-    public OrderService(OrderRepository orderRepository, MenuRepository menuRepository) {
+    public OrderService(OrderRepository orderRepository, MenuRepository menuRepository, DiscordBotService discordBotService) {
         this.orderRepository = orderRepository;
         this.menuRepository = menuRepository;
+        this.discordBotService = discordBotService;
     }
 
     public List<Sales> findByProcess(int process) {
@@ -26,7 +29,7 @@ public class OrderService {
     }
 
     public Sales findById(int id) {
-        return orderRepository.findById(id).orElse(null);
+        return orderRepository.findById(id);
     }
 
     public List<Object[]> findSalesById(long orderId) {
@@ -40,5 +43,15 @@ public class OrderService {
     public void updateOrderApproval(long orderId, int orderQuantity, long menuId) {
         orderRepository.updateSalesProcess(orderId);
         orderRepository.updateMenuStock(menuId, orderQuantity);
+    }
+
+    @Transactional
+    public void approveOrder(long orderId, String message) {
+        Sales order = orderRepository.findById(orderId);
+
+        if (order != null) {
+            System.out.println("주문승인");
+            discordBotService.sendOrderNotification(message);
+        }
     }
 }

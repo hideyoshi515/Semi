@@ -39,6 +39,9 @@ public interface SalesRepository extends JpaRepository<Sales, Long> {
     @Query("SELECT s FROM Sales s")
     List<Sales> findAllSales();
 
+
+
+
     // 오늘 날짜의 판매 기록을 조회
     @Query(value = "SELECT * FROM Sales s WHERE s.process = 1 AND DATE(s.date) = :today", nativeQuery = true)
     List<Sales> findSalesByToday(@Param("today") LocalDate today);

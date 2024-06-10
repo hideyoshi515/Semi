@@ -11,5 +11,5 @@ import lombok.*;
 public class OrderNum {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderNum;
+    private long orderNum;
 }

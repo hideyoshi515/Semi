@@ -22,11 +22,20 @@ public class SalesController {
         this.salesService = salesService;
     }
 
-    // 관리자 판매 메뉴 페이지를 반환하는 메서드
-    @RequestMapping(value = "/adminSalesMenu", method=RequestMethod.GET)
+    // 구버전 관리자 판매 메뉴 페이지를 반환하는 메서드(css없음)
+//    @RequestMapping(value = "/adminSalesMenu", method=RequestMethod.GET)
+//    public String getAdminSalesMenu() {
+//        return "/sales/adminSalesMenu.html";
+//    }
+
+    // 신버전 관리자 페이지 - 판매 관리 페이지를 반환하는 메서드(css있음)
+    @RequestMapping(value = "/adminSalesMain", method=RequestMethod.GET)
     public String getAdminSalesMenu() {
-        return "/sales/adminSalesMenu.html";
+        return "/sales/adminSalesMain.html";
     }
+
+
+
 
     // 판매 데이터베이스 컨트롤러 메뉴 페이지를 반환하는 메서드
     @RequestMapping(value = "/salesDataBaseControllerMenu", method=RequestMethod.GET)
@@ -57,23 +66,48 @@ public class SalesController {
         return "/sales/readSales.html";
     }
 
-    // 각 카테고리별 총 판매액을 반환하는 메서드
+    // 각 카테고리별 총 판매액을 반환하는 메서드//6월 10일 작업중
+//    @RequestMapping(value = "/totalSalesbyCategory", method = RequestMethod.GET)
+//    public String getTotalSalesByCategory(Model model) {
+//        Map<Integer, Double> totalByCategory = salesService.getTotalSalesByCategory();
+//        model.addAttribute("totalByCategory", totalByCategory);
+//        System.out.println(totalByCategory);
+//        return "/sales/totalSalesByCategory.html";
+//    }
+
+    //6월 10일 작업중
     @RequestMapping(value = "/totalSalesbyCategory", method = RequestMethod.GET)
     public String getTotalSalesByCategory(Model model) {
-        Map<Integer, Double> totalByCategory = salesService.getTotalSalesByCategory();
+        Map<String, Double> totalByCategory = salesService.getTotalSalesByCategory();
         model.addAttribute("totalByCategory", totalByCategory);
         System.out.println(totalByCategory);
         return "/sales/totalSalesByCategory.html";
     }
 
+
+
     // 각 메뉴별 총 판매액을 반환하는 메서드. 6월 7일 오후 5시 작업중
+//    @RequestMapping(value = "/totalSalesbyMenu", method = RequestMethod.GET)
+//    public String getTotalSalesByMenu(Model model) {
+//        Map<Integer, Double> totalByMenu = salesService.getTotalSalesByMenu();
+//        model.addAttribute("totalByMenu", totalByMenu);
+//
+//        return "/sales/totalSalesByMenu.html";
+//    }
+    //6월 10일 작업중
     @RequestMapping(value = "/totalSalesbyMenu", method = RequestMethod.GET)
     public String getTotalSalesByMenu(Model model) {
-        Map<Integer, Double> totalByMenu = salesService.getTotalSalesByMenu();
+        Map<String, Double> totalByMenu = salesService.getTotalSalesByMenu();
         model.addAttribute("totalByMenu", totalByMenu);
 
         return "/sales/totalSalesByMenu.html";
     }
+
+
+
+
+
+
 
     // 연도별 총 판매액을 반환하는 메서드
     @RequestMapping(value= "/totalSalesByYear", method = RequestMethod.GET)
