@@ -10,11 +10,11 @@
         <div th:each="entry : ${orderedItems}">
             メニュー : <span th:text="${entry.key.name}"></span>
             <br>
-            値段 : <span th:text="${entry.key.price}"></span>
+            値段 : <span th:text="${#numbers.formatInteger(entry.key.price,1,'COMMA')}"></span>
             <br>
             數量 : <span th:text="${entry.value}"></span>
             <br>
-            總收量　: <span th:text="${entry.key.price * entry.value}"></span>
+            總收量　: <span th:text="${#numbers.formatInteger(entry.key.price * entry.value,1,'COMMA')}"></span>
             <br>
             <br>
             <input type="hidden" th:field="*{quantities[__${entry.key.id}__]}" th:value="${entry.value}">
@@ -22,7 +22,7 @@
         <input type="hidden" th:field="*{device}" th:value="${device}">
         <input type="hidden" th:field="*{deviceNum}" th:value="${deviceNum}">
         <input type="hidden" th:field="*{orderNum}" th:value="${orderNum}">
-        <h2>合計 : <span th:text="${totalPrice}"></span>￦</h2>
+        <h2>合計 : <span th:text="${#numbers.formatInteger(totalPrice,1,'COMMA')}"></span>￦</h2>
         <br>
         <br>
         <div>
