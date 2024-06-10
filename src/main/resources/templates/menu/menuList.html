@@ -38,6 +38,13 @@
         }
     </script>
     <style>
+        .menu-list-navi {
+            display: flex;
+            justify-content: space-between;
+            height: 35px;
+            align-items: center;
+        }
+
         .menu-list-container {
             display: flex;
             flex-direction: column;
@@ -71,16 +78,16 @@
         }
     </style>
     <div>
-        <div>
-            <select class="mt-3 ms-3" onchange="(location.href = this.value);" style="width: 180px;">
+        <div class="menu-list-navi">
+            <select class="mt-3 ms-3" onchange="(location.href = this.value);" style="width: 180px; height: 30px">
                 <option value="/menuList">전체</option>
                 <option th:each="category : ${categories}"
                         th:value="|/menuList?category=${category.id}|"
                         th:text="${category.name}"
                         th:selected="${#strings.equals(param.category, category.id)}">
                 </option>
-
             </select>
+            <button class="btn btn-primary" onclick="location.href='/menuCreate'">メニュー登録</button>
         </div>
         <div id="scrollable-content" class="scrollable-container">
             <div id="menu-container" class="mt-3 d-flex flex-wrap justify-content-around">
@@ -114,9 +121,7 @@
                 </div>
             </div>
 
-            <div class="mt-5 text-center">
-                <button class="btn btn-primary" onclick="location.href='/menuCreate'">メニュー登録</button>
-            </div>
+
         </div>
 
         <!-- Modal -->
