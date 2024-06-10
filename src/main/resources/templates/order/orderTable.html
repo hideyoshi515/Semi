@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/default_layout}">
+>
+<th:block layout:fragment="content">
+    <table class="table">
+        <thead>
+        <tr>
+            <th colspan="4" style="text-align: center">Table</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td th:id="TB1">
+                <div th:if="${tableOrders['TB1'] != null}">
+                    <p>1번 테이블</p>
+                    <p th:text="${tableOrders['TB1'][1]}">No Data</p>
+                    <p th:text="${tableOrders['TB1'][2]}">No Data</p>
+                    <p th:text="${tableOrders['TB1'][3]}">No Data</p>
+                </div>
+                <div th:if="${tableOrders['TB1'] == null}">
+                    <p>1번 테이블</p>
+                </div>
+            </td>
+            <td></td>
+            <td></td>
+            <td th:id="TB6">
+                <div th:if="${tableOrders['TB6'] != null}">
+                    <p>6번 테이블</p>
+                    <p th:text="${tableOrders['TB6'][1]}">No Data</p>
+                    <p th:text="${tableOrders['TB6'][2]}">No Data</p>
+                    <p th:text="${tableOrders['TB6'][3]}">No Data</p>
+                </div>
+                <div th:if="${tableOrders['TB6'] == null}">
+                    <p>6번 테이블</p>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td th:id="TB2">
+                <div th:if="${tableOrders['TB2'] != null}">
+                    <p>2번 테이블</p>
+                    <p th:text="${tableOrders['TB2'][1]}">No Data</p>
+                    <p th:text="${tableOrders['TB2'][2]}">No Data</p>
+                    <p th:text="${tableOrders['TB2'][3]}">No Data</p>
+                </div>
+                <div th:if="${tableOrders['TB2'] == null}">
+                    <p>2번 테이블</p>
+                </div>
+            </td>
+            <td th:id="TB4">
+                <div th:if="${tableOrders['TB4'] != null}">
+                    <p>4번 테이블</p>
+                    <p th:text="${tableOrders['TB4'][1]}">No Data</p>
+                    <p th:text="${tableOrders['TB4'][2]}">No Data</p>
+                    <p th:text="${tableOrders['TB4'][3]}">No Data</p>
+                </div>
+                <div th:if="${tableOrders['TB4'] == null}">
+                    <p>4번 테이블</p>
+                </div>
+            </td>
+            <td></td>
+            <td th:id="TB7">
+                <div th:if="${tableOrders['TB7'] != null}">
+                    <p>7번 테이블</p>
+                    <p th:text="${tableOrders['TB7'][1]}">No Data</p>
+                    <p th:text="${tableOrders['TB7'][2]}">No Data</p>
+                    <p th:text="${tableOrders['TB7'][3]}">No Data</p>
+                </div>
+                <div th:if="${tableOrders['TB7'] == null}">
+                    <p>7번 테이블</p>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td th:id="TB3">
+                <div th:if="${tableOrders['TB3'] != null}">
+                    <p>3번 테이블</p>
+                    <p th:text="${tableOrders['TB3'][1]}">No Data</p>
+                    <p th:text="${tableOrders['TB3'][2]}">No Data</p>
+                    <p th:text="${tableOrders['TB3'][3]}">No Data</p>
+                </div>
+                <div th:if="${tableOrders['TB3'] == null}">
+                    <p>7번 테이블</p>
+                </div>
+            </td>
+            <td th:id="TB5">
+                <div th:if="${tableOrders['TB5'] != null}">
+                    <p>5번 테이블</p>
+                    <p th:text="${tableOrders['TB5'][1]}">No Data</p>
+                    <p th:text="${tableOrders['TB5'][2]}">No Data</p>
+                    <p th:text="${tableOrders['TB5'][3]}">No Data</p>
+                </div>
+                <div th:if="${tableOrders['TB5'] == null}">
+                    <p>5번 테이블</p>
+                </div>
+            </td>
+            <td></td>
+            <td th:id="TB8">
+                <div th:if="${tableOrders['TB8'] != null}">
+                    <p>8번 테이블</p>
+                    <p th:text="${tableOrders['TB8'][1]}">No Data</p>
+                    <p th:text="${tableOrders['TB8'][2]}">No Data</p>
+                    <p th:text="${tableOrders['TB8'][3]}">No Data</p>
+                </div>
+                <div th:if="${tableOrders['TB8'] == null}">
+                    <p>8번 테이블</p>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</th:block>
+</html>

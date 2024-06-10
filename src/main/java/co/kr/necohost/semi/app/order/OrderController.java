@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -96,5 +97,37 @@ public class OrderController {
         orderService.updateDenialByProcess(orderID);
 
         return ("redirect:/orderList");
+    }
+
+    @RequestMapping(value = "/orderTable", method = RequestMethod.GET)
+    public String getOrderTable(Model model, @RequestParam Map<String, Object> params) {
+        List<Object[]> orderList = orderService.findSalesByProcessAndDevice(0);
+
+        // 주문 목록을 각 자리(TB1 ~ TB8)에 배치하기 위해 초기화
+        Map<String, Object[]> tableOrders = new HashMap<>();
+        for (int i = 1; i <= 8; i++) {
+            tableOrders.put("TB" + i, null);
+        }
+
+        // 주문 목록을 각 자리에 매핑
+        for (int i = 0; i < orderList.size(); i++) {
+            tableOrders.put("TB" + (i + 1), orderList.get(i));
+        }
+
+        model.addAttribute("tableOrders", tableOrders);
+
+        List<Sales> sales = orderList.stream().map(objects -> (Sales) objects[0]).collect(Collectors.toList());
+        List<String> menuNames = orderList.stream().map(objects -> (String) objects[1]).collect(Collectors.toList());
+        List<String> categoryNames = orderList.stream().map(objects -> (String) objects[2]).collect(Collectors.toList());
+        List<Integer> menuStocks = orderList.stream().map(objects -> (Integer) objects[3]).collect(Collectors.toList());
+
+        model.addAttribute("menuStock", menuStocks);
+        model.addAttribute("orderList", sales);
+        model.addAttribute("menuName", menuNames);
+        model.addAttribute("categoryName", categoryNames);
+        model.addAttribute("orderRequest", new SalesRequest());
+
+
+        return ("order/orderTable");
     }
 }
