@@ -27,10 +27,17 @@ public class SalesController {
     }
 
     // 신버전 관리자 페이지 - 판매 관리 페이지를 반환하는 메서드(css있음)
-    @RequestMapping(value = "/adminSalesMain", method=RequestMethod.GET)
-    public String getAdminSalesMenu() {
-        return "/sales/adminSalesMain.html";
+    @RequestMapping(value = "/adminSalesMainMenu", method=RequestMethod.GET)
+    public String getAdminSalesMainMenu() {
+        return "/sales/adminSalesMainMenu.html";
     }
+
+    // 신버전 관리자 페이지 - 홈 페이지(오늘의 매출)를 반환하는 메서드(css있음)
+    @RequestMapping(value = "/adminSalesMainHome", method=RequestMethod.GET)
+    public String getAdminSalesMainHome() {
+        return "/sales/adminSalesMainHome.html";
+    }
+
 
 
 
@@ -65,7 +72,7 @@ public class SalesController {
     }
 
 
-    //6월 10일 작업중. 각 카테고리별 총 판매액을 반환하는 메서드
+    //각 카테고리별 총 판매액을 반환하는 메서드
     @RequestMapping(value = "/totalSalesbyCategory", method = RequestMethod.GET)
     public String getTotalSalesByCategory(Model model) {
         Map<String, Double> totalByCategory = salesService.getTotalSalesByCategory();
@@ -99,11 +106,6 @@ public class SalesController {
 //        model.addAttribute("monthlySales", sortedMonthlySales);
 //        return "sales/totalSalesByMonth";
 //    }
-
-
-
-
-
     // 연도별 총 판매액을 반환하는 메서드
 //    @RequestMapping(value= "/totalSalesByYear", method = RequestMethod.GET)
 //    public String getTotalSalesByYear(Model model) {
@@ -113,6 +115,8 @@ public class SalesController {
 //        return "/sales/totalSalesByYear";
 //    }
     // 연도별 총 판매액을 반환하는 메서드. 6월 10일 오후 4시 수정중
+
+    //연도별 총 판매액을 반환하는 메서드
     @RequestMapping(value = "/totalSalesByYear", method = RequestMethod.GET)
     public String getTotalSalesByYear(Model model) {
         Map<Integer, Double> yearlySales = salesService.getYearlySalesByProcess();
@@ -142,6 +146,7 @@ public class SalesController {
 //        model.addAttribute("monthlySales", sortedMonthlySales);
 //        return "sales/totalSalesByMonth";
 //    }
+
     // 월별 총 판매액을 반환하는 메서드 6월 10일 수정중
     @RequestMapping(value = "/totalSalesByMonth", method = RequestMethod.GET)
     public String getTotalSalesByMonth(Model model) {
