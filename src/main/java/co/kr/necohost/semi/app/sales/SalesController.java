@@ -22,11 +22,20 @@ public class SalesController {
         this.salesService = salesService;
     }
 
-    // 관리자 판매 메뉴 페이지를 반환하는 메서드
-    @RequestMapping(value = "/adminSalesMenu", method=RequestMethod.GET)
+    // 구버전 관리자 판매 메뉴 페이지를 반환하는 메서드(css없음)
+//    @RequestMapping(value = "/adminSalesMenu", method=RequestMethod.GET)
+//    public String getAdminSalesMenu() {
+//        return "/sales/adminSalesMenu.html";
+//    }
+
+    // 신버전 관리자 페이지 - 판매 관리 페이지를 반환하는 메서드(css있음)
+    @RequestMapping(value = "/adminSalesMain", method=RequestMethod.GET)
     public String getAdminSalesMenu() {
-        return "/sales/adminSalesMenu.html";
+        return "/sales/adminSalesMain.html";
     }
+
+
+
 
     // 판매 데이터베이스 컨트롤러 메뉴 페이지를 반환하는 메서드
     @RequestMapping(value = "/salesDataBaseControllerMenu", method=RequestMethod.GET)
