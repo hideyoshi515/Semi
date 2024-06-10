@@ -15,7 +15,7 @@
 
     <div class="">
         <div class="row" id="menuContainer">
-            <div class="mb-3 menuItem" th:each="menu : ${menus}" th:attr="data-category=${menu.category}"
+            <div class="mb-3 menuItem" th:each="menu : ${menus}" th:attr="data-category=${menu.category}, data-menu-id=${menu.id}"
                  style="width: 200px">
                 <a th:if="${menu.stock} > 0"
                    th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ウォン'}">
@@ -161,7 +161,6 @@
             xhr.send(data);
         }
 
-
         document.getElementById('orderForm').addEventListener('submit', function (event) {
             var orders = sessionStorage.getItem('orders');
             document.getElementById('orderData').value = orders;
@@ -177,7 +176,6 @@
                 }
             });
         }
-
 
         function changeQuantity(amount) {
             var quantityInput = document.getElementById('quantityInput');
@@ -214,21 +212,21 @@
                 var item = cartItems[menuId];
                 var formattedPrice = item.price.toLocaleString();
                 var itemHtml = `
-            <div class="d-flex mb-3 align-items-center" data-menu-id="${menuId}" style="gap: 10px;">
-                <div style="flex: 1;">${item.name}</div>
-                <div style="width: 120px;">${formattedPrice} ウォン</div>
-                <div style="width: 120px;">
-                    <div class="input-group">
-                        <button type="button" class="btn btn-outline-secondary" onclick="changeCartQuantity(${menuId}, ${item.stock}, -1)">-</button>
-                        <input type="number" class="form-control text-center" id="quantity-${menuId}" value="${item.quantity}" readonly>
-                        <button type="button" class="btn btn-outline-secondary" onclick="changeCartQuantity(${menuId}, ${item.stock}, 1)">+</button>
+                <div class="d-flex mb-3 align-items-center cart-item" data-menu-id="${menuId}" style="gap: 10px;">
+                    <div style="flex: 1;">${item.name}</div>
+                    <div style="width: 120px;">${formattedPrice} ウォン</div>
+                    <div style="width: 120px;">
+                        <div class="input-group">
+                            <button type="button" class="btn btn-outline-secondary" onclick="changeCartQuantity(${menuId}, ${item.stock}, -1)">-</button>
+                            <input type="number" class="form-control text-center" id="quantity-${menuId}" value="${item.quantity}" readonly>
+                            <button type="button" class="btn btn-outline-secondary" onclick="changeCartQuantity(${menuId}, ${item.stock}, 1)">+</button>
+                        </div>
+                    </div>
+                    <div style="width: 60px;">
+                        <button type="button" class="btn btn-danger" onclick="deleteCartItem(${menuId})">삭제</button>
                     </div>
                 </div>
-                <div style="width: 60px;">
-                    <button type="button" class="btn btn-danger" onclick="deleteCartItem(${menuId})">삭제</button>
-                </div>
-            </div>
-        `;
+                `;
                 container.insertAdjacentHTML('beforeend', itemHtml);
             }
         }
@@ -260,6 +258,34 @@
             xhr.send(data);
         }
 
+        // 장바구니 삭제
+        function deleteCartItem(menuId) {
+            // AJAX 요청을 통해 서버로 데이터 전송
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/deleteCartItem", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    if (xhr.responseText === "success") {
+                        // 성공적으로 삭제되면 장바구니에서 항목 제거
+                        var itemRow = document.querySelector(`#cartItemsContainer [data-menu-id="${menuId}"]`);
+                        if (itemRow) {
+                            itemRow.remove();
+                        }
+                    } else {
+                        console.error("오류가 발생했습니다: " + xhr.responseText);
+                        alert("오류가 발생했습니다: " + xhr.responseText);
+                    }
+                } else if (xhr.readyState === 4) {
+                    console.error("오류가 발생했습니다: " + xhr.status, xhr.responseText);
+                    alert("오류가 발생했습니다: " + xhr.status);
+                }
+            };
+
+            var data = JSON.stringify({"menuId": menuId});
+            xhr.send(data);
+        }
+
         function checkout() {
             // 결제하기 버튼 클릭 시 동작하는 함수
             window.location.href = '/orderPayment';
@@ -269,28 +295,6 @@
         document.getElementById('cartModal').addEventListener('show.bs.modal', function () {
             loadCart();
         });
-
-        function deleteCartItem(menuId) {
-            // AJAX 요청을 통해 서버로 데이터 전송
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/deleteCartItem", true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    // 성공적으로 삭제되면 장바구니에서 항목 제거
-                    var itemRow = document.querySelector(`[data-menu-id="${menuId}"]`);
-                    if (itemRow) {
-                        itemRow.remove();
-                    }
-                } else if (xhr.readyState === 4) {
-                    alert("오류가 발생했습니다: " + xhr.status);
-                }
-            };
-
-            var data = JSON.stringify({"menuId": menuId});
-            xhr.send(data);
-        }
-
 
     </script>
 </th:block>

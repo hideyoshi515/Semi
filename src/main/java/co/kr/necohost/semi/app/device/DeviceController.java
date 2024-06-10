@@ -253,4 +253,23 @@ public class DeviceController {
 
         return "success";
     }
+    @PostMapping("deleteCartItem")
+    @ResponseBody
+    public String deleteCartItem(@RequestBody Map<String, Object> data, HttpSession session) {
+        Long menuId = ((Number) data.get("menuId")).longValue();
+        Menu menu = menuRepository.findById(menuId).orElse(null);
+        if (menu == null) {
+            return "error: menu not found";
+        }
+        Map<Menu, Integer> orders = (Map<Menu, Integer>) session.getAttribute("orders");
+        if (orders == null) {
+            orders = new HashMap<>();
+        }
+        if (orders.containsKey(menu)) {
+            orders.remove(menu);
+        }
+        session.setAttribute("orders", orders);
+        return "success";
+
+    }
 }
