@@ -22,4 +22,5 @@ public class Menu {
     private int stock;
     private String image;
     private String description;
+    private int stockorder;
 }
