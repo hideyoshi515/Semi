@@ -33,7 +33,7 @@
 
         .menu-section {
             padding: 20px;
-            min-height: 1120px; /* 최소 높이 설정 (4줄이 나오도록) */
+            min-height: 1110px; /* 최소 높이 설정 (4줄이 나오도록) */
         }
 
         .menu-category {
@@ -114,11 +114,11 @@
         <header>
             KIOSK
         </header>
-        <div class="btn-group-wrapper mb-3" role="group" aria-label="Category filter">
+        <div class="btn-group-wrapper mb-2" role="group" aria-label="Category filter">
             <div class="btn-group-container">
                 <div class="btn-group" id="categoryContainer">
-                    <button type="button" class="btn btn-secondary" onclick="filterMenu('all')">すべて</button>
-                    <button type="button" class="btn btn-secondary" th:each="category : ${categories}"
+                    <button type="button" class="btn btn-lg btn-secondary" onclick="filterMenu('all')">すべて</button>
+                    <button type="button" class="btn btn-lg btn-secondary" th:each="category : ${categories}"
                             th:text="${category.name}" th:id="|c_${category.id}_btn|"
                             th:onclick="|filterMenu(${category.id})|"></button>
                 </div>
@@ -160,9 +160,9 @@
                     </div>
                 </div>
                 <div class="d-flex justify-content-center mt-2" id="paginationControls">
-                    <button type="button" class="btn btn-secondary me-2" id="prevPageBtn" onclick="changePage(-1)">이전
+                    <button type="button" class="btn btn-lg btn-secondary me-2" id="prevPageBtn" onclick="changePage(-1)">이전
                     </button>
-                    <button type="button" class="btn btn-secondary" id="nextPageBtn" onclick="changePage(1)">다음</button>
+                    <button type="button" class="btn btn-lg btn-secondary" id="nextPageBtn" onclick="changePage(1)">다음</button>
                 </div>
             </div>
         </div>
@@ -170,12 +170,12 @@
             <div class="order-summary">
             </div>
             <div class="d-flex">
-                <button type="button" class="btn btn-warning me-3" data-bs-toggle="modal" data-bs-target="#cartModal">
+                <button type="button" class="btn btn-lg btn-warning me-3" data-bs-toggle="modal" data-bs-target="#cartModal">
                     장바구니 열기
                 </button>
                 <form method="post" action="orderPayment" id="orderForm">
                     <input type="hidden" name="orderData" id="orderData">
-                    <button type="submit" class="btn btn-warning">결제</button>
+                    <button type="submit" class="btn btn-lg btn-warning">결제</button>
                 </form>
             </div>
         </div>
@@ -193,15 +193,14 @@
                     <img id="modalImage" style="width: 180px; height: auto;">
                     <form id="quantityForm">
                         <div class="mb-3">
-                            <div id="modalDesc" class="">説明</div>
-                            <div id="modalPrice" class="">価格</div>
-                            <label for="quantityInput" class="form-label">数量</label>
-                            <div class="input-group">
-                                <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(-1)">-
+                            <div id="modalDesc" class="" style="font-size: 1.5rem;">説明</div>
+                            <div id="modalPrice" class="" style="font-size: 1.25rem;">価格</div>
+                            <div class="input-group w-75 mx-auto">
+                                <button type="button" class="btn btn-lg btn-outline-secondary" style="width: 50px;font-size: 2rem;" onclick="changeQuantity(-1)">-
                                 </button>
                                 <input type="number" class="form-control text-center" id="quantityInput" name="quantity"
-                                       value="1" min="1" readonly>
-                                <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(1)">+
+                                       value="1" min="1" style="font-size: 2rem;" readonly>
+                                <button type="button" class="btn btn-lg btn-outline-secondary" style="width: 50px;font-size: 2rem;" onclick="changeQuantity(1)">+
                                 </button>
                             </div>
                         </div>
@@ -209,8 +208,8 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="saveToSession()">追加</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+                    <button type="button" class="btn btn-lg btn-primary" onclick="saveToSession()">追加</button>
+                    <button type="button" class="btn btn-lg btn-secondary" data-bs-dismiss="modal">閉じる</button>
                 </div>
             </div>
         </div>
@@ -230,8 +229,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="checkout()">결제하기</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    <button type="button" class="btn btn-lg btn-primary" onclick="checkout()">결제하기</button>
+                    <button type="button" class="btn btn-lg btn-secondary" data-bs-dismiss="modal">닫기</button>
                 </div>
             </div>
         </div>
