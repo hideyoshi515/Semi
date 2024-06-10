@@ -3,15 +3,11 @@ package co.kr.necohost.semi.app.device;
 import co.kr.necohost.semi.domain.model.dto.AccountRequest;
 import co.kr.necohost.semi.domain.model.dto.DeviceRequest;
 import co.kr.necohost.semi.domain.model.dto.SalesRequest;
-import co.kr.necohost.semi.domain.model.entity.Account;
-import co.kr.necohost.semi.domain.model.entity.Category;
-import co.kr.necohost.semi.domain.model.entity.Device;
-import co.kr.necohost.semi.domain.model.entity.Menu;
+import co.kr.necohost.semi.domain.model.entity.*;
 import co.kr.necohost.semi.domain.repository.MenuRepository;
+import co.kr.necohost.semi.domain.repository.OrderNumRepository;
+import co.kr.necohost.semi.domain.repository.OrderRepository;
 import co.kr.necohost.semi.domain.service.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,14 +27,18 @@ public class DeviceController {
     private final MenuRepository menuRepository;
     private final AccountService accountService;
     private final CategoryService categoryService;
+    private final OrderRepository orderRepository;
+    private final OrderNumRepository orderNumRepository;
 
-    public DeviceController(MenuService menuService, DeviceService deviceService, SalesService salesService, MenuRepository menuRepository, AccountService accountService, CategoryService categoryService) {
+    public DeviceController(MenuService menuService, DeviceService deviceService, SalesService salesService, MenuRepository menuRepository, AccountService accountService, CategoryService categoryService, OrderRepository orderRepository, OrderNumRepository orderNumRepository) {
         this.menuService = menuService;
         this.deviceService = deviceService;
         this.salesService = salesService;
         this.menuRepository = menuRepository;
         this.accountService = accountService;
         this.categoryService = categoryService;
+        this.orderRepository = orderRepository;
+        this.orderNumRepository = orderNumRepository;
     }
 
     private int calculatePoints(long price) {
@@ -64,6 +64,7 @@ public class DeviceController {
         model.addAttribute("categories", categories);
         return "order/orderMenuSelect.html";
     }
+
     @RequestMapping(value = "/orderPayment", method = RequestMethod.POST)
     public String postOrderPayment(HttpSession session, Model model, DeviceRequest deviceRequest) {
         long totalPrice = 0;
@@ -95,6 +96,8 @@ public class DeviceController {
         String phone = deviceRequest.getPhoneNum();
         String pass = deviceRequest.getPass();
 
+        OrderNum orderNum = orderNumRepository.save(new OrderNum());
+
         for (Map.Entry<Long, Integer> entry : quantities.entrySet()) {
             Long menuId = entry.getKey();
             Integer quantity = entry.getValue();
@@ -117,6 +120,7 @@ public class DeviceController {
                 salesRequest.setDeviceNum((int) deviceRequest.getDeviceNum());
                 salesRequest.setOrderNum((int) deviceRequest.getOrderNum());
                 salesRequest.setProcess(paymentMethod.equals("CASH") ? 1 : paymentMethod.equals("CARD") ? 2 : 3);
+                salesRequest.setOrderNum((int) orderNum.getOrderNum());
 
                 salesService.save(salesRequest);
 
@@ -181,5 +185,51 @@ public class DeviceController {
         return "success";
     }
 
+    @GetMapping("/getCartItems")
+    @ResponseBody
+    public Map<String, Object> getCartItems(HttpSession session) {
+        Map<Menu, Integer> orders = (Map<Menu, Integer>) session.getAttribute("orders");
+        Map<String, Object> response = new HashMap<>();
+        if (orders != null) {
+            for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("name", entry.getKey().getName());
+                item.put("price", entry.getKey().getPrice());
+                item.put("quantity", entry.getValue());
+                item.put("stock", entry.getKey().getStock());
+                response.put(String.valueOf(entry.getKey().getId()), item);
+            }
+        }
+        return response;
+    }
 
+    @PostMapping("/updateCartQuantity")
+    @ResponseBody
+    public String updateCartQuantity(@RequestBody Map<String, Object> data, HttpSession session) {
+        Long menuId = ((Number) data.get("menuId")).longValue();
+        Integer quantity = (Integer) data.get("quantity");
+
+        Menu menu = menuRepository.findById(menuId).orElse(null);
+        if (menu == null) {
+            return "error: menu not found";
+        }
+
+        // 세션에서 현재 주문을 가져옴
+        Map<Menu, Integer> orders = (Map<Menu, Integer>) session.getAttribute("orders");
+        if (orders == null) {
+            orders = new HashMap<>();
+        }
+
+        // 수량을 업데이트
+        if (quantity > 0) {
+            orders.put(menu, quantity);
+        } else {
+            orders.remove(menu);
+        }
+
+        // 세션에 업데이트된 주문 저장
+        session.setAttribute("orders", orders);
+
+        return "success";
+    }
 }
