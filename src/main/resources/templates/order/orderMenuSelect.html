@@ -4,6 +4,34 @@
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var idleTime = 0;
+        var idleInterval;
+        var maxIdleTime = 5;
+
+        function resetIdleTimer(){
+            idleTime = 0;
+        }
+
+        function startIdleTimer() {
+            idleInterval = setInterval(function (){
+                idleTime++;
+                if (idleTime >= maxIdleTime){
+                    clearInterval(idleInterval);
+                    window.location.href = '/order'
+                }
+            }, 1000);
+        }
+
+        document.addEventListener('mousemove', resetIdleTimer);
+        document.addEventListener('keypress', resetIdleTimer);
+        document.addEventListener('click', resetIdleTimer);
+        document.addEventListener('touchstart', resetIdleTimer);
+
+        window.onload = function (){
+            startIdleTimer();
+        }
+    </script>
 </head>
 <body>
 <th:block layout:fragment="content">
