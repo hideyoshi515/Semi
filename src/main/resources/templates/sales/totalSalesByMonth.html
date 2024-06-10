@@ -1,62 +1,58 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/default_layout}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
 <head>
   <meta charset="UTF-8">
-  <title>月別総売上高</title>
-  <style>
-    table {
-      width: 50%;
-      border-collapse: collapse;
-      margin: 25px 0;
-      font-size: 18px;
-      text-align: left;
-    }
-    th, td {
-      padding: 12px;
-      border-bottom: 1px solid #ddd;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-    .chart-container {
-      position: relative;
-      width: 100%;
-      max-width: 600px;
-      height: auto;
-    }
-    canvas {
-      width: 100% !important;
-      height: auto !important;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POSOLDESK 売上管理プログラム</title>
+  <link rel="stylesheet" href="/css/adminSalesCss.css"> <!-- adminSalesCss.css 파일 경로로 수정 -->
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<th:block layout:fragment="content">
-  <body>
-  <h1>月別総売上高</h1>
-  <table>
-    <thead>
-    <tr>
-      <th>年月</th>
-      <th>総売上高</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="entry : ${monthlySales}">
-      <td th:text="${entry.key}"></td>
-      <td th:text="${#numbers.formatDecimal(entry.value, 0, 0)}"></td>
-    </tr>
-    </tbody>
-  </table>
-  <button onclick="location.href='/totalSalesByYearAndMonthInput'">年度と月を入力して総売上高を検索</button>
-  <button onclick="location.href='/adminSalesMenu'">管理者メイン画面に復帰</button>
 
-  <!-- 차트 짜보자 -->
-  <div class="chart-container">
-    <canvas id="monthlySalesChart"></canvas>
+  <body>
+
+  <th:block layout:fragment="content">
+    <div class="navbar">
+      <a href="#main">ホーム</a>
+      <a href="#menu" onclick="location.href='/adminSalesMainMenu'">メニュー</a>
+    </div>
+
+
+    <h1><img style="width: 38px;height: 38px;" src="/img/storeownerpage/monthrevenueicon.png" >月別総売上高</h1>
+
+  <div class="content">
+    <div class="table-container">
+      <table>
+        <thead>
+        <tr>
+          <th>年月</th>
+          <th>総売上高</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="monthlySales : ${monthlySales}">
+          <td th:text="${monthlySales.key}"></td>
+          <td th:text="${#numbers.formatInteger(monthlySales.value,1,'COMMA')} + '円'"></td>
+
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="chart-wrapper">
+      <div class="chart-container">
+        <canvas id="monthlySalesChart"></canvas>
+      </div>
+    </div>
   </div>
+  <div>
+
+    <button class="button" onclick="location.href='/totalSalesByYearAndMonthInput'">年度と月を入力して総売上高を検索</button>
+    <button class="button" onclick="location.href='/adminSalesMain'">管理者メイン画面に復帰</button>
+
+  </div>
+
   <!-- ThymeleafをJavaScriptに伝達 -->
   <script th:inline="javascript">
     /*<![CDATA[*/
@@ -109,6 +105,7 @@
       }
     });
   </script>
+  </th:block>
   </body>
 </th:block>
 </html>
