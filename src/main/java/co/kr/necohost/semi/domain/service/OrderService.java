@@ -28,6 +28,10 @@ public class OrderService {
         return orderRepository.findSalesByProcess(process);
     }
 
+    public List<Object[]> findSalesByProcessAndDevice(int process) {
+        return orderRepository.findSalesByProcessAndDevice(process);
+    }
+
     public Sales findById(int id) {
         return orderRepository.findById(id);
     }
