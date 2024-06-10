@@ -9,7 +9,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class MenuService {
@@ -43,7 +45,7 @@ public class MenuService {
         // 파일이 저장될 곳. 실제 서버의 로컬 경로를 의미함
         String path = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\img\\menu\\";
         File pathCheck = new File(path);
-        if(!pathCheck.exists()) {
+        if (!pathCheck.exists()) {
             pathCheck.mkdirs();
         }
         // 서버에서 파일을 불러올 경로 설정. 다음과 같이 처리하면 serverPath는 img\menu\ 가 될 것
@@ -75,8 +77,13 @@ public class MenuService {
                 throw new RuntimeException(e);
             }
 
-        }else{
+        } else {
             menuRepository.save(menuRequest.toEntity(menuRepository.findById(menuRequest.getId()).get().getImage()));
         }
+    }
+
+    public Map<Long, List<Menu>> getCategorizedMenus() {
+        List<Menu> menus = menuRepository.findAll();
+        return menus.stream().collect(Collectors.groupingBy(Menu::getCategory));
     }
 }

@@ -11,10 +11,8 @@ public class CategoryRequest {
 
     public Category toEntity() {
         Category category = new Category();
-
         category.setId(id);
         category.setName(name);
-
         return category;
     }
 }
