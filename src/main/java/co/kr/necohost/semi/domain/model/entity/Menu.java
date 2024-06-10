@@ -20,6 +20,7 @@ public class Menu {
     private int price;
     private long category;
     private int stock;
+    private int stockorder;
     private String image;
     private String description;
     private int stockorder;
