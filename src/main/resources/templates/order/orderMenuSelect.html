@@ -15,7 +15,7 @@
 
     <div class="">
         <div class="row" id="menuContainer">
-            <div class="mb-3" th:each="menu : ${menus}" th:attr="data-category=${menu.category}" style="width: 200px">
+            <div class="mb-3 menuItem" th:each="menu : ${menus}" th:attr="data-category=${menu.category}" style="width: 200px">
                 <a th:if="${menu.stock} > 0"
                    th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ウォン'}">
                     <div class="card rounded rounded-3" style="width: 180px;">
@@ -61,7 +61,7 @@
                                 <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(-1)">-
                                 </button>
                                 <input type="number" class="form-control text-center" id="quantityInput" name="quantity"
-                                       value="1" min="1">
+                                       value="1" min="1" readonly>
                                 <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(1)">+
                                 </button>
                             </div>
@@ -130,7 +130,7 @@
         });
 
         function filterMenu(category) {
-            var menuItems = document.querySelectorAll('#menuContainer .col-md-3');
+            var menuItems = document.querySelectorAll('#menuContainer .menuItem');
             menuItems.forEach(function (item) {
                 if (category === 'all' || item.getAttribute('data-category') == category) {
                     item.style.display = 'block';
