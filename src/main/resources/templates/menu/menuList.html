@@ -87,21 +87,21 @@
                     <div class="user-select-none" th:text="${menu.name}"></div>
                     <div class="user-select-none" th:text="|${#numbers.formatInteger(menu.price,1,'COMMA')} 원|"></div>
                     <div th:each="category : ${categories}">
-                        <div class="user-select-none" th:text="|카테고리 : ${category.name}|"
+                        <div class="user-select-none" th:text="|カテゴリー : ${category.name}|"
                              th:if="${category.id == menu.category}"></div>
                     </div>
-                    <div th:if="${menu.stock > 0}" class="user-select-none" th:text="|재고 : ${menu.stock}|"></div>
-                    <div th:if="${menu.stock <= 0}" class="user-select-none" th:text="|재고 : 매진|"></div>
+                    <div th:if="${menu.stock > 0}" class="user-select-none" th:text="|ストック : ${menu.stock}|"></div>
+                    <div th:if="${menu.stock <= 0}" class="user-select-none" th:text="|在庫切れ|"></div>
                     <div th:each="sale : ${salesCount}" th:if="${sale.key.id == menu.id}">
-                        <div th:if="${sale.key.id == menu.id}" class="user-select-none" th:text="|${salesDays}일간 판매량 : ${sale.value}|"></div>
-                        <div style="color: #ff363b" th:if="${menu.stock < sale.value * 0.5}" class="user-select-none" th:text="'재고 부족'"></div>
+                        <div th:if="${sale.key.id == menu.id}" class="user-select-none" th:text="|${salesDays}日間販売量 : ${sale.value}|"></div>
+                        <div style="color: #ff363b" th:if="${menu.stock < sale.value * 0.5}" class="user-select-none" th:text="'在庫不足'"></div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="mt-5 text-center">
-            <button class="btn btn-primary" onclick="location.href='/menuCreate'">메뉴 추가</button>
+            <button class="btn btn-primary" onclick="location.href='/menuCreate'">メニュー登録</button>
         </div>
     </div>
 
@@ -110,7 +110,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">메뉴 상세</h5>
+                    <h5 class="modal-title" id="modalTitle">メニュー詳細</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -121,8 +121,8 @@
                     <p id="modalDescription"></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="update()">수정</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="update()">修正</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
                 </div>
             </div>
         </div>
