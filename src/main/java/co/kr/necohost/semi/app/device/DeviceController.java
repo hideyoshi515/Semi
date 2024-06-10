@@ -56,7 +56,6 @@ public class DeviceController {
     @RequestMapping(value = "/order", method = RequestMethod.POST)
     public String postOrder(DeviceRequest deviceRequest, Model model, @RequestParam Map<String, Object> params) {
         model.addAttribute("deviceRequest", deviceRequest);
-//        long device = Long.parseLong(params.get("device").toString());
         Map<Long, List<Menu>> categorizedMenus = menuService.getCategorizedMenus();
         model.addAttribute("categorizedMenus", categorizedMenus);
         List<Menu> menus = menuService.getAllMenus();
@@ -65,30 +64,14 @@ public class DeviceController {
         model.addAttribute("categories", categories);
         return "order/orderMenuSelect.html";
     }
-
     @RequestMapping(value = "/orderPayment", method = RequestMethod.POST)
-    public String postOrderPayment(@RequestParam Map<String, String> quantities, @RequestParam String orderData, HttpSession session, Model model, DeviceRequest deviceRequest) {
+    public String postOrderPayment(HttpSession session, Model model, DeviceRequest deviceRequest) {
         long totalPrice = 0;
-        Map<Menu, Integer> orders = new HashMap<>();
-        ObjectMapper mapper = new ObjectMapper();
 
-        if (orderData != null && !orderData.isEmpty()) {
-            try {
-                // Step 1: JSON을 Map<String, String>으로 역직렬화
-                Map<String, String> stringOrders = mapper.readValue(orderData, new TypeReference<Map<String, String>>() {});
-
-                // Step 2: Map<String, String>을 Map<Menu, String>으로 변환
-                for (Map.Entry<String, String> entry : stringOrders.entrySet()) {
-                    String menuId = entry.getKey();
-                    int quantityStr = Integer.parseInt(entry.getValue());
-
-                    Menu menu = menuRepository.findById(Long.valueOf(menuId)).orElse(null); // Menu 객체를 검색하거나 생성하는 메서드
-                    orders.put(menu, quantityStr);
-                }
-                session.setAttribute("orders", orders);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+        // 세션에서 주문 데이터를 가져옴
+        Map<Menu, Integer> orders = (Map<Menu, Integer>) session.getAttribute("orders");
+        if (orders == null || orders.isEmpty()) {
+            return "order/orderMenuSelect.html"; // 주문이 없는 경우
         }
 
         // totalPrice 계산
@@ -112,7 +95,6 @@ public class DeviceController {
         String phone = deviceRequest.getPhoneNum();
         String pass = deviceRequest.getPass();
 
-
         for (Map.Entry<Long, Integer> entry : quantities.entrySet()) {
             Long menuId = entry.getKey();
             Integer quantity = entry.getValue();
@@ -124,7 +106,6 @@ public class DeviceController {
                 LocalDateTime localDate = LocalDateTime.now();
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String formattedDateTime = localDate.format(formatter);
-
 
                 accountRequest = new AccountRequest();
                 salesRequest = new SalesRequest();
@@ -142,7 +123,6 @@ public class DeviceController {
                 menu.setStock(menu.getStock() - quantity);
                 menuService.saveMenu(menu);
 
-
                 int pointsEarned = calculatePoints((long) menu.getPrice() * quantity);
                 if (phone.equals(phone)) {
                     account.setMsPoint(account.getMsPoint() + pointsEarned);
@@ -150,8 +130,6 @@ public class DeviceController {
                 } else {
                     return "order/orderPoint.html";
                 }
-
-
             }
         }
         model.addAttribute("orderedItems", quantities);
@@ -168,8 +146,6 @@ public class DeviceController {
                 model.addAttribute("error", "유효하지 않은 결제방법입니다.");
                 return "order/orderPaymentSelect.html";
         }
-
-
     }
 
     @ResponseBody
@@ -178,4 +154,32 @@ public class DeviceController {
         Map<Menu, Integer> orders = (Map<Menu, Integer>) session.getAttribute("orders");
         return orders;
     }
+
+    @PostMapping("/addToSession")
+    @ResponseBody
+    public String addToSession(@RequestBody Map<String, Object> data, HttpSession session) {
+        String menuId = (String) data.get("menuId");
+        Integer quantity = (Integer) data.get("quantity");
+
+        Menu menu = menuRepository.findById(Long.valueOf(menuId)).orElse(null);
+        if (menu == null) {
+            return "error: menu not found";
+        }
+
+        // 세션에서 현재 주문을 가져옴
+        Map<Menu, Integer> orders = (Map<Menu, Integer>) session.getAttribute("orders");
+        if (orders == null) {
+            orders = new HashMap<>();
+        }
+
+        // 기존 주문이 있는지 확인하고, 있으면 수량을 덮어쓰기
+        orders.put(menu, quantity);
+
+        // 세션에 업데이트된 주문 저장
+        session.setAttribute("orders", orders);
+
+        return "success";
+    }
+
+
 }
