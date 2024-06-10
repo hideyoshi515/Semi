@@ -103,9 +103,10 @@
                         $('#modalCategory').text('カテゴリー : ' + data.category.name);
                         if (data.menu.stockorder > 0) {
                             $('#modalStock').text('ストック : ' + data.menu.stock + ' + ' + data.menu.stockorder);
-                            $('#modalStock').on('click', updateStockAndOrder);
+                            $('#modalStock').off('click').on('click', updateStockAndOrder);
                         } else {
                             $('#modalStock').text('ストック : ' + data.menu.stock);
+                            $('#modalStock').off('click');
                         }
                         $('#modalDescription').text(data.menu.description);
                         // 모달을 표시
