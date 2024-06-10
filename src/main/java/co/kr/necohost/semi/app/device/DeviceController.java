@@ -87,6 +87,27 @@ public class DeviceController {
 
         return "order/orderPaymentSelect.html";
     }
+    @RequestMapping(value = "/orderPayment", method = RequestMethod.GET)
+    public String getOrderPayment(Model model, DeviceRequest deviceRequest,HttpSession session) {
+        long totalPrice = 0;
+
+        Map<Menu, Integer> orders = (Map<Menu, Integer>) session.getAttribute("orders");
+        if (orders == null || orders.isEmpty()) {
+            return "order/orderMenuSelect.html"; // 주문이 없는 경우
+        }
+
+
+        for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
+            Menu menu = entry.getKey();
+            int quantity = entry.getValue();
+            totalPrice += menu.getPrice() * quantity;
+        }
+
+        model.addAttribute("orderedItems", orders);
+        model.addAttribute("totalPrice", totalPrice);
+
+        return "order/orderPaymentSelect.html";
+    }
 
     @RequestMapping(value = "/orderPaymentSelect", method = RequestMethod.POST)
     public String OrderPaymentSelect(@ModelAttribute DeviceRequest deviceRequest, @RequestParam String paymentMethod, Model model, SalesRequest salesRequest, AccountRequest accountRequest) {
