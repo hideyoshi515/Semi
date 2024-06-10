@@ -41,6 +41,12 @@ public class MenuService {
         return menuRepository.save(menu);
     }
 
+    public void addStockOrder(long id, int amount) {
+        Menu menu = menuRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid menu ID"));
+        menu.setStockorder(menu.getStockorder() + amount);
+        menuRepository.save(menu);
+    }
+
     public void saveMenuWithImage(MenuRequest menuRequest, MultipartFile file) {
         // 파일이 저장될 곳. 실제 서버의 로컬 경로를 의미함
         String path = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\img\\menu\\";
@@ -85,5 +91,12 @@ public class MenuService {
     public Map<Long, List<Menu>> getCategorizedMenus() {
         List<Menu> menus = menuRepository.findAll();
         return menus.stream().collect(Collectors.groupingBy(Menu::getCategory));
+    }
+
+    public void updateStockAndOrder(long id) {
+        Menu menu = menuRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid menu ID"));
+        menu.setStock(menu.getStock() + menu.getStockorder());
+        menu.setStockorder(0);
+        menuRepository.save(menu);
     }
 }
