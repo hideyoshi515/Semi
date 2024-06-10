@@ -3644,11 +3644,6 @@ textarea.form-control-lg {
   text-decoration: none;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
 }
-
-.nav-now{
-  color: #fff !important;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .nav-link {
     transition: none;
@@ -10854,7 +10849,7 @@ body {
 #layoutAuthentication {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - var(--header-height));
+  min-height: 100vh;
 }
 #layoutAuthentication #layoutAuthentication_content {
   min-width: 0;
@@ -10882,7 +10877,7 @@ body {
   min-width: 0;
   flex-grow: 1;
   min-height: calc(100vh - 56px);
-  margin-left: 0px;
+  margin-left: -225px;
 }
 
 .sb-sidenav-toggled #layoutSidenav #layoutSidenav_nav {
@@ -10914,7 +10909,7 @@ body {
     transform: translateX(-225px);
   }
   .sb-sidenav-toggled #layoutSidenav #layoutSidenav_content {
-    margin-left: 0px;
+    margin-left: -225px;
   }
   .sb-sidenav-toggled #layoutSidenav #layoutSidenav_content:before {
     display: none;
@@ -10935,7 +10930,7 @@ body {
   overflow-y: auto;
 }
 .sb-nav-fixed #layoutSidenav #layoutSidenav_content {
-  padding-left: 0px;
+  padding-left: 225px;
   top: 56px;
 }
 
@@ -11056,12 +11051,6 @@ body {
   background-color: #f8f9fa;
   color: #212529;
 }
-
-.sb-sidenav-warning {
-  background-color: #ffc107 !important;
-  color: #000 !important;
-}
-
 .sb-sidenav-light .sb-sidenav-menu .sb-sidenav-menu-heading {
   color: #adb5bd;
 }
