@@ -23,7 +23,6 @@
                     $('#modalCategory').text('カテゴリー : ' + data.category.name);
                     $('#modalStock').text(data.menu.stock > 0 ? 'ストック : ' + data.menu.stock : '在庫切れ');
                     $('#modalDescription').text(data.menu.description);
-
                     // 모달을 표시
                     var myModal = new bootstrap.Modal(document.getElementById('menuModal'), {});
                     myModal.show();
@@ -65,6 +64,11 @@
         .menu-item {
             border-bottom: 1px solid #ccc; /* 항목들 사이의 구분선 */
         }
+
+        .scrollable-container {
+            height: 80vh; /* 원하는 높이 설정 */
+            overflow: auto;
+        }
     </style>
     <div>
         <div>
@@ -78,54 +82,65 @@
 
             </select>
         </div>
-
-        <div class="mt-3 d-flex justify-content-around">
-            <div th:each="menu : ${menus}" class="border text-center align-content-center"
-                 th:id="${menu.id}" style="width: 180px; height: 240px;" th:onclick="|detail(${menu.id})|">
-                <div class="user-select-none">
-                    <img th:src="${menu.image}" style="width: 75px; height: 75px;">
-                    <div class="user-select-none" th:text="${menu.name}"></div>
-                    <div class="user-select-none" th:text="|${#numbers.formatInteger(menu.price,1,'COMMA')} 원|"></div>
-                    <div th:each="category : ${categories}">
-                        <div class="user-select-none" th:text="|カテゴリー : ${category.name}|"
-                             th:if="${category.id == menu.category}"></div>
+        <div id="scrollable-content" class="scrollable-container">
+            <div id="menu-container" class="mt-3 d-flex flex-wrap justify-content-around">
+                <div th:each="menu : ${menus}" class="border text-center align-content-center"
+                     th:id="${menu.id}" style="width: 20%; height: 30%;" th:onclick="|detail(${menu.id})|">
+                    <div class="user-select-none">
+                        <img th:src="${menu.image}" style="width: 150px; height: 150px;">
+                        <div class="user-select-none" th:text="${menu.name}"></div>
+                        <div class="user-select-none"
+                             th:text="|${#numbers.formatInteger(menu.price,1,'COMMA')} 원|"></div>
+                        <div th:each="category : ${categories}">
+                            <div class="user-select-none" th:text="|カテゴリー : ${category.name}|"
+                                 th:if="${category.id == menu.category}"></div>
+                        </div>
+                        <div class="user-select-none" th:text="|ストック : ${menu.stock}|"></div>
+                        <div th:each="sale : ${salesCount}" th:if="${sale.key.id == menu.id}">
+                            <div th:if="${sale.key.id == menu.id}" class="user-select-none"
+                                 th:text="|${salesDays}日間販売量 : ${sale.value}|"></div>
+                            <div th:if="${menu.stock <= 0}" class="user-select-none" style="color: #ff363b"
+                                 th:text="在庫切れ"></div>
+                            <div th:if="${menu.stock > 0}">
+                                <div th:if="${menu.stock < sale.value * 0.5}" class="user-select-none"
+                                     style="color: #ff363b"
+                                     th:text="在庫不足"></div>
+                                <div th:if="${menu.stock >= sale.value * 0.5}" class="user-select-none"
+                                     style="color: #0a53be"
+                                     th:text="在庫あり"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div th:if="${menu.stock > 0}" class="user-select-none" th:text="|ストック : ${menu.stock}|"></div>
-                    <div th:if="${menu.stock <= 0}" class="user-select-none" th:text="|在庫切れ|"></div>
-                    <div th:each="sale : ${salesCount}" th:if="${sale.key.id == menu.id}">
-                        <div th:if="${sale.key.id == menu.id}" class="user-select-none" th:text="|${salesDays}日間販売量 : ${sale.value}|"></div>
-                        <div style="color: #ff363b" th:if="${menu.stock < sale.value * 0.5}" class="user-select-none" th:text="'在庫不足'"></div>
+                </div>
+            </div>
+
+            <div class="mt-5 text-center">
+                <button class="btn btn-primary" onclick="location.href='/menuCreate'">メニュー登録</button>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalTitle">メニュー詳細</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <img id="modalImage" src="" style="width: 100%; height: auto;">
+                        <p id="modalPrice"></p>
+                        <p id="modalCategory"></p>
+                        <p id="modalStock"></p>
+                        <p id="modalDescription"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="update()">修正
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="mt-5 text-center">
-            <button class="btn btn-primary" onclick="location.href='/menuCreate'">メニュー登録</button>
-        </div>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">メニュー詳細</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <img id="modalImage" src="" style="width: 100%; height: auto;">
-                    <p id="modalPrice"></p>
-                    <p id="modalCategory"></p>
-                    <p id="modalStock"></p>
-                    <p id="modalDescription"></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="update()">修正</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
-                </div>
-            </div>
-        </div>
-    </div>
 </th:block>
 </html>
