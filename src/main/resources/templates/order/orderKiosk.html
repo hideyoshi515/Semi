@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIOSK</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+        }
+
+        .container {
+            width: 768px;
+            margin: auto;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            background-color: #ffcc00;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        header img {
+            height: 50px;
+        }
+
+        .menu-section {
+            padding: 20px;
+            min-height: 1120px; /* 최소 높이 설정 (4줄이 나오도록) */
+        }
+
+        .menu-category {
+            margin-bottom: 20px;
+        }
+
+        .menu-category h2 {
+            margin-bottom: 10px;
+            border-bottom: 2px solid #ffcc00;
+            padding-bottom: 5px;
+        }
+
+        .menu-items {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .menu-item {
+            width: 30%;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .menu-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .menu-item p {
+            margin: 10px 0 0;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f2f2f2;
+            padding: 10px 20px;
+        }
+
+        .btn-group-wrapper {
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             width: 100%;
+         }
+
+        .btn-group-container {
+            overflow-x: auto;
+            white-space: nowrap;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-group {
+            display: flex;
+        }
+
+        .btn-group .btn {
+            margin: 0px;
+            white-space: nowrap;
+        }
+        .modal-dialog-centered {
+            display: flex;
+            align-items: center;
+            min-height: calc(100vh - 1rem);
+        }
+
+    </style>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="container">
+        <header>
+            KIOSK
+        </header>
+        <div class="btn-group-wrapper mb-3" role="group" aria-label="Category filter">
+            <div class="btn-group-container">
+                <div class="btn-group" id="categoryContainer">
+                    <button type="button" class="btn btn-secondary" onclick="filterMenu('all')">すべて</button>
+                    <button type="button" class="btn btn-secondary" th:each="category : ${categories}"
+                            th:text="${category.name}" th:id="|c_${category.id}_btn|"
+                            th:onclick="|filterMenu(${category.id})|"></button>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="menu-section">
+            <div class="menu-category">
+                <h2 id="categoryTitle">すべて</h2>
+                <div class="row ms-4" id="menuContainer">
+                    <div class="menu-item mb-3 me-2" th:each="menu : ${menus}" th:attr="data-category=${menu.category}"
+                         style="width: 200px">
+                        <a th:if="${menu.stock} > 0"
+                           th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ウォン'}">
+                            <div class="card rounded rounded-3" style="width: 180px;">
+                                <div class="card-body text-center">
+                                    <img th:src="${menu.image}"
+                                         onerror="this.onerror=null; this.src='/img/americano.png'"
+                                         style="width: 8rem; height: auto;">
+                                    <h5 class="card-title" th:text="${menu.name}"></h5>
+                                    <p class="card-text mb-0"><span
+                                            th:text="${#numbers.formatInteger(menu.price, 1, 'COMMA')}+ウォン"></span>
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="card rounded rounded-3" style="width: 180px;" th:if="${menu.stock} <= 0">
+                            <div class="rounded-3 w-100 h-100"
+                                 style="background: rgba(0, 0, 0, 0.7); position: absolute;"></div>
+                            <div class="card-body text-center">
+                                <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'"
+                                     style="width: 8rem; height: auto;">
+                                <h5 class="card-title" th:text="${menu.name}"></h5>
+                                <p class="card-text mb-0" style="color: darkred; font-weight: bold; z-index: 100000;">
+                                    売れ切り</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center mt-2" id="paginationControls">
+                    <button type="button" class="btn btn-secondary me-2" id="prevPageBtn" onclick="changePage(-1)">이전
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="nextPageBtn" onclick="changePage(1)">다음</button>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="order-summary">
+                <p>총 결제 금액: ₩0</p>
+            </div>
+            <div class="d-flex">
+                <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#cartModal">
+                    장바구니 열기
+                </button>
+                <form method="post" action="orderPayment" id="orderForm">
+                    <input type="hidden" name="orderData" id="orderData">
+                    <button type="submit" class="btn btn-success">결제</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="menuModalLabel"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="modalImage" style="width: 180px; height: auto;">
+                    <form id="quantityForm">
+                        <div class="mb-3">
+                            <div id="modalDesc" class="">説明</div>
+                            <div id="modalPrice" class="">価格</div>
+                            <label for="quantityInput" class="form-label">数量</label>
+                            <div class="input-group">
+                                <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(-1)">-
+                                </button>
+                                <input type="number" class="form-control text-center" id="quantityInput" name="quantity"
+                                       value="1" min="1" readonly>
+                                <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(1)">+
+                                </button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="menuIdInput" name="menuId">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="saveToSession()">追加</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cartModalLabel">장바구니</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="cartItemsContainer">
+                        <!-- 장바구니 아이템들이 여기에 동적으로 추가됩니다 -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="checkout()">결제하기</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('menuModal').addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var menuName = button.getAttribute('data-menu-name');
+            var menuId = button.getAttribute('data-menu-id');
+            var menuStock = button.getAttribute('data-menu-stock');
+            var menuImage = button.getAttribute('data-menu-image');
+            var menuDesc = button.getAttribute('data-menu-desc');
+            var menuPrice = button.getAttribute('data-menu-price');
+
+            var modalTitle = document.getElementById('menuModalLabel');
+            var quantityInput = document.getElementById('quantityInput');
+            var menuIdInput = document.getElementById('menuIdInput');
+            var modalImage = document.getElementById('modalImage');
+            var modalDesc = document.getElementById('modalDesc');
+            var modalPrice = document.getElementById('modalPrice');
+
+            modalTitle.textContent = menuName;
+            modalDesc.textContent = menuDesc;
+            modalPrice.textContent = menuPrice;
+            quantityInput.value = '1';
+            quantityInput.setAttribute('max', menuStock);
+            menuIdInput.value = menuId;
+            modalImage.setAttribute('src', "/"+menuImage)
+        });
+
+        function saveToSession() {
+            var menuId = document.getElementById('menuIdInput').value;
+            var quantity = parseInt(document.getElementById('quantityInput').value);
+
+            if (quantity < 0) {
+                alert("数量は0以上にしてください。");
+                return;
+            }
+
+            // AJAX 요청을 통해 서버로 데이터 전송
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/addToSession", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    alert("상품이 세션에 추가되었습니다.");
+                    document.getElementById('menuModal').querySelector('.btn-close').click();
+                } else if (xhr.readyState === 4) {
+                    alert("오류가 발생했습니다: " + xhr.status);
+                }
+            };
+
+            var data = JSON.stringify({"menuId": menuId, "quantity": quantity});
+            xhr.send(data);
+        }
+
+        document.getElementById('orderForm').addEventListener('submit', function (event) {
+            var orders = sessionStorage.getItem('orders');
+            document.getElementById('orderData').value = orders;
+        });
+
+        var currentPage = 1;
+        var itemsPerPage = 12; // 한 페이지에 보여줄 아이템 수
+        function filterMenu(category) {
+            var menuItems = document.querySelectorAll('#menuContainer .menu-item');
+            var title = document.getElementById('categoryTitle');
+            var getTitle = document.getElementById('c_' + category + '_btn');
+            if (category === 'all') {
+                title.innerText = "すべて"
+            } else {
+                title.innerText = getTitle.innerText;
+            }
+            menuItems.forEach(function (item) {
+                item.style.display = 'none';
+                if (category === 'all' || item.getAttribute('data-category') == category) {
+                    item.classList.add('filtered');
+                } else {
+                    item.classList.remove('filtered');
+                }
+            });
+            showPage(1);
+        }
+
+        function showPage(page) {
+            var items = document.querySelectorAll('#menuContainer .filtered');
+            var totalItems = items.length;
+            var totalPages = Math.ceil(totalItems / itemsPerPage);
+            currentPage = page;
+
+            items.forEach(function (item, index) {
+                item.style.display = 'none';
+                if (index >= (page - 1) * itemsPerPage && index < page * itemsPerPage) {
+                    item.style.display = 'block';
+                }
+            });
+
+            if (totalPages > 1) {
+                document.getElementById('prevPageBtn').style.display = 'inline-block';
+                document.getElementById('nextPageBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('prevPageBtn').style.display = 'none';
+                document.getElementById('nextPageBtn').style.display = 'none';
+            }
+
+            document.getElementById('prevPageBtn').disabled = page === 1;
+            document.getElementById('nextPageBtn').disabled = page === totalPages;
+        }
+
+
+        function changePage(direction) {
+            showPage(currentPage + direction);
+        }
+
+        function changeQuantity(amount) {
+            var quantityInput = document.getElementById('quantityInput');
+            var currentQuantity = parseInt(quantityInput.value);
+            var newQuantity = currentQuantity + amount;
+            if (newQuantity < 1) {
+                newQuantity = 1;
+            }
+            var maxQuantity = parseInt(quantityInput.getAttribute('max'));
+            if (newQuantity > maxQuantity) {
+                newQuantity = maxQuantity;
+            }
+            quantityInput.value = newQuantity;
+        }
+
+        function loadCart() {
+            // AJAX 요청을 통해 장바구니 데이터를 가져옴
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/getCartItems", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var cartItems = JSON.parse(xhr.responseText);
+                    displayCartItems(cartItems);
+                }
+            };
+            xhr.send();
+        }
+
+        function displayCartItems(cartItems) {
+            var container = document.getElementById('cartItemsContainer');
+            container.innerHTML = '';
+            for (var menuId in cartItems) {
+                var item = cartItems[menuId];
+                var itemHtml = `
+                        <div class="row mb-3 align-content-center" data-menu-id="${menuId}">
+                            <div class="col-md-5 pt-2">${item.name}</div>
+                            <div class="col-md-2 pt-2">${item.price} ウォン</div>
+                            <div class="col-md-3">
+                                <div class="input-group">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="changeCartQuantity(${menuId}, ${item.stock}, -1)">-</button>
+                                    <input type="number" class="form-control text-center" id="quantity-${menuId}" value="${item.quantity}" readonly>
+                                    <button type="button" class="btn btn-outline-secondary" onclick="changeCartQuantity(${menuId}, ${item.stock}, 1)">+</button>
+                                </div>
+                            </div>
+                            <div class="col-md-2 pt-2" id="cart-total">${item.price * item.quantity} ウォン</div>
+                        </div>
+                    `;
+                container.insertAdjacentHTML('beforeend', itemHtml);
+            }
+        }
+
+        function changeCartQuantity(menuId, stock, amount) {
+            var quantityInput = document.getElementById('quantity-' + menuId);
+            var currentQuantity = parseInt(quantityInput.value);
+            var newQuantity = currentQuantity + amount;
+
+            if (newQuantity < 1) {
+                newQuantity = 1;
+            } else if (newQuantity > stock) {
+                newQuantity = stock;
+            }
+
+            // AJAX 요청을 통해 서버로 데이터 전송
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/updateCartQuantity", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    quantityInput.value = newQuantity;
+                } else if (xhr.readyState === 4) {
+                    alert("오류가 발생했습니다: " + xhr.status);
+                }
+            };
+
+            var data = JSON.stringify({"menuId": menuId, "quantity": newQuantity});
+            xhr.send(data);
+        }
+
+        function checkout() {
+            // 결제하기 버튼 클릭 시 동작하는 함수
+            window.location.href = '/orderPayment';
+        }
+
+        // 장바구니 모달을 열 때 장바구니 데이터를 로드
+        document.getElementById('cartModal').addEventListener('show.bs.modal', function () {
+            loadCart();
+        });
+        let scrollAmount = 0;
+
+
+        filterMenu('all');
+
+
+    </script>
+</th:block>
+</body>
+</html>
