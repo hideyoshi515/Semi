@@ -13,6 +13,10 @@
   <body>
 
   <th:block layout:fragment="content">
+    <div class="navbar">
+      <a href="#main">ホーム</a>
+      <a href="#menu" onclick="location.href='/adminSalesMainMenu'">メニュー</a>
+    </div>
 
 
     <h1><img style="width: 38px;height: 38px;" src="/img/storeownerpage/monthrevenueicon.png" >月別総売上高</h1>
@@ -29,7 +33,7 @@
         <tbody>
         <tr th:each="monthlySales : ${monthlySales}">
           <td th:text="${monthlySales.key}"></td>
-          <td th:text="${monthlySales.value}+ '円'"></td>
+          <td th:text="${#numbers.formatInteger(monthlySales.value,1,'COMMA')} + '円'"></td>
 
         </tr>
         </tbody>

@@ -13,6 +13,10 @@
 
 <body>
 <th:block layout:fragment="content">
+    <div class="navbar">
+        <a onclick="location.href='/adminSalesMainHome'">ホーム</a>
+        <a onclick="location.href='/adminSalesMainMenu'">メニュー</a>
+    </div>
     <h1><img style="width: 38px;height: 38px;" src="/img/storeownerpage/yearlyrevenueicon2.png">年度別総売上高</h1>
 
     <div class="content">
@@ -20,14 +24,14 @@
             <table>
                 <thead>
                 <tr>
-                    <th>年月</th>
+                    <th>年</th>
                     <th>総売上高</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="monthlySales : ${yearlySales}">
-                    <td th:text="${monthlySales.key}"></td>
-                    <td th:text="${#numbers.formatInteger(monthlySales.value,1,'COMMA')} + '円'"></td>
+                <tr th:each="yearlySales : ${yearlySales}">
+                    <td th:text="${yearlySales.key}"></td>
+                    <td th:text="${#numbers.formatInteger(yearlySales.value,1,'COMMA')} + '円'"></td>
                 </tr>
                 </tbody>
             </table>
