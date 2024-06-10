@@ -19,9 +19,9 @@
                     // 데이터가 성공적으로 로드되면 모달에 데이터를 설정
                     $('#modalTitle').text(data.menu.name);
                     $('#modalImage').attr('src', data.menu.image);
-                    $('#modalPrice').text('가격 : ' + data.menu.price + ' 원');
-                    $('#modalCategory').text('카테고리 : ' + data.category.name);
-                    $('#modalStock').text(data.menu.stock > 0 ? '재고 : ' + data.menu.stock : '매진');
+                    $('#modalPrice').text('価格 : ' + data.menu.price + ' ウォン');
+                    $('#modalCategory').text('カテゴリー : ' + data.category.name);
+                    $('#modalStock').text(data.menu.stock > 0 ? 'ストック : ' + data.menu.stock : '在庫切れ');
                     $('#modalDescription').text(data.menu.description);
 
                     // 모달을 표시
@@ -29,7 +29,7 @@
                     myModal.show();
                 },
                 error: function () {
-                    alert('메뉴 정보를 불러오는데 실패했습니다.');
+                    alert('メニューをロードエラー');
                 }
             });
         }
