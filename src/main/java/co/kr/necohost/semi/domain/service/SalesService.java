@@ -1,8 +1,10 @@
 package co.kr.necohost.semi.domain.service;
 
 import co.kr.necohost.semi.domain.model.dto.SalesRequest;
+import co.kr.necohost.semi.domain.model.entity.Category;
 import co.kr.necohost.semi.domain.model.entity.Menu;
 import co.kr.necohost.semi.domain.model.entity.Sales;
+import co.kr.necohost.semi.domain.repository.CategoryRepository;
 import co.kr.necohost.semi.domain.repository.MenuRepository;
 import co.kr.necohost.semi.domain.repository.SalesRepository;
 import org.springframework.stereotype.Service;
@@ -20,11 +22,13 @@ import java.util.stream.Collectors;
 @Service
 public class SalesService {
     private final SalesRepository salesRepository;
+    private final CategoryRepository categoryRepository;
     MenuRepository menuRepository;
 
-    public SalesService(SalesRepository salesRepository, MenuRepository menuRepository) {
+    public SalesService(SalesRepository salesRepository, MenuRepository menuRepository, CategoryRepository categoryRepository) {
         this.salesRepository = salesRepository;
         this.menuRepository = menuRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     // 새로운 판매 기록을 저장
@@ -90,25 +94,67 @@ public class SalesService {
                         Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
                 ));
     }
-    // 카테고리별 총 판매량을 계산
-    public Map<Integer, Double> getTotalSalesByCategory() {
+    // 카테고리별 총 판매량을 계산. 6월 10일 작업중
+//    public Map<Integer, Double> getTotalSalesByCategory() {
+//        List<Sales> salesList = salesRepository.findAllSales();
+//        return salesList.stream()
+//                .collect(Collectors.groupingBy(
+//                        Sales::getCategory,
+//                        Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
+//                ));
+//    }
+
+    public Map<String, Double> getTotalSalesByCategory() {
         List<Sales> salesList = salesRepository.findAllSales();
+        List<Category> categoryList = categoryRepository.findAll();
+
+        // 카테고리 ID와 이름을 매핑
+        Map<Integer, String> categoryMap = categoryList.stream()
+                .collect(Collectors.toMap(category -> Math.toIntExact(category.getId()), Category::getName));
+
+        // 판매 데이터를 카테고리 이름으로 그룹화
         return salesList.stream()
                 .collect(Collectors.groupingBy(
-                        Sales::getCategory,
+                        sales -> categoryMap.get(sales.getCategory()),
                         Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
                 ));
     }
 
+
+
+
+
+
+
+
+
+
     // 각 메뉴별 총 판매액을 계산. 6월 7일 오후 5시 작업중
-    public Map<Integer, Double> getTotalSalesByMenu() {
+//    public Map<Integer, Double> getTotalSalesByMenu() {
+//        List<Sales> salesList = salesRepository.findAllSales();
+//        return salesList.stream()
+//                .collect(Collectors.groupingBy(
+//                        Sales::getMenu,
+//                        Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
+//                ));
+//    }
+    //6월 10일 작업중
+    public Map<String, Double> getTotalSalesByMenu() {
         List<Sales> salesList = salesRepository.findAllSales();
+        List<Menu> menuList = menuRepository.findAll();
+
+        // 메뉴 ID와 이름을 매핑
+        Map<Integer, String> menuMap = menuList.stream()
+                .collect(Collectors.toMap(menu -> Math.toIntExact(menu.getId()), Menu::getName));
+
+        // 판매 데이터를 메뉴 이름으로 그룹화
         return salesList.stream()
                 .collect(Collectors.groupingBy(
-                        Sales::getMenu,
+                        sales -> menuMap.get(sales.getMenu()),
                         Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
                 ));
     }
+
 
 
 
@@ -203,6 +249,11 @@ public class SalesService {
         }
         return ((currentMonthSales - previousMonthSales) / previousMonthSales) * 100;
     }
+
+
+
+
+
 
 
 

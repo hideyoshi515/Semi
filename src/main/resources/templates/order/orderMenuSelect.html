@@ -110,19 +110,30 @@
 
         function saveToSession() {
             var menuId = document.getElementById('menuIdInput').value;
-            var quantity = document.getElementById('quantityInput').value;
+            var quantity = parseInt(document.getElementById('quantityInput').value);
 
             if (quantity < 0) {
                 alert("数量は0以上にしてください。");
                 return;
             }
 
-            var orders = JSON.parse(sessionStorage.getItem('orders')) || {};
-            orders[menuId] = quantity;
-            sessionStorage.setItem('orders', JSON.stringify(orders));
+            // AJAX 요청을 통해 서버로 데이터 전송
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/addToSession", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    alert("상품이 세션에 추가되었습니다.");
+                    document.getElementById('menuModal').querySelector('.btn-close').click();
+                } else if (xhr.readyState === 4) {
+                    alert("오류가 발생했습니다: " + xhr.status);
+                }
+            };
 
-            document.getElementById('menuModal').querySelector('.btn-close').click();
+            var data = JSON.stringify({ "menuId": menuId, "quantity": quantity });
+            xhr.send(data);
         }
+
 
         document.getElementById('orderForm').addEventListener('submit', function (event) {
             var orders = sessionStorage.getItem('orders');
