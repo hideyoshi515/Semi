@@ -8,7 +8,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f7f7f7;
@@ -44,12 +43,6 @@
             margin-bottom: 10px;
             border-bottom: 2px solid #ffcc00;
             padding-bottom: 5px;
-        }
-
-        .menu-items {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
         }
 
         .menu-item {
@@ -129,9 +122,9 @@
         <div class="menu-section">
             <div class="menu-category">
                 <h2 id="categoryTitle">すべて</h2>
-                <div class="row ms-4" id="menuContainer" style="min-height: 944px;">
-                    <div class="menu-item mb-3 me-2" th:each="menu : ${menus}" th:attr="data-category=${menu.category}"
-                         style="width: 200px">
+                <div class="row ms-3" id="menuContainer" style="min-height: 944px;">
+                    <div class="menu-item mb-2 me-4" th:each="menu : ${menus}" th:attr="data-category=${menu.category}"
+                         style="width: 200px; height: 220px;">
                         <a th:if="${menu.stock} > 0"
                            th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ウォン'}">
                             <div class="card rounded rounded-3" style="width: 180px;">
