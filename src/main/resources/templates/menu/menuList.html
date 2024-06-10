@@ -5,78 +5,6 @@
         layout:decorate="~{layout/default_layout}">
 >
 <th:block layout:fragment="content">
-    <script>
-        let currentMenu;
-
-        function detail(pk) {
-            currentMenu = pk;
-            // AJAX를 사용하여 메뉴 상세 정보를 가져옴
-            $.ajax({
-                url: '/menuDetail?id=' + pk,
-                type: 'GET',
-                success: function (data) {
-                    console.log(data)
-                    // 데이터가 성공적으로 로드되면 모달에 데이터를 설정
-                    $('#modalTitle').text(data.menu.name);
-                    $('#modalImage').attr('src', data.menu.image);
-                    $('#modalPrice').text('価格 : ' + data.menu.price + ' ウォン');
-                    $('#modalCategory').text('カテゴリー : ' + data.category.name);
-                    $('#modalStock').text(data.menu.stock > 0 ? 'ストック : ' + data.menu.stock : '在庫切れ');
-                    $('#modalDescription').text(data.menu.description);
-                    // 모달을 표시
-                    var myModal = new bootstrap.Modal(document.getElementById('menuModal'), {});
-                    myModal.show();
-                },
-                error: function () {
-                    alert('メニューをロードエラー');
-                }
-            });
-        }
-
-        function update() {
-            location.href = "/menuUpdate?id=" + currentMenu;
-        }
-    </script>
-    <style>
-        .menu-list-navi {
-            display: flex;
-            justify-content: space-between;
-            height: 35px;
-            align-items: center;
-        }
-
-        .menu-list-container {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .menu-list-bar,
-        .menu-item {
-            display: flex;
-            justify-content: space-between; /* 항목들 사이에 공간을 균등하게 배분 */
-        }
-
-        .menu-list-bar > div,
-        .menu-item > div {
-            flex: 1; /* 모든 자식 div가 동등한 공간을 차지하도록 함 */
-            text-align: center; /* 텍스트를 중앙 정렬 */
-            padding: 10px; /* 패딩으로 간격 추가 */
-        }
-
-        .menu-list-bar {
-            margin-bottom: 20px; /* 제목과 항목들 사이의 간격 */
-            font-weight: bold; /* 제목의 글자를 굵게 */
-        }
-
-        .menu-item {
-            border-bottom: 1px solid #ccc; /* 항목들 사이의 구분선 */
-        }
-
-        .scrollable-container {
-            height: 80vh; /* 원하는 높이 설정 */
-            overflow: auto;
-        }
-    </style>
     <div>
         <div class="menu-list-navi">
             <select class="mt-3 ms-3" onchange="(location.href = this.value);" style="width: 180px; height: 30px">
@@ -87,6 +15,7 @@
                         th:selected="${#strings.equals(param.category, category.id)}">
                 </option>
             </select>
+            <input type="text" id="search-input" placeholder="メニュー名で検索" oninput="filterMenus()">
             <button class="btn btn-primary" onclick="location.href='/menuCreate'">メニュー登録</button>
         </div>
         <div id="scrollable-content" class="scrollable-container">
@@ -120,8 +49,6 @@
                     </div>
                 </div>
             </div>
-
-
         </div>
 
         <!-- Modal -->
@@ -147,5 +74,79 @@
                 </div>
             </div>
         </div>
+        <script>
+            let currentMenu;
+
+            function detail(pk) {
+                currentMenu = pk;
+                // AJAX를 사용하여 메뉴 상세 정보를 가져옴
+                $.ajax({
+                    url: '/menuDetail?id=' + pk,
+                    type: 'GET',
+                    success: function (data) {
+                        console.log(data)
+                        // 데이터가 성공적으로 로드되면 모달에 데이터를 설정
+                        $('#modalTitle').text(data.menu.name);
+                        $('#modalImage').attr('src', data.menu.image);
+                        $('#modalPrice').text('価格 : ' + data.menu.price + ' ウォン');
+                        $('#modalCategory').text('カテゴリー : ' + data.category.name);
+                        $('#modalStock').text(data.menu.stock > 0 ? 'ストック : ' + data.menu.stock : '在庫切れ');
+                        $('#modalDescription').text(data.menu.description);
+                        // 모달을 표시
+                        var myModal = new bootstrap.Modal(document.getElementById('menuModal'), {});
+                        myModal.show();
+                    },
+                    error: function () {
+                        alert('メニューをロードエラー');
+                    }
+                });
+            }
+
+            function update() {
+                location.href = "/menuUpdate?id=" + currentMenu;
+            }
+
+        </script>
+        <style>
+            .menu-list-navi {
+                display: flex;
+                justify-content: space-between;
+                height: 35px;
+                align-items: center;
+            }
+
+            .menu-list-container {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .menu-list-bar,
+            .menu-item {
+                display: flex;
+                justify-content: space-between; /* 항목들 사이에 공간을 균등하게 배분 */
+            }
+
+            .menu-list-bar > div,
+            .menu-item > div {
+                flex: 1; /* 모든 자식 div가 동등한 공간을 차지하도록 함 */
+                text-align: center; /* 텍스트를 중앙 정렬 */
+                padding: 10px; /* 패딩으로 간격 추가 */
+            }
+
+            .menu-list-bar {
+                margin-bottom: 20px; /* 제목과 항목들 사이의 간격 */
+                font-weight: bold; /* 제목의 글자를 굵게 */
+            }
+
+            .menu-item {
+                border-bottom: 1px solid #ccc; /* 항목들 사이의 구분선 */
+            }
+
+            .scrollable-container {
+                height: 80vh; /* 원하는 높이 설정 */
+                overflow: auto;
+            }
+
+        </style>
 </th:block>
 </html>
