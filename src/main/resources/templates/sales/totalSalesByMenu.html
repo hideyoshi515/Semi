@@ -2,7 +2,7 @@
 <html
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{layout/default_layout}">
+
 <head>
     <meta charset="UTF-8">
     <title>メニュー別売上</title>
@@ -30,6 +30,14 @@
             width: 100% !important;
             height: auto !important;
         }
+        .chart-wrapper {
+            background-color: white; /* 하늘색 배경 */
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -51,8 +59,10 @@
         </tbody>
     </table>
     <button onclick="location.href='/adminSalesMenu'">メイン画面に復帰</button>
-    <div class="chart-container">
-        <canvas id="menuSalesChart"></canvas>
+    <div class="chart-wrapper">
+        <div class="chart-container">
+            <canvas id="menuSalesChart"></canvas>
+        </div>
     </div>
 
     <script th:inline="javascript">
