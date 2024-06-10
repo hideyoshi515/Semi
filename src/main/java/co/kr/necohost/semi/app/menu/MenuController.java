@@ -122,6 +122,23 @@ public class MenuController {
         return "redirect:/menuList";
     }
 
+    // 입력받은 발주량 값을 메뉴 속성에 추가
+    @RequestMapping(value = "/orderStock", method = RequestMethod.POST)
+    public ResponseEntity<?> orderStock(@RequestBody Map<String, Object> payload) {
+        long id = ((Number) payload.get("id")).longValue();
+        int amount = Integer.parseInt(payload.get("amount").toString());
+        menuService.addStockOrder(id, amount);
+        return ResponseEntity.ok().build();
+    }
+    
+    // 발주량을 실제 재고에 추가하고 초기화
+    @RequestMapping(value = "/updateStockAndOrder", method = RequestMethod.POST)
+    public ResponseEntity<?> updateStockAndOrder(@RequestBody Map<String, Object> payload) {
+        long id = ((Number) payload.get("id")).longValue();
+        menuService.updateStockAndOrder(id);
+        return ResponseEntity.ok().build();
+    }
+
     // 카테고리 관리 페이지를 반환
     @RequestMapping(value = "/categoryList", method = RequestMethod.GET)
     public String getCategoryList(Model model) {
@@ -139,14 +156,14 @@ public class MenuController {
         model.addAttribute("categoryRequest", categoryRequest);
         return "menu/categoryCreate.html";
     }
-    
+
     // 카테고리 추가 작업 후 리스트 반환
     @RequestMapping(value = "/categoryCreate", method = RequestMethod.POST)
     public String postCategoryCreate(Model model, @ModelAttribute("categoryRequest") CategoryRequest categoryRequest) {
         categoryService.saveCategory(categoryRequest);
         return "redirect:/categoryList";
     }
-    
+
     // 카테고리 수정을 위해 pk와 새 카테고리명을 받아서 작업 후 리스트 반환
     @RequestMapping(value = "/categoryUpdate", method = RequestMethod.POST)
     @ResponseBody
@@ -160,6 +177,6 @@ public class MenuController {
     @RequestMapping(value = "/CategoryDelete", method = RequestMethod.POST)
     @ResponseBody
     public void getCategoryDelete(Model model, @RequestParam Map<String, Object> params) {
-        categoryService.deleteCategory(Integer.parseInt((String)params.get("id")));
+        categoryService.deleteCategory(Integer.parseInt((String) params.get("id")));
     }
 }
