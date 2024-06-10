@@ -12,6 +12,8 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Sales, Integer> {
     List<Sales> findByProcess(int processId);
 
+    Sales findById(long id);
+
     @Query("SELECT s, m.name, c.name, m.stock FROM Sales s JOIN Menu m ON s.menu = m.id JOIN Category c ON s.category = c.id WHERE s.process = 0")
     List<Object[]> findSalesByProcess(int process);
 
