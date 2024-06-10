@@ -182,9 +182,10 @@ public class DeviceController {
 
     @PostMapping("/addToSession")
     @ResponseBody
-    public String addToSession(@RequestBody Map<String, Object> data, HttpSession session) {
+    public String addToSession(@RequestBody Map<String, Object> data, HttpSession session, Model model) {
         String menuId = (String) data.get("menuId");
         Integer quantity = (Integer) data.get("quantity");
+        Long totalPrice = 0L;
 
         Menu menu = menuRepository.findById(Long.valueOf(menuId)).orElse(null);
         if (menu == null) {
@@ -199,6 +200,13 @@ public class DeviceController {
 
         // 기존 주문이 있는지 확인하고, 있으면 수량을 덮어쓰기
         orders.put(menu, quantity);
+
+        for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
+            menu = entry.getKey();
+            quantity = entry.getValue();
+            totalPrice += menu.getPrice() * quantity;
+        }
+
 
         // 세션에 업데이트된 주문 저장
         session.setAttribute("orders", orders);
