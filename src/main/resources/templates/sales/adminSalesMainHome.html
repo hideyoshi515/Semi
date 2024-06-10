@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POSOLDESK 売上管理プログラム</title>
+    <style>
+
+    </style>
+    <link rel="stylesheet" href="/css/adminSalesCss.css"> <!-- adminSalesCss.css 파일 경로로 수정 -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<th:block layout:fragment="content">
+    <body>
+    <div class="navbar">
+        <a onclick="location.href='/adminSalesMainHome'">ホーム</a>
+        <a onclick="location.href='/adminSalesMainMenu'">メニュー</a>
+    </div>
+    <h1 style="width: 100%"><img style="width: 38px;height: 38px;" src="/img/storeownerpage/money.png">今日の売上高</h1>
+    <div class="content">
+        現在時間：
+
+
+
+
+</div>
+</body>
+<th:block layout:fragment="content">
+</th:block>
+</html>

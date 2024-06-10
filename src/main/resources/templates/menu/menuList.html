@@ -20,22 +20,27 @@
         </div>
         <div id="scrollable-content" class="scrollable-container">
             <div id="menu-container" class="mt-3 d-flex flex-wrap justify-content-around">
-                <div th:each="menu : ${menus}" class="border text-center align-content-center"
+                <div th:each="menu : ${menus}" class="menu-item border text-center align-content-center"
                      th:id="${menu.id}" style="width: 20%; height: 30%;" th:onclick="|detail(${menu.id})|">
                     <div class="user-select-none">
                         <img th:src="${menu.image}" style="width: 150px; height: 150px;">
-                        <div class="user-select-none" th:text="${menu.name}"></div>
+                        <div id="menu-name" class="user-select-none" th:text="${menu.name}"></div>
                         <div class="user-select-none"
                              th:text="|${#numbers.formatInteger(menu.price,1,'COMMA')} 원|"></div>
                         <div th:each="category : ${categories}">
                             <div class="user-select-none" th:text="|カテゴリー : ${category.name}|"
                                  th:if="${category.id == menu.category}"></div>
                         </div>
-                        <div class="user-select-none" th:text="|ストック : ${menu.stock}|"></div>
+                        <div id="menu-stock" class="user-select-none">
+                            <span th:text="|ストック : ${menu.stock}|"></span>
+                            <span style="color: #7e149f" th:if="${menu.stockorder != 0}"
+                                  th:text="| + ${menu.stockorder}|"></span>
+                        </div>
                         <div th:each="sale : ${salesCount}" th:if="${sale.key.id == menu.id}">
                             <div th:if="${sale.key.id == menu.id}" class="user-select-none"
                                  th:text="|${salesDays}日間販売量 : ${sale.value}|"></div>
-                            <div th:if="${menu.stock <= 0}" class="user-select-none" style="color: #ff363b"
+                            <div th:if="${menu.stock <= 0}" class="user-select-none"
+                                 style="color: #ff363b; font-weight: bold;"
                                  th:text="在庫切れ"></div>
                             <div th:if="${menu.stock > 0}">
                                 <div th:if="${menu.stock < sale.value * 0.5}" class="user-select-none"
@@ -67,6 +72,11 @@
                         <p id="modalDescription"></p>
                     </div>
                     <div class="modal-footer">
+                        <input type="number" id="order-input" placeholder="수량 입력"
+                               style="display: none; margin-right: 10px;">
+                        <button type="button" class="btn btn-warning" id="order-button" onclick="toggleOrderInput()">
+                            発注
+                        </button>
                         <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="update()">修正
                         </button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
@@ -74,6 +84,7 @@
                 </div>
             </div>
         </div>
+
         <script>
             let currentMenu;
 
@@ -90,7 +101,13 @@
                         $('#modalImage').attr('src', data.menu.image);
                         $('#modalPrice').text('価格 : ' + data.menu.price + ' ウォン');
                         $('#modalCategory').text('カテゴリー : ' + data.category.name);
-                        $('#modalStock').text(data.menu.stock > 0 ? 'ストック : ' + data.menu.stock : '在庫切れ');
+                        if (data.menu.stockorder > 0) {
+                            $('#modalStock').text('ストック : ' + data.menu.stock + ' + ' + data.menu.stockorder);
+                            $('#modalStock').off('click').on('click', updateStockAndOrder);
+                        } else {
+                            $('#modalStock').text('ストック : ' + data.menu.stock);
+                            $('#modalStock').off('click');
+                        }
                         $('#modalDescription').text(data.menu.description);
                         // 모달을 표시
                         var myModal = new bootstrap.Modal(document.getElementById('menuModal'), {});
@@ -106,7 +123,80 @@
                 location.href = "/menuUpdate?id=" + currentMenu;
             }
 
+            function filterMenus() {
+                const searchInput = document.getElementById('search-input').value.toLowerCase();
+                const menuItems = document.getElementsByClassName('menu-item');
+                for (let i = 0; i < menuItems.length; i++) {
+                    const menuItem = menuItems[i];
+                    const menuName = menuItem.querySelector('#menu-name').innerText.toLowerCase();
+                    if (menuName.includes(searchInput)) {
+                        menuItem.style.display = '';
+                    } else {
+                        menuItem.style.display = 'none';
+                    }
+                }
+            }
+
+            function orderStock() {
+                const orderInput = document.getElementById('order-input');
+                const orderAmount = orderInput.value;
+                if (orderAmount !== '' && !isNaN(orderAmount) && orderAmount > 0) {
+                    $.ajax({
+                        url: '/orderStock',
+                        type: 'POST',
+                        data: JSON.stringify({id: currentMenu, amount: orderAmount}),
+                        contentType: 'application/json; charset=utf-8',
+                        success: function (response) {
+                            alert('発注しました。');
+                            location.reload(); // 페이지를 새로고침하여 변경사항을 반영합니다.
+                        },
+                        error: function (error) {
+                            alert('発注中エラーが発生しました。');
+                        }
+                    });
+                } else {
+                    alert('入力値を確認してください。');
+                }
+            }
+
+            function updateStockAndOrder() {
+                let ok = confirm('発注したメニューを受領しましたか？')
+                if (ok) {
+                    $.ajax({
+                        url: '/updateStockAndOrder',
+                        type: 'POST',
+                        data: JSON.stringify({id: currentMenu}),
+                        contentType: 'application/json; charset=utf-8',
+                        success: function (response) {
+                            alert('在庫が追加されました。');
+                            location.reload(); // 페이지를 새로고침하여 변경사항을 반영합니다.
+                        },
+                        error: function (error) {
+                            alert('エラーが発生しました。');
+                        }
+                    });
+                }
+            }
+
+            function toggleOrderInput() {
+                const orderInput = document.getElementById('order-input');
+                const orderButton = document.getElementById('order-button');
+                if (orderInput.style.display === 'none') {
+                    orderInput.style.display = 'block';
+                    orderButton.innerText = '発注確認';
+                    orderButton.setAttribute('onclick', 'orderStock()');
+                }
+            }
+
+            $('#menuModal').on('hidden.bs.modal', function () {
+                const orderInput = document.getElementById('order-input');
+                const orderButton = document.getElementById('order-button');
+                orderInput.style.display = 'none';
+                orderButton.innerText = '発注';
+                orderButton.setAttribute('onclick', 'toggleOrderInput()');
+            });
         </script>
+
         <style>
             .menu-list-navi {
                 display: flex;
@@ -146,7 +236,6 @@
                 height: 80vh; /* 원하는 높이 설정 */
                 overflow: auto;
             }
-
         </style>
 </th:block>
 </html>

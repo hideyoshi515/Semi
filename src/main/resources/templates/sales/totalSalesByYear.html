@@ -1,90 +1,77 @@
 <!DOCTYPE html>
-<html
-        xmlns:th="http://www.thymeleaf.org"
-        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{layout/default_layout}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 <head>
     <meta charset="UTF-8">
-    <title>Total Sales by Category</title>
-    <style>
-        table {
-            width: 50%;
-            border-collapse: collapse;
-            margin: 25px 0;
-            font-size: 18px;
-            text-align: left;
-        }
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            height: auto;
-        }
-        canvas {
-            width: 100% !important;
-            height: auto !important;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POSOLDESK 売上管理プログラム</title><!-- adminSalesCss.css 파일 경로로 수정 -->
+
+    <link rel="stylesheet" href="/css/adminSalesCss.css">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
+<body>
 <th:block layout:fragment="content">
-    <body>
-    <h1>年度別総売上高</h1>
-    <table>
-        <thead>
-        <tr>
-            <th>年度</th>
-            <th>総売上高</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="yearlySales : ${yearlySales}">
-            <td th:text="${yearlySales.key}"></td>
-            <td th:text="${#numbers.formatDecimal(yearlySales.value, 0, 0)}"></td>
-        </tr>
-        </tbody>
-    </table>
-
-    <!-- 차트를 그릴 캔버스 추가 -->
-    <div class="chart-container">
-        <canvas id="yearlySalesChart"></canvas>
+    <div class="navbar">
+        <a onclick="location.href='/adminSalesMainHome'">ホーム</a>
+        <a onclick="location.href='/adminSalesMainMenu'">メニュー</a>
     </div>
-    <button onclick="location.href='/adminSalesMenu'">管理者メイン画面に復帰</button>
-    <button onclick="location.href='/totalSalesByYearInput'">年度を入力して総売上高検索</button>
+    <h1><img style="width: 38px;height: 38px;" src="/img/storeownerpage/yearlyrevenueicon2.png">年度別総売上高</h1>
+
+    <div class="content">
+        <div class="table-container">
+            <table>
+                <thead>
+                <tr>
+                    <th>年</th>
+                    <th>総売上高</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="yearlySales : ${yearlySales}">
+                    <td th:text="${yearlySales.key}"></td>
+                    <td th:text="${#numbers.formatInteger(yearlySales.value,1,'COMMA')} + '円'"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="chart-wrapper">
+            <div class="chart-container">
+                <canvas id="monthlySalesChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div>
+        <button class="button" onclick="location.href='/totalSalesByYearAndMonthInput'">年度と月を入力して総売上高を検索</button>
+        <button class="button" onclick="location.href='/adminSalesMain'">管理者メイン画面に復帰</button>
+    </div>
 
     <!-- ThymeleafをJavaScriptに伝達 -->
     <script th:inline="javascript">
         /*<![CDATA[*/
-        var yearlySalesData = /*[[${yearlySales}]]*/ {};
+        var monthlySalesData = /*[[${yearlySales}]]*/ {};
         /*]]>*/
 
-        var labels = Object.keys(yearlySalesData);
-        var data = Object.values(yearlySalesData);
+        // 날짜별 오름차순으로 정렬 (이미 서버에서 정렬됨)
+        var labels = Object.keys(monthlySalesData);
+        var data = Object.values(monthlySalesData);
 
         // 차트를 그리는 함수
-        var ctx = document.getElementById('yearlySalesChart').getContext('2d');
-        var yearlySalesChart = new Chart(ctx, {
+        var ctx = document.getElementById('monthlySalesChart').getContext('2d');
+        var monthlySalesChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
-                datasets: [
-                    {
-                        label: '総売上高 (棒グラフ)',
-                        data: data,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1,
-                        yAxisID: 'y'
-                    },
+                datasets: [{
+                    label: '総売上高 (棒グラフ)',
+                    data: data,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    yAxisID: 'y'
+                },
                     {
                         label: '総売上高 (折れ線グラフ)',
                         data: data,
@@ -112,6 +99,6 @@
             }
         });
     </script>
-    </body>
 </th:block>
+</body>
 </html>
