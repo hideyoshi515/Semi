@@ -9,7 +9,7 @@
     <title>Title</title>
     <script>
         function deleteMenuObject(pk) {
-            let ok = confirm('지우시겠습니까?');
+            let ok = confirm('本当に削除しますか?');
             if (ok) {
                 location.href="/menuDelete?id=" + pk;
             }
@@ -28,21 +28,21 @@
                                 <img id="menu-detail-image" th:if="${menu.image} != null" th:src="${menu.image}" style="width: 33%; height: auto;"> </div>
                                 <input th:field="${menu.id}" style="display: none">
                                 <div class="row mb-3">
-                                    <div style="text-align: start; margin: 6px 0;">상품 이름</div>
+                                    <div style="text-align: start; margin: 6px 0;">メニュー名</div>
                                     <div class="mb-3 mb-md-0">
                                     <input class="form-control" th:field="${menu.name}"
-                                           type="text" placeholder="상품 이름">
+                                           type="text" placeholder="メニュー名">
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <div style="text-align: start; margin: 6px 0;">상품 가격</div>
+                                <div style="text-align: start; margin: 6px 0;">メニュー価格</div>
                                 <div class="mb-3 mb-md-0">
                                     <input class="form-control" th:field="${menu.price}"
-                                           type="number" min="0" placeholder="상품 가격">
+                                           type="number" min="0" placeholder="メニュー価格">
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <div style="text-align: start; margin: 6px 0;">카테고리</div>
+                                <div style="text-align: start; margin: 6px 0;">カテゴリー</div>
                                 <div class="mb-3 mb-md-0">
                                     <select class="form-control" th:field="${menu.category}">
                                         <option th:each="category : ${categories}" th:value="${category.id}"
@@ -51,30 +51,30 @@
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <div style="text-align: start; margin: 6px 0;">상품 이미지</div>
+                                <div style="text-align: start; margin: 6px 0;">メニューイメージ</div>
                                 <div class="mb-3 mb-md-0">
                                     <input class="form-control" th:field="${menu.image}"
-                                           type="file" min="0" placeholder="상품 이미지">
+                                           type="file" min="0" placeholder="メニューイメージ">
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <div style="text-align: start; margin: 6px 0;">상품 설명</div>
+                                <div style="text-align: start; margin: 6px 0;">メニュー詳細</div>
                                 <div class="mb-3 mb-md-0">
                                     <input class="form-control" th:field="${menu.description}"
-                                           type="text" placeholder="상품 설명">
+                                           type="text" placeholder="メニュー詳細">
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <div style="text-align: start; margin: 6px 0;">재고</div>
+                                <div style="text-align: start; margin: 6px 0;">在庫</div>
                                 <div class="mb-3 mb-md-0">
                                     <input class="form-control" th:field="${menu.stock}"
-                                           type="number" min="0" placeholder="재고">
+                                           type="number" min="0" placeholder="在庫">
                                 </div>
                             </div>
                             <div class="mt-4 mb-0">
                                 <div class="d-flex justify-content-end">
-                                    <button type="submit" class="btn btn-primary btn-block col-9 me-2">수정</button>
-                                    <button type="button" th:onclick="|deleteMenuObject(${menu.id})|" class="btn btn-danger btn-block col-3">삭제</button>
+                                    <button type="submit" class="btn btn-primary btn-block col-9 me-2">修正</button>
+                                    <button type="button" th:onclick="|deleteMenuObject(${menu.id})|" class="btn btn-danger btn-block col-3">削除</button>
                                 </div>
                             </div>
                         </form>
