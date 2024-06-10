@@ -182,10 +182,9 @@ public class DeviceController {
 
     @PostMapping("/addToSession")
     @ResponseBody
-    public String addToSession(@RequestBody Map<String, Object> data, HttpSession session, Model model) {
+    public String addToSession(@RequestBody Map<String, Object> data, HttpSession session) {
         String menuId = (String) data.get("menuId");
         Integer quantity = (Integer) data.get("quantity");
-        Long totalPrice = 0L;
 
         Menu menu = menuRepository.findById(Long.valueOf(menuId)).orElse(null);
         if (menu == null) {
@@ -200,13 +199,6 @@ public class DeviceController {
 
         // 기존 주문이 있는지 확인하고, 있으면 수량을 덮어쓰기
         orders.put(menu, quantity);
-
-        for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
-            menu = entry.getKey();
-            quantity = entry.getValue();
-            totalPrice += menu.getPrice() * quantity;
-        }
-
 
         // 세션에 업데이트된 주문 저장
         session.setAttribute("orders", orders);
@@ -261,16 +253,23 @@ public class DeviceController {
 
         return "success";
     }
+    @PostMapping("deleteCartItem")
+    @ResponseBody
+    public String deleteCartItem(@RequestBody Map<String, Object> data, HttpSession session) {
+        Long menuId = ((Number) data.get("menuId")).longValue();
+        Menu menu = menuRepository.findById(menuId).orElse(null);
+        if (menu == null) {
+            return "error: menu not found";
+        }
+        Map<Menu, Integer> orders = (Map<Menu, Integer>) session.getAttribute("orders");
+        if (orders == null) {
+            orders = new HashMap<>();
+        }
+        if (orders.containsKey(menu)) {
+            orders.remove(menu);
+        }
+        session.setAttribute("orders", orders);
+        return "success";
 
-    @RequestMapping(value = "/order/kiosk", method = RequestMethod.GET)
-    public String getKiosk(@ModelAttribute DeviceRequest deviceRequest, @RequestParam Map<String, Object> params, HttpSession session, Model model){
-        model.addAttribute("deviceRequest", deviceRequest);
-        Map<Long, List<Menu>> categorizedMenus = menuService.getCategorizedMenus();
-        model.addAttribute("categorizedMenus", categorizedMenus);
-        List<Menu> menus = menuService.getAllMenus();
-        List<Category> categories = categoryService.getAllCategories();
-        model.addAttribute("menus", menus);
-        model.addAttribute("categories", categories);
-        return "/order/orderKiosk.html";
     }
 }
