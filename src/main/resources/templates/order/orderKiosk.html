@@ -77,11 +77,11 @@
         }
 
         .btn-group-wrapper {
-             display: flex;
-             align-items: center;
-             justify-content: center;
-             width: 100%;
-         }
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
 
         .btn-group-container {
             overflow-x: auto;
@@ -99,6 +99,7 @@
             margin: 0px;
             white-space: nowrap;
         }
+
         .modal-dialog-centered {
             display: flex;
             align-items: center;
@@ -128,7 +129,7 @@
         <div class="menu-section">
             <div class="menu-category">
                 <h2 id="categoryTitle">すべて</h2>
-                <div class="row ms-4" id="menuContainer">
+                <div class="row ms-4" id="menuContainer" style="min-height: 944px;">
                     <div class="menu-item mb-3 me-2" th:each="menu : ${menus}" th:attr="data-category=${menu.category}"
                          style="width: 200px">
                         <a th:if="${menu.stock} > 0"
@@ -259,7 +260,7 @@
             quantityInput.value = '1';
             quantityInput.setAttribute('max', menuStock);
             menuIdInput.value = menuId;
-            modalImage.setAttribute('src', "/"+menuImage)
+            modalImage.setAttribute('src', "/" + menuImage)
         });
 
         function saveToSession() {
@@ -339,7 +340,6 @@
             document.getElementById('prevPageBtn').disabled = page === 1;
             document.getElementById('nextPageBtn').disabled = page === totalPages;
         }
-
 
         function changePage(direction) {
             showPage(currentPage + direction);
@@ -432,12 +432,9 @@
         document.getElementById('cartModal').addEventListener('show.bs.modal', function () {
             loadCart();
         });
-        let scrollAmount = 0;
 
-
+        // 초기 필터링 설정
         filterMenu('all');
-
-
     </script>
 </th:block>
 </body>
