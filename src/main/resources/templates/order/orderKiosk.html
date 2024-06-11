@@ -8,8 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KIOSK</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         body {
             margin: 0;
@@ -133,7 +131,7 @@
                              th:attr="data-category=${menu.category}"
                              style="width: 200px; height: 220px;">
                             <a th:if="${menu.stock} > 0"
-                               th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ウォン'}">
+                               th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ₩'}">
                                 <div class="card rounded rounded-3" style="width: 180px;">
                                     <div class="card-body text-center">
                                         <img th:src="${menu.image}"
@@ -141,7 +139,7 @@
                                              style="width: 8rem; height: auto;">
                                         <h5 class="card-title" th:text="${menu.name}"></h5>
                                         <p class="card-text mb-0"><span
-                                                th:text="${#numbers.formatInteger(menu.price, 1, 'COMMA')}+ウォン"></span>
+                                                th:text="|${#numbers.formatInteger(menu.price, 1, 'COMMA')} ₩|"></span>
                                         </p>
                                     </div>
                                 </div>
@@ -390,7 +388,7 @@
                 const itemHtml = `
         <div class="d-flex mb-1 align-items-center cart-item" data-menu-id="${menuId}" style="gap: 10px;">
             <div style="flex: 1;">${item.name}</div>
-            <div style="width: 120px;">${formattedPrice} ウォン</div>
+            <div style="width: 120px; text-align: end !important;">${formattedPrice} ₩</div>
             <div style="width: 120px;">
                 <div class="input-group">
                     <button type="button" class="btn btn-outline-secondary" onclick="changeCartQuantity(${menuId}, ${item.stock}, -1)">-</button>
@@ -409,7 +407,7 @@
             });
 
             getTotalPrice().then(totalPrice => {
-                document.getElementById('cartTotalPrice').innerText = '合計 : ' + totalPrice.toLocaleString() + 'ウォン';
+                document.getElementById('cartTotalPrice').innerText = '合計 : ' + totalPrice.toLocaleString() + ' ₩';
             }).catch(error => {
                 console.error("총 가격을 가져오는 중 오류 발생:", error);
             });
@@ -436,7 +434,7 @@
 
 
                     getTotalPrice().then(totalPrice => {
-                        document.getElementById('cartTotalPrice').innerText = '合計 : ' + totalPrice.toLocaleString() + 'ウォン';
+                        document.getElementById('cartTotalPrice').innerText = '合計 : ' + totalPrice.toLocaleString() + ' ₩';
                     }).catch(error => {
                         console.error("총 가격을 가져오는 중 오류 발생:", error);
                     });
@@ -465,7 +463,7 @@
 
 
                         getTotalPrice().then(totalPrice => {
-                            document.getElementById('cartTotalPrice').innerText = '合計 : ' + totalPrice.toLocaleString() + 'ウォン';
+                            document.getElementById('cartTotalPrice').innerText = '合計 : ' + totalPrice.toLocaleString() + ' ₩';
                         }).catch(error => {
                             console.error("총 가격을 가져오는 중 오류 발생:", error);
                         });
