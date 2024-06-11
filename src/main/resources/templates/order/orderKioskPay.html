@@ -90,7 +90,8 @@
 
     </style>
 </head>
-<body><th:block layout:fragment="content">
+<body>
+<th:block layout:fragment="content">
     <div class="container">
         <div class="headTitle">
             KIOSK
@@ -99,7 +100,7 @@
         <div class="menu-section">
             <div class="menu-category">
                 <h2 id="categoryTitle">お支払い</h2>
-                <div class="row align-top ms-2" id="menuContainer" style="width: 645px; max-height: 1057.28px; overflow-y: auto; overflow-x: hidden;">
+                <div class="row align-top ms-2" id="menuContainer" style="width: 645px; min-height: 1057.28px; max-height: 1057.28px; overflow-y: auto; overflow-x: hidden;">
                     <div class="menu-item mb-2 me-4" th:each="item : ${orderedItems}"
                          style="width: 660px; height: 130px;">
                         <div class="border border-1 rounded-1 d-flex w-100" style="width: 180px;">
@@ -121,7 +122,7 @@
         </div>
         <div class="footer">
             <div class="order-summary">
-                <div class="fs-2" th:text="|合計 : ${#numbers.formatInteger(totalPrice,1,'COMMA')} ₩|"></div>
+                <div class="fs-2 ms-1" th:text="|合計 : ${#numbers.formatInteger(totalPrice,1,'COMMA')} ₩|"></div>
             </div>
             <div class="d-flex">
                 <a href="/order/kiosk" class="btn btn-lg btn-warning me-3">戻る</a>
