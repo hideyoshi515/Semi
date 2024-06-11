@@ -251,11 +251,21 @@ public class SalesController {
             Map<LocalDate, Double> weeklySales = salesService.getWeeklySalesByDay(year, month, day);
             double totalWeeklySales = weeklySales.values().stream().mapToDouble(Double::doubleValue).sum();
 
+            // 매출 금액 형식 지정
+            DecimalFormat decimalFormat = new DecimalFormat("#,###");
+
+            // 천단위 콤마 추가 및 소수점 생략
+            Map<LocalDate, String> formattedWeeklySales = new HashMap<>();
+            for (Map.Entry<LocalDate, Double> entry : weeklySales.entrySet()) {
+                formattedWeeklySales.put(entry.getKey(), decimalFormat.format(entry.getValue()));
+            }
+            String formattedTotalWeeklySales = decimalFormat.format(totalWeeklySales);
+
             model.addAttribute("year", year);
             model.addAttribute("month", month);
             model.addAttribute("day", day);
-            model.addAttribute("weeklySales", weeklySales);
-            model.addAttribute("totalWeeklySales", totalWeeklySales);
+            model.addAttribute("weeklySales", formattedWeeklySales);
+            model.addAttribute("totalWeeklySales", formattedTotalWeeklySales);
         }
         return "/sales/totalWeeklySalesByDayInput";
     }
