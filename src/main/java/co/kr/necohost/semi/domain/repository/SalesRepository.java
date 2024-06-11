@@ -81,4 +81,5 @@ public interface SalesRepository extends JpaRepository<Sales, Long> {
     @Query("SELECT s FROM Sales s WHERE s.process = 1 AND s.date BETWEEN :start AND :end ORDER BY s.date")
     List<Sales> findSalesByDateRangeAndProcess(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
+
 }

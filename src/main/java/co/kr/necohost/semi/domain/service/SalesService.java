@@ -35,6 +35,10 @@ public class SalesService {
     public void save(SalesRequest salesRequest) {
         salesRepository.save(salesRequest.toEntity());
     }
+    public void save2(SalesRequest salesRequest){
+        Sales sales = salesRequest.toEntity();
+        salesRepository.save(sales);
+    }
 
     // 모든 판매 기록을 조회
     public List<Sales> findAll() {

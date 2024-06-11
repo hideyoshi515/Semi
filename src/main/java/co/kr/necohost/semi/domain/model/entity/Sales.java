@@ -23,8 +23,8 @@ public class Sales {
     private long menu;
     private int price;
     private int quantity;
-    private int device;
-    private int deviceNum;
+    private long device;
+    private long deviceNum;
     private long orderNum;
     private int process;
 
