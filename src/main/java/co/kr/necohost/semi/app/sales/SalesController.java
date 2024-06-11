@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -163,23 +164,31 @@ public class SalesController {
 
 
 
-    // 월별 총 판매액을 반환하는 메서드
+    // (구)월별 총 판매액을 반환하는 메서드 6월 11일 오후 2시 47분 작업중
+//    @RequestMapping(value = "/totalSalesByMonth", method = RequestMethod.GET)
+//    public String getTotalSalesByMonth(Model model) {
+//        Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
+//        Map<String, String> formattedMonthlySales = monthlySales.entrySet().stream()
+//                .sorted(Map.Entry.comparingByKey())
+//                .collect(Collectors.toMap(
+//                        Map.Entry::getKey,
+//                        entry -> String.format("%,d", entry.getValue().longValue()),
+//                        (e1, e2) -> e1,
+//                        LinkedHashMap::new
+//                ));
+//        model.addAttribute("monthlySales", monthlySales);
+//        model.addAttribute("formattedMonthlySales", formattedMonthlySales); // 포맷팅된 데이터를 따로 추가
+//        return "sales/totalSalesByMonth";
+//    }
+
+    // (신)월별 총 판매액을 반환하는 메서드 6월 11일 오후 2시 47분 작업중
     @RequestMapping(value = "/totalSalesByMonth", method = RequestMethod.GET)
     public String getTotalSalesByMonth(Model model) {
         Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
-        Map<String, String> formattedMonthlySales = monthlySales.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> String.format("%,d", entry.getValue().longValue()),
-                        (e1, e2) -> e1,
-                        LinkedHashMap::new
-                ));
         model.addAttribute("monthlySales", monthlySales);
-        model.addAttribute("formattedMonthlySales", formattedMonthlySales); // 포맷팅된 데이터를 따로 추가
         return "sales/totalSalesByMonth";
     }
-
+    // 월별 총 판매액을 반환하는 메서드 6월 11일 오후 2시 47분 작업중
 
 
 
@@ -218,10 +227,14 @@ public class SalesController {
 
         if (year != null && month != null && day != null) {
             double totalSales = salesService.getTotalSalesByDay(year, month, day);
+            DecimalFormat decimalFormat = new DecimalFormat("#,##0");
+            String formattedTotalSales = decimalFormat.format(totalSales);
+
+
             model.addAttribute("year", year);
             model.addAttribute("month", month);
             model.addAttribute("day", day);
-            model.addAttribute("totalSales", totalSales);
+            model.addAttribute("totalSales", formattedTotalSales);
         }
         return "/sales/totalSalesByDayInput.html";
     }

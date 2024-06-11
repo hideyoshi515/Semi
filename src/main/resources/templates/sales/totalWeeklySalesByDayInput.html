@@ -2,33 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/default_layout}">
 <head>
-    <title>Total Sales by Year and Month</title>
-    <style>
-        table {
-            width: 50%;
-            border-collapse: collapse;
-            margin: 25px 0;
-            font-size: 18px;
-            text-align: left;
-        }
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            height: auto;
-        }
-        canvas {
-            width: 100% !important;
-            height: auto !important;
-        }
-    </style>
+    <title>POSOLDESK 売上管理プログラム</title>
+
     <meta charset="UTF-8">
     <script>
         function formatGrowthRate() {
@@ -53,19 +28,20 @@
 
         window.onload = formatGrowthRate;
     </script>
+    <link rel="stylesheet" href="/css/adminSalesCss.css">
 </head>
 <body>
-<div layout:fragment="content">
-    <h1>週別日商</h1>
+<th:block layout:fragment="content">
+    <h1><img style="width: 38px;height: 38px;" src="/img/storeownerpage/dailyrevenueicon.png">日商/週間売上</h1>
     <form action="/totalSalesByDayInput" method="get">
-        <label for="year">年度を入力:</label>
-        <input type="number" id="year" name="year" th:value="${year}">
-        <label for="month">月を入力:</label>
-        <input type="number" id="month" name="month" th:value="${month}">
-        <label for="day">日を入力:</label>
-        <input type="number" id="day" name="day" th:value="${day}">
+        <h3><label for="year">年度を入力:</label>
+            <input style="font-size:1.17em;" type="number" id="year" name="year" th:value="${year}">
+            <label for="month">月を入力:</label>
+            <input style="font-size:1.17em;" type="number" id="month" name="month" th:value="${month}">
+            <label for="day">日を入力:</label>
+            <input style="font-size:1.17em;" type="number" id="day" name="day" th:value="${day}"></h3>
 
-        <button type="submit">日商閲覧</button>
+        <button class="button"  type="submit">日商閲覧</button>
     </form>
 
     <div th:if="${year != null && month != null && day != null}">
@@ -96,9 +72,10 @@
             </tbody>
         </table>
     </div>
-
+    <div class="chart-wrapper">
     <div class="chart-container">
         <canvas id="weeklySalesChart"></canvas>
+    </div>
     </div>
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -158,6 +135,7 @@
 
 
 
+</th:block>
 </div>
 </body>
 </html>
