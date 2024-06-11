@@ -1,7 +1,11 @@
 :root {
     --header-height: 72px;
     --footer-height: 0px;
+    --bs-font-sans-serif: "Noto Sans JP", "Noto Sans KR", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+
 }
+
+
 
 /* header footer 레이아웃 잡기 */
 header {
