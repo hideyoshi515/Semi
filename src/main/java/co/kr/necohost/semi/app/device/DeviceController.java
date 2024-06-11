@@ -361,6 +361,9 @@ public class DeviceController {
             sales.setOrderNum(orderNum.getOrderNum());
             sales.setProcess(1);
             salesService.save(sales);
+            menu.setStock(menu.getStock() - quantity);
+            menuRepository.save(menu);
+            orders.remove(menu);
         }
         if (params.get("phone") != null) {
             String phoneNum = (String) params.get("phone");
