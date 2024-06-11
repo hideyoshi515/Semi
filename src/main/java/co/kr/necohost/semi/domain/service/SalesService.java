@@ -268,7 +268,7 @@ public class SalesService {
         // 2시간 단위로 그룹화
         for (Sales sales : salesList) {
             LocalDateTime hour = sales.getDate().withMinute(0).withSecond(0).withNano(0);
-            hour = hour.withHour((hour.getHour() / 2) * 2); // 2시간 단위로 그룹화
+            hour = hour.withHour((hour.getHour())); // 2시간 단위로 그룹화
             double salesAmount = sales.getPrice() * sales.getQuantity();
             hourlySales.put(hour, hourlySales.getOrDefault(hour, 0.0) + salesAmount);
         }
