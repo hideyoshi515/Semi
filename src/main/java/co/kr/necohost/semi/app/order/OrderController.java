@@ -9,10 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -102,55 +99,89 @@ public class OrderController {
 
     @RequestMapping(value = "/orderTable", method = RequestMethod.GET)
     public String getOrderTable(Model model, @RequestParam Map<String, Object> params) {
-        List<Object[]> orderList = orderService.findSalesByProcessAndDevice(0);
+        ArrayList<Object> tableList = new ArrayList<>();  // 8개
+        Map<String, List<Object>> orderWrap = new HashMap<>();
 
-        for (int i = 0; i < orderList.size(); i++) {
-            Object[] order = orderList.get(i);
+        List<Object[]> orderDetail = orderService.findSalesByProcessAndDevice(0);
+
+        Map<String, List<Map<String, Object>>> tableOrders = new HashMap<>();
+        Map<String, Integer> totalOrders = new HashMap<>();
+        Map<String, String> viewMenus = new HashMap<>();
+        Map<String, Integer> totalPrices = new HashMap<>();
+
+        for (int i = 0; i < orderDetail.size(); i++) {
+            Object[] order = orderDetail.get(i);
             Sales sales = (Sales) order[0];
-            System.out.println("Order " + i + ": " + sales.toString() + ", " + Arrays.toString(Arrays.copyOfRange(order, 1, order.length)));
+            System.out.println("Order " + i + ": " + sales + ", " + Arrays.toString(Arrays.copyOfRange(order, 1, order.length)));
         }
 
-        Map<String, Map<String, Object>> tableOrders = new HashMap<>();
+        int totalCnt;
+        int totalPrice;
+        String viewMenu;
 
-        for (int i = 0; i < orderList.size(); i++) {
-            Object[] order = orderList.get(i);
-            Map<String, Object> orderDetails = new HashMap<>();
+//        viewMenu = orderDetail.get(0)[1].toString() + "외 " + (orderDetail.size() - 1) + "개";
 
-            if (order.length >= 4) {
-                Sales sales = (Sales) order[0];
-                orderDetails.put("id", sales.getId());
-                orderDetails.put("category", sales.getCategory());
-                orderDetails.put("date", sales.getDate());
-                orderDetails.put("device", sales.getDevice());
-                orderDetails.put("deviceNum", sales.getDeviceNum());
-                orderDetails.put("menu", sales.getMenu());
-                orderDetails.put("orderNum", sales.getOrderNum());
-                orderDetails.put("price", sales.getPrice());
-                orderDetails.put("process", sales.getProcess());
-                orderDetails.put("quantity", sales.getQuantity());
-                orderDetails.put("menuName", order[1]);
-                orderDetails.put("categoryName", order[2]);
-                orderDetails.put("stock", order[3]);
+        Map<String, Object> orderDetails;
 
-                tableOrders.put("TB" + sales.getDeviceNum(), orderDetails);
-            }
+        for (int i = 0; i < orderDetail.size(); i++) {
+            Object[] order = orderDetail.get(i);
+            orderDetails = new HashMap<>();
+
+            totalCnt = 0;
+            totalPrice = 0;
+            viewMenu = "";
+
+            Sales sales = (Sales) order[0];
+
+            orderDetails.put("id", sales.getId());
+            orderDetails.put("category", sales.getCategory());
+            orderDetails.put("date", sales.getDate());
+            orderDetails.put("device", sales.getDevice());
+            orderDetails.put("deviceNum", sales.getDeviceNum());
+            orderDetails.put("menu", sales.getMenu());
+            orderDetails.put("orderNum", sales.getOrderNum());
+            orderDetails.put("price", sales.getPrice());
+            orderDetails.put("process", sales.getProcess());
+            orderDetails.put("quantity", sales.getQuantity());
+            orderDetails.put("menuName", order[1]);
+            orderDetails.put("categoryName", order[2]);
+            orderDetails.put("stock", order[3]);
+
+            totalCnt += sales.getQuantity();
+            totalPrice += sales.getPrice() * sales.getQuantity();
+
+            String tableKey = "TB" + sales.getDeviceNum();
+            tableOrders.computeIfAbsent(tableKey, k -> new ArrayList<>()).add(orderDetails);
+
+
+
+            totalOrders.put(tableKey+"Cnt", totalCnt);
+            totalPrices.put(tableKey+"Price", totalPrice);
+            totalPrices.put(tableKey+"View", totalPrice);
+
+            model.addAttribute(tableKey+"Cnt", totalCnt);
+            model.addAttribute(tableKey+"Price", totalPrices);
         }
+
+//        for (int i = 0; i < 8; i++) {
+//            tableList.add();
+//        }
 
         model.addAttribute("tableOrders", tableOrders);
 
-        List<Sales> sales = orderList.stream()
+        List<Sales> sales = orderDetail.stream()
                 .filter(objects -> objects.length > 0)
                 .map(objects -> (Sales) objects[0])
                 .collect(Collectors.toList());
-        List<String> menuNames = orderList.stream()
+        List<String> menuNames = orderDetail.stream()
                 .filter(objects -> objects.length > 1)
                 .map(objects -> (String) objects[1])
                 .collect(Collectors.toList());
-        List<String> categoryNames = orderList.stream()
+        List<String> categoryNames = orderDetail.stream()
                 .filter(objects -> objects.length > 2)
                 .map(objects -> (String) objects[2])
                 .collect(Collectors.toList());
-        List<Integer> menuStocks = orderList.stream()
+        List<Integer> menuStocks = orderDetail.stream()
                 .filter(objects -> objects.length > 3)
                 .map(objects -> (Integer) objects[3])
                 .collect(Collectors.toList());
@@ -161,7 +192,7 @@ public class OrderController {
         model.addAttribute("categoryName", categoryNames);
         model.addAttribute("orderRequest", new SalesRequest());
 
-        return ("order/orderTable");
+        return ("order/orderTable.html");
     }
 
     @RequestMapping(value = "/orderDetailTable", method = RequestMethod.GET)
