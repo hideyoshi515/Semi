@@ -49,7 +49,8 @@ public class MVCConfiguration implements WebMvcConfigurer {
         return new ConcurrentMapCacheManager(
                 "categories",
                 "cat_menus",
-                "findByEmail"
+                "findByEmail",
+                "Menu_findById"
         );
     }
 }

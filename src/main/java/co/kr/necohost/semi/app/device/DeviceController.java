@@ -261,4 +261,16 @@ public class DeviceController {
 
         return "success";
     }
+
+    @RequestMapping(value = "/order/kiosk", method = RequestMethod.GET)
+    public String getKiosk(@ModelAttribute DeviceRequest deviceRequest, @RequestParam Map<String, Object> params, HttpSession session, Model model){
+        model.addAttribute("deviceRequest", deviceRequest);
+        Map<Long, List<Menu>> categorizedMenus = menuService.getCategorizedMenus();
+        model.addAttribute("categorizedMenus", categorizedMenus);
+        List<Menu> menus = menuService.getAllMenus();
+        List<Category> categories = categoryService.getAllCategories();
+        model.addAttribute("menus", menus);
+        model.addAttribute("categories", categories);
+        return "/order/orderKiosk.html";
+    }
 }
