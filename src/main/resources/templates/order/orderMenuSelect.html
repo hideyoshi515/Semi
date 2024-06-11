@@ -5,20 +5,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     <script>
-        var idleTime = 0;
-        var idleInterval;
-        var maxIdleTime = 5;
+        let idleTime = 0;
+        let idleInterval;
+        const maxIdleTime = 5;
 
-        function resetIdleTimer(){
+        function resetIdleTimer() {
             idleTime = 0;
         }
 
         function startIdleTimer() {
-            idleInterval = setInterval(function (){
+            idleInterval = setInterval(function () {
                 idleTime++;
-                if (idleTime >= maxIdleTime){
+                if (idleTime >= maxIdleTime) {
                     clearInterval(idleInterval);
-                    window.location.href = '/order'
+                    window.location.href = '/order';
                 }
             }, 1000);
         }
@@ -28,10 +28,11 @@
         document.addEventListener('click', resetIdleTimer);
         document.addEventListener('touchstart', resetIdleTimer);
 
-        window.onload = function (){
+        window.onload = function () {
             startIdleTimer();
-        }
+        };
     </script>
+
 </head>
 <body>
 <th:block layout:fragment="content">
@@ -136,23 +137,22 @@
         </div>
     </div>
 
-
     <script>
         document.getElementById('menuModal').addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var menuName = button.getAttribute('data-menu-name');
-            var menuId = button.getAttribute('data-menu-id');
-            var menuStock = button.getAttribute('data-menu-stock');
-            var menuImage = button.getAttribute('data-menu-image');
-            var menuDesc = button.getAttribute('data-menu-desc');
-            var menuPrice = button.getAttribute('data-menu-price');
+            const button = event.relatedTarget;
+            const menuName = button.getAttribute('data-menu-name');
+            const menuId = button.getAttribute('data-menu-id');
+            const menuStock = button.getAttribute('data-menu-stock');
+            const menuImage = button.getAttribute('data-menu-image');
+            const menuDesc = button.getAttribute('data-menu-desc');
+            const menuPrice = button.getAttribute('data-menu-price');
 
-            var modalTitle = document.getElementById('menuModalLabel');
-            var quantityInput = document.getElementById('quantityInput');
-            var menuIdInput = document.getElementById('menuIdInput');
-            var modalImage = document.getElementById('modalImage');
-            var modalDesc = document.getElementById('modalDesc');
-            var modalPrice = document.getElementById('modalPrice');
+            const modalTitle = document.getElementById('menuModalLabel');
+            const quantityInput = document.getElementById('quantityInput');
+            const menuIdInput = document.getElementById('menuIdInput');
+            const modalImage = document.getElementById('modalImage');
+            const modalDesc = document.getElementById('modalDesc');
+            const modalPrice = document.getElementById('modalPrice');
 
             modalTitle.textContent = menuName;
             modalDesc.textContent = menuDesc;
@@ -160,12 +160,12 @@
             quantityInput.value = '1';
             quantityInput.setAttribute('max', menuStock);
             menuIdInput.value = menuId;
-            modalImage.setAttribute('src', menuImage)
+            modalImage.setAttribute('src', menuImage);
         });
 
         function saveToSession() {
-            var menuId = document.getElementById('menuIdInput').value;
-            var quantity = parseInt(document.getElementById('quantityInput').value);
+            const menuId = document.getElementById('menuIdInput').value;
+            const quantity = parseInt(document.getElementById('quantityInput').value);
 
             if (quantity < 0) {
                 alert("数量は0以上にしてください。");
@@ -173,7 +173,7 @@
             }
 
             // AJAX 요청을 통해 서버로 데이터 전송
-            var xhr = new XMLHttpRequest();
+            const xhr = new XMLHttpRequest();
             xhr.open("POST", "/addToSession", true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
@@ -185,19 +185,19 @@
                 }
             };
 
-            var data = JSON.stringify({"menuId": menuId, "quantity": quantity});
+            const data = JSON.stringify({ "menuId": menuId, "quantity": quantity });
             xhr.send(data);
         }
 
         document.getElementById('orderForm').addEventListener('submit', function (event) {
-            var orders = sessionStorage.getItem('orders');
+            const orders = sessionStorage.getItem('orders');
             document.getElementById('orderData').value = orders;
         });
 
         function filterMenu(category) {
-            var menuItems = document.querySelectorAll('#menuContainer .menuItem');
+            const menuItems = document.querySelectorAll('#menuContainer .menuItem');
             menuItems.forEach(function (item) {
-                if (category === 'all' || item.getAttribute('data-category') == category) {
+                if (category === 'all' || item.getAttribute('data-category') === category) {
                     item.style.display = 'block';
                 } else {
                     item.style.display = 'none';
@@ -206,13 +206,13 @@
         }
 
         function changeQuantity(amount) {
-            var quantityInput = document.getElementById('quantityInput');
-            var currentQuantity = parseInt(quantityInput.value);
-            var newQuantity = currentQuantity + amount;
+            const quantityInput = document.getElementById('quantityInput');
+            const currentQuantity = parseInt(quantityInput.value);
+            let newQuantity = currentQuantity + amount;
             if (newQuantity < 1) {
                 newQuantity = 1;
             }
-            var maxQuantity = parseInt(quantityInput.getAttribute('max'));
+            const maxQuantity = parseInt(quantityInput.getAttribute('max'));
             if (newQuantity > maxQuantity) {
                 newQuantity = maxQuantity;
             }
@@ -221,12 +221,12 @@
 
         function loadCart() {
             // AJAX 요청을 통해 장바구니 데이터를 가져옴
-            var xhr = new XMLHttpRequest();
+            const xhr = new XMLHttpRequest();
             xhr.open("GET", "/getCartItems", true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    var cartItems = JSON.parse(xhr.responseText);
+                    const cartItems = JSON.parse(xhr.responseText);
                     displayCartItems(cartItems);
                 }
             };
@@ -234,35 +234,35 @@
         }
 
         function displayCartItems(cartItems) {
-            var container = document.getElementById('cartItemsContainer');
+            const container = document.getElementById('cartItemsContainer');
             container.innerHTML = '';
-            for (var menuId in cartItems) {
-                var item = cartItems[menuId];
-                var formattedPrice = item.price.toLocaleString();
-                var itemHtml = `
-                <div class="d-flex mb-3 align-items-center cart-item" data-menu-id="${menuId}" style="gap: 10px;">
-                    <div style="flex: 1;">${item.name}</div>
-                    <div style="width: 120px;">${formattedPrice} ウォン</div>
-                    <div style="width: 120px;">
-                        <div class="input-group">
-                            <button type="button" class="btn btn-outline-secondary" onclick="changeCartQuantity(${menuId}, ${item.stock}, -1)">-</button>
-                            <input type="number" class="form-control text-center" id="quantity-${menuId}" value="${item.quantity}" readonly>
-                            <button type="button" class="btn btn-outline-secondary" onclick="changeCartQuantity(${menuId}, ${item.stock}, 1)">+</button>
-                        </div>
-                    </div>
-                    <div style="width: 60px;">
-                        <button type="button" class="btn btn-danger" onclick="deleteCartItem(${menuId})">삭제</button>
+            for (const menuId in cartItems) {
+                const item = cartItems[menuId];
+                const formattedPrice = item.price.toLocaleString();
+                const itemHtml = `
+            <div class="d-flex mb-3 align-items-center cart-item" data-menu-id="${menuId}" style="gap: 10px;">
+                <div style="flex: 1;">${item.name}</div>
+                <div style="width: 120px;">${formattedPrice} ウォン</div>
+                <div style="width: 120px;">
+                    <div class="input-group">
+                        <button type="button" class="btn btn-outline-secondary" onclick="changeCartQuantity(${menuId}, ${item.stock}, -1)">-</button>
+                        <input type="number" class="form-control text-center" id="quantity-${menuId}" value="${item.quantity}" readonly>
+                        <button type="button" class="btn btn-outline-secondary" onclick="changeCartQuantity(${menuId}, ${item.stock}, 1)">+</button>
                     </div>
                 </div>
-                `;
+                <div style="width: 60px;">
+                    <button type="button" class="btn btn-danger" onclick="deleteCartItem(${menuId})">삭제</button>
+                </div>
+            </div>
+            `;
                 container.insertAdjacentHTML('beforeend', itemHtml);
             }
         }
 
         function changeCartQuantity(menuId, stock, amount) {
-            var quantityInput = document.getElementById('quantity-' + menuId);
-            var currentQuantity = parseInt(quantityInput.value);
-            var newQuantity = currentQuantity + amount;
+            const quantityInput = document.getElementById('quantity-' + menuId);
+            const currentQuantity = parseInt(quantityInput.value);
+            let newQuantity = currentQuantity + amount;
 
             if (newQuantity < 1) {
                 newQuantity = 1;
@@ -271,7 +271,7 @@
             }
 
             // AJAX 요청을 통해 서버로 데이터 전송
-            var xhr = new XMLHttpRequest();
+            const xhr = new XMLHttpRequest();
             xhr.open("POST", "/updateCartQuantity", true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
@@ -282,21 +282,21 @@
                 }
             };
 
-            var data = JSON.stringify({"menuId": menuId, "quantity": newQuantity});
+            const data = JSON.stringify({ "menuId": menuId, "quantity": newQuantity });
             xhr.send(data);
         }
 
         // 장바구니 삭제
         function deleteCartItem(menuId) {
             // AJAX 요청을 통해 서버로 데이터 전송
-            var xhr = new XMLHttpRequest();
+            const xhr = new XMLHttpRequest();
             xhr.open("POST", "/deleteCartItem", true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     if (xhr.responseText === "success") {
                         // 성공적으로 삭제되면 장바구니에서 항목 제거
-                        var itemRow = document.querySelector(`#cartItemsContainer [data-menu-id="${menuId}"]`);
+                        const itemRow = document.querySelector(`#cartItemsContainer [data-menu-id="${menuId}"]`);
                         if (itemRow) {
                             itemRow.remove();
                         }
@@ -310,7 +310,7 @@
                 }
             };
 
-            var data = JSON.stringify({"menuId": menuId});
+            const data = JSON.stringify({ "menuId": menuId });
             xhr.send(data);
         }
 
@@ -325,6 +325,7 @@
         });
 
     </script>
+
 </th:block>
 </body>
 </html>
