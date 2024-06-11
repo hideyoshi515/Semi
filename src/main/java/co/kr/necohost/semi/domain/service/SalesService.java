@@ -138,7 +138,27 @@ public class SalesService {
 //                        Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
 //                ));
 //    }
-    //6월 10일 작업중
+
+
+    //6월 10일 , 6월 11일 오후 5시 39분 오류 관련 내용 작업중.
+//    public Map<String, Double> getTotalSalesByMenu() {
+//        List<Sales> salesList = salesRepository.findAllSales();
+//        List<Menu> menuList = menuRepository.findAll();
+//
+//        // 메뉴 ID와 이름을 매핑
+//        Map<Integer, String> menuMap = menuList.stream()
+//                .collect(Collectors.toMap(menu -> Math.toIntExact(menu.getId()), Menu::getName));
+//
+//        // 판매 데이터를 메뉴 이름으로 그룹화
+//        return salesList.stream()
+//                .collect(Collectors.groupingBy(
+//                        sales -> menuMap.get(sales.getMenu()),
+//                        Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
+//                ));
+//    }
+
+
+    //6월 11일 오후 5시 39분 오류 관련 내용 작업중.
     public Map<String, Double> getTotalSalesByMenu() {
         List<Sales> salesList = salesRepository.findAllSales();
         List<Menu> menuList = menuRepository.findAll();
@@ -147,13 +167,15 @@ public class SalesService {
         Map<Integer, String> menuMap = menuList.stream()
                 .collect(Collectors.toMap(menu -> Math.toIntExact(menu.getId()), Menu::getName));
 
-        // 판매 데이터를 메뉴 이름으로 그룹화
+        // menuMap에 없는 키를 가진 판매 항목을 필터링
         return salesList.stream()
+                .filter(sales -> menuMap.containsKey(sales.getMenu()))
                 .collect(Collectors.groupingBy(
                         sales -> menuMap.get(sales.getMenu()),
                         Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
                 ));
     }
+
 
 
 
