@@ -368,7 +368,12 @@ public class DeviceController {
             account.setMsPoint((int) (account.getMsPoint() + (totalPrice * 0.01)));
             accountService.save(account);
         }
-        return "redirect:/order/kiosk";
+        return "redirect:/order/kiosk/success";
+    }
+
+    @RequestMapping(value = "/order/kiosk/success",method = RequestMethod.GET)
+    public String getSuccess(){
+        return "/order/orderKioskSuccess.html";
     }
 
 }
