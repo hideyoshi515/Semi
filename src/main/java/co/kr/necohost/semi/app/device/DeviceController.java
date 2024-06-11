@@ -285,8 +285,13 @@ public class DeviceController {
         return "/order/orderKiosk.html";
     }
 
+    @RequestMapping(value = "/order/kiosk/pay", method = RequestMethod.GET)
+    public String getKioskPayment(){
+        return "redirect:/order/kiosk";
+    }
+
     @RequestMapping(value = "/order/kiosk/pay", method = RequestMethod.POST)
-    public String getKioskPayment(Model model, DeviceRequest deviceRequest, HttpSession session) {
+    public String postKioskPayment(Model model, DeviceRequest deviceRequest, HttpSession session) {
         long totalPrice = 0;
 
         Map<Menu, Integer> orders = (Map<Menu, Integer>) session.getAttribute("orders");

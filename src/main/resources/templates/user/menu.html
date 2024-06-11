@@ -14,7 +14,7 @@
                          th:style="|width:200px !important;height:180px !important;|">
                         <img th:src="|${menu.image}|" th:style="|width:120px;height:90px;|">
                         <div th:text="${menu.name}"></div>
-                        <div th:text="|${#numbers.formatInteger(menu.price, 1 , 'COMMA')}ウォン|"></div>
+                        <div th:text="|${#numbers.formatInteger(menu.price, 1 , 'COMMA')}₩|"></div>
                     </div>
                 </div>
             </div>

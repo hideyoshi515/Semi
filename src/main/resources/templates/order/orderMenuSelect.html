@@ -47,14 +47,14 @@
             <div class="mb-3 menuItem" th:each="menu : ${menus}" th:attr="data-category=${menu.category}, data-menu-id=${menu.id}"
                  style="width: 200px">
                 <a th:if="${menu.stock} > 0"
-                   th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ウォン'}">
+                   th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ₩'}">
                     <div class="card rounded rounded-3" style="width: 180px;">
                         <div class="card-body text-center">
                             <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'"
                                  style="width: 8rem; height: auto;">
                             <h5 class="card-title" th:text="${menu.name}"></h5>
                             <p class="card-text mb-0"><span
-                                    th:text="${#numbers.formatInteger(menu.price, 1, 'COMMA')}+ウォン"></span></p>
+                                    th:text="${#numbers.formatInteger(menu.price, 1, 'COMMA')}+₩"></span></p>
                         </div>
                     </div>
                 </a>
@@ -242,7 +242,7 @@
                 const itemHtml = `
             <div class="d-flex mb-3 align-items-center cart-item" data-menu-id="${menuId}" style="gap: 10px;">
                 <div style="flex: 1;">${item.name}</div>
-                <div style="width: 120px;">${formattedPrice} ウォン</div>
+                <div style="width: 120px;">${formattedPrice} ₩</div>
                 <div style="width: 120px;">
                     <div class="input-group">
                         <button type="button" class="btn btn-outline-secondary" onclick="changeCartQuantity(${menuId}, ${item.stock}, -1)">-</button>
