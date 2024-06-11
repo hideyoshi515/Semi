@@ -180,4 +180,7 @@ public class MenuController {
     public void getCategoryDelete(Model model, @RequestParam Map<String, Object> params) {
         categoryService.deleteCategory(Integer.parseInt((String) params.get("id")));
     }
+
+    // 발주 관련 컨트롤러
+
 }
