@@ -251,6 +251,44 @@ public class SalesService {
     }
 
 
+    //현재 시간까지의 매출 총액을 계산하는 메서드
+//    public double getTotalSalesUntilNow(LocalDateTime now) {
+//        LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+//        List<Sales> salesList = salesRepository.findSalesByDateTimeRange(startOfDay, now);
+//        return salesList.stream()
+//                .mapToDouble(s -> s.getPrice() * s.getQuantity())
+//                .sum();
+//    }
+
+    //6월 11일 작업중
+    public Map<LocalDateTime, Double> getHourlySalesByDay(LocalDateTime startOfDay, LocalDateTime endOfDay) {
+        List<Sales> salesList = salesRepository.findSalesByDateRange(startOfDay, endOfDay);
+        Map<LocalDateTime, Double> hourlySales = new TreeMap<>();
+
+        // 2시간 단위로 그룹화
+        for (Sales sales : salesList) {
+            LocalDateTime hour = sales.getDate().withMinute(0).withSecond(0).withNano(0);
+            hour = hour.withHour((hour.getHour() / 2) * 2); // 2시간 단위로 그룹화
+            double salesAmount = sales.getPrice() * sales.getQuantity();
+            hourlySales.put(hour, hourlySales.getOrDefault(hour, 0.0) + salesAmount);
+        }
+
+        return hourlySales;
+    }
+    //6월 11일 작업중
+    public double getTotalSalesUntilNow(LocalDateTime now) {
+        LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+        List<Sales> salesList = salesRepository.findSalesByDateTimeRange(startOfDay, now);
+        return salesList.stream()
+                .mapToDouble(s -> s.getPrice() * s.getQuantity())
+                .sum();
+    }
+
+
+
+
+
+
 
 
 

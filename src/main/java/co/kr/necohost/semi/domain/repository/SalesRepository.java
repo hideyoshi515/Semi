@@ -68,4 +68,14 @@ public interface SalesRepository extends JpaRepository<Sales, Long> {
     @Query(value = "SELECT COUNT(s.id) FROM Sales s WHERE s.process = 1 AND s.menu = :menuID AND s.date > DATE_SUB(NOW(), INTERVAL :days DAY)", nativeQuery = true)
     int getCountByMenuAfterDaysAgo(@Param("menuID") long menuID, @Param("days") int days);
 
+    //LocalDateTime 범위로 매출 기록을 조회
+    @Query("SELECT s FROM Sales s WHERE s.date >= :start AND s.date <= :end AND s.process = 1")
+    List<Sales> findSalesByDateTimeRange(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    //특정 날짜의 시간대별 매출을 조회하는 쿼리 6월 11일 작업중findSalesByDateRange =>  findSalesByDateAndTimeRange
+
+    @Query("SELECT s FROM Sales s WHERE s.date >= :start AND s.date <= :end AND s.process = 1 ORDER BY s.date")
+    List<Sales> findSalesByDateAndTimeRange(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+
 }

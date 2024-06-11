@@ -7,7 +7,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,9 +35,42 @@ public class SalesController {
         return "/sales/adminSalesMainMenu.html";
     }
 
-    // 신버전 관리자 페이지 - 홈 페이지(오늘의 매출)를 반환하는 메서드(css있음)
+    // 신버전 관리자 페이지 - 홈 페이지(오늘의 현재 시간까지의 매출)를 반환하는 메서드(css있음)
+//    @RequestMapping(value = "/adminSalesMainHome", method=RequestMethod.GET)
+//    public String getAdminSalesMainHome(Model model) {
+//        LocalDateTime now = LocalDateTime.now();
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        String formattedNow = now.format(formatter);
+//        model.addAttribute("currentTime", formattedNow);
+//        double totalSalesToday = salesService.getTotalSalesUntilNow(now);
+//        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
+//        String formattedTotalSalesToday = numberFormat.format(totalSalesToday);
+//        model.addAttribute("totalSalesToday", formattedTotalSalesToday);
+//
+//        return "/sales/adminSalesMainHome.html";
+//    }
+
+
+    //6월 11일 확인중. 오늘의 현재 시간까지의 totalSalesToday 보임 / 시간대별 누적 매출 보여주는 차트 안보임 .
     @RequestMapping(value = "/adminSalesMainHome", method=RequestMethod.GET)
-    public String getAdminSalesMainHome() {
+    public String getAdminSalesHourly(Model model) {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedNow = now.format(formatter);
+        model.addAttribute("currentTime", formattedNow);
+
+        LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = now.withHour(23).withMinute(59).withSecond(59);
+
+        Map<LocalDateTime, Double> hourlySales = salesService.getHourlySalesByDay(startOfDay, endOfDay);
+
+        double totalSalesToday = salesService.getTotalSalesUntilNow(now);
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
+        String formattedTotalSalesToday = numberFormat.format(totalSalesToday);
+        model.addAttribute("totalSalesToday", formattedTotalSalesToday);
+
+        model.addAttribute("hourlySales", hourlySales);
+
         return "/sales/adminSalesMainHome.html";
     }
 
@@ -248,6 +284,8 @@ public class SalesController {
         }
         return "sales/totalSalesByYearAndCategoryInput";
     }
+
+
 
 
 
