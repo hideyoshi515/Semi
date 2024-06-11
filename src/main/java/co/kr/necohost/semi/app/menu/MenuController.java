@@ -34,7 +34,7 @@ public class MenuController {
     }
 
     // 메뉴 인덱스 페이지를 반환
-    @RequestMapping(value = "/MenuIndex", method = RequestMethod.GET)
+    @RequestMapping(value = "/menuIndex", method = RequestMethod.GET)
     public String getMenuIndex(Model model) {
         return "/menu/menuIndex.html";
     }

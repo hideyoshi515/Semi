@@ -74,6 +74,8 @@
                     <div class="modal-footer">
                         <input type="number" id="order-input" placeholder="수량 입력"
                                style="display: none; margin-right: 10px;">
+                        <div id="alert-container"
+                             style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1050;"></div>
                         <button type="button" class="btn btn-warning" id="order-button" onclick="toggleOrderInput()">
                             発注
                         </button>
@@ -147,16 +149,39 @@
                         data: JSON.stringify({id: currentMenu, amount: orderAmount}),
                         contentType: 'application/json; charset=utf-8',
                         success: function (response) {
-                            alert('発注しました。');
+                            showBootstrapAlert('発注しました。', 'primary');
                             location.reload(); // 페이지를 새로고침하여 변경사항을 반영합니다.
                         },
                         error: function (error) {
-                            alert('発注中エラーが発生しました。');
+                            showBootstrapAlert('発注中エラーが発生しました。', 'danger');
                         }
                     });
                 } else {
-                    alert('入力値を確認してください。');
+                    showBootstrapAlert('入力値を確認してください。', 'warning');
                 }
+            }
+
+            function showBootstrapAlert(message, type) {
+                const alertContainer = document.getElementById('alert-container');
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible alert-show`;
+                alertDiv.role = 'alert';
+                alertDiv.style.width = '300px';  // 너비 설정
+                alertDiv.style.fontSize = '1.25rem';  // 글자 크기 설정
+                alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+                alertContainer.appendChild(alertDiv);
+
+                // 알림을 5초 동안 표시
+                setTimeout(function () {
+                    alertDiv.classList.remove('alert-show');
+                    alertDiv.classList.add('alert-fade');
+                    setTimeout(function () {
+                        alertDiv.remove();
+                    }, 500); // 0.5초 후 요소 제거
+                }, 3000); // 5초 후 자동으로 사라짐
             }
 
             function updateStockAndOrder() {
@@ -202,7 +227,7 @@
                 display: flex;
                 justify-content: space-between;
                 height: 35px;
-                align-items: center;
+                align-items: flex-end;
             }
 
             .menu-list-container {
@@ -235,6 +260,15 @@
             .scrollable-container {
                 height: 80vh; /* 원하는 높이 설정 */
                 overflow: auto;
+            }
+
+            .alert-fade {
+                transition: opacity 0.5s ease-out;
+                opacity: 0;
+            }
+
+            .alert-show {
+                opacity: 1;
             }
         </style>
 </th:block>
