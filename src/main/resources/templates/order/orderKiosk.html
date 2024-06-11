@@ -1,39 +1,41 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/plain_layout}">
+>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KIOSK</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f7f7f7;
         }
 
         .container {
-            width: 768px;
+            width: 768px !important;
             margin: auto;
             background-color: white;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        header {
+        .headTitle {
+            width: 100% !important;
             background-color: #ffcc00;
             text-align: center;
             padding: 10px 0;
         }
 
-        header img {
+        .headTitle img {
             height: 50px;
         }
 
         .menu-section {
             padding: 20px;
-            min-height: 1120px; /* 최소 높이 설정 (4줄이 나오도록) */
+            min-height: 1110px; /* 최소 높이 설정 (4줄이 나오도록) */
         }
 
         .menu-category {
@@ -44,12 +46,6 @@
             margin-bottom: 10px;
             border-bottom: 2px solid #ffcc00;
             padding-bottom: 5px;
-        }
-
-        .menu-items {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
         }
 
         .menu-item {
@@ -84,7 +80,7 @@
         }
 
         .btn-group-container {
-            overflow-x: auto;
+            overflow-x: hidden;
             white-space: nowrap;
             width: 100%;
             display: flex;
@@ -103,7 +99,7 @@
         .modal-dialog-centered {
             display: flex;
             align-items: center;
-            min-height: calc(100vh - 1rem);
+            min-height: calc(100vh - 5rem);
         }
 
     </style>
@@ -111,14 +107,14 @@
 <body>
 <th:block layout:fragment="content">
     <div class="container">
-        <header>
+        <div class="headTitle">
             KIOSK
-        </header>
-        <div class="btn-group-wrapper mb-3" role="group" aria-label="Category filter">
+        </div>
+        <div class="btn-group-wrapper mb-2" role="group" aria-label="Category filter">
             <div class="btn-group-container">
                 <div class="btn-group" id="categoryContainer">
-                    <button type="button" class="btn btn-secondary" onclick="filterMenu('all')">すべて</button>
-                    <button type="button" class="btn btn-secondary" th:each="category : ${categories}"
+                    <button type="button" class="btn btn-lg btn-secondary" onclick="filterMenu('all')">すべて</button>
+                    <button type="button" class="btn btn-lg btn-secondary" th:each="category : ${categories}"
                             th:text="${category.name}" th:id="|c_${category.id}_btn|"
                             th:onclick="|filterMenu(${category.id})|"></button>
                 </div>
@@ -129,40 +125,50 @@
         <div class="menu-section">
             <div class="menu-category">
                 <h2 id="categoryTitle">すべて</h2>
-                <div class="row ms-4" id="menuContainer" style="min-height: 944px;">
-                    <div class="menu-item mb-3 me-2" th:each="menu : ${menus}" th:attr="data-category=${menu.category}"
-                         style="width: 200px">
-                        <a th:if="${menu.stock} > 0"
-                           th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ウォン'}">
-                            <div class="card rounded rounded-3" style="width: 180px;">
+                <div style="min-height: 944px;">
+                    <div class="row align-top ms-3" id="menuContainer">
+                        <div class="menu-item mb-2 me-2" th:each="menu : ${menus}"
+                             th:attr="data-category=${menu.category}"
+                             style="width: 200px; height: 220px;">
+                            <a th:if="${menu.stock} > 0"
+                               th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ₩'}">
+                                <div class="card rounded rounded-3" style="width: 180px;">
+                                    <div class="card-body text-center">
+                                        <img th:src="${menu.image}"
+                                             onerror="this.onerror=null; this.src='/img/americano.png'"
+                                             style="width: 8rem; height: auto;">
+                                        <h5 class="card-title" th:text="${menu.name}"></h5>
+                                        <p class="card-text mb-0"><span
+                                                th:text="|${#numbers.formatInteger(menu.price, 1, 'COMMA')} ₩|"></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                            <div class="card rounded rounded-3" style="width: 180px;" th:if="${menu.stock} <= 0">
+                                <div class="rounded-3 w-100 h-100"
+                                     style="background: rgba(0, 0, 0, 0.7); position: absolute;"></div>
                                 <div class="card-body text-center">
                                     <img th:src="${menu.image}"
                                          onerror="this.onerror=null; this.src='/img/americano.png'"
                                          style="width: 8rem; height: auto;">
                                     <h5 class="card-title" th:text="${menu.name}"></h5>
-                                    <p class="card-text mb-0"><span
-                                            th:text="${#numbers.formatInteger(menu.price, 1, 'COMMA')}+ウォン"></span>
-                                    </p>
+                                    <p class="card-text mb-0"
+                                       style="color: darkred; font-weight: bold; z-index: 100000;">
+                                        売れ切り</p>
                                 </div>
-                            </div>
-                        </a>
-                        <div class="card rounded rounded-3" style="width: 180px;" th:if="${menu.stock} <= 0">
-                            <div class="rounded-3 w-100 h-100"
-                                 style="background: rgba(0, 0, 0, 0.7); position: absolute;"></div>
-                            <div class="card-body text-center">
-                                <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'"
-                                     style="width: 8rem; height: auto;">
-                                <h5 class="card-title" th:text="${menu.name}"></h5>
-                                <p class="card-text mb-0" style="color: darkred; font-weight: bold; z-index: 100000;">
-                                    売れ切り</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="d-flex justify-content-center mt-2" id="paginationControls">
-                    <button type="button" class="btn btn-secondary me-2" id="prevPageBtn" onclick="changePage(-1)">이전
-                    </button>
-                    <button type="button" class="btn btn-secondary" id="nextPageBtn" onclick="changePage(1)">다음</button>
+                <div class="position-absolute mt-4" style="width: 660px;">
+                    <div class="d-flex justify-content-center align-bottom" id="paginationControls">
+                        <button type="button" class="btn btn-lg btn-secondary me-2" id="prevPageBtn"
+                                onclick="changePage(-1)">前ページ
+                        </button>
+                        <button type="button" class="btn btn-lg btn-secondary" id="nextPageBtn" onclick="changePage(1)">
+                            次ページ
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -170,12 +176,13 @@
             <div class="order-summary">
             </div>
             <div class="d-flex">
-                <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#cartModal">
-                    장바구니 열기
+                <button type="button" class="btn btn-lg btn-warning me-3" data-bs-toggle="modal"
+                        data-bs-target="#cartModal">
+                    カーゴ
                 </button>
-                <form method="post" action="orderPayment" id="orderForm">
+                <form method="post" action="/order/kiosk/pay" id="orderForm">
                     <input type="hidden" name="orderData" id="orderData">
-                    <button type="submit" class="btn btn-success">결제</button>
+                    <button type="submit" class="btn btn-lg btn-warning">支払い</button>
                 </form>
             </div>
         </div>
@@ -193,15 +200,16 @@
                     <img id="modalImage" style="width: 180px; height: auto;">
                     <form id="quantityForm">
                         <div class="mb-3">
-                            <div id="modalDesc" class="">説明</div>
-                            <div id="modalPrice" class="">価格</div>
-                            <label for="quantityInput" class="form-label">数量</label>
-                            <div class="input-group">
-                                <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(-1)">-
+                            <div id="modalDesc" class="" style="font-size: 1.5rem;">説明</div>
+                            <div id="modalPrice" class="" style="font-size: 1.25rem;">価格</div>
+                            <div class="input-group w-75 mx-auto">
+                                <button type="button" class="btn btn-lg btn-outline-secondary"
+                                        style="width: 50px;font-size: 2rem;" onclick="changeQuantity(-1)">-
                                 </button>
                                 <input type="number" class="form-control text-center" id="quantityInput" name="quantity"
-                                       value="1" min="1" readonly>
-                                <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(1)">+
+                                       value="1" min="1" style="font-size: 2rem;" readonly>
+                                <button type="button" class="btn btn-lg btn-outline-secondary"
+                                        style="width: 50px;font-size: 2rem;" onclick="changeQuantity(1)">+
                                 </button>
                             </div>
                         </div>
@@ -209,8 +217,8 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="saveToSession()">追加</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+                    <button type="button" class="btn btn-lg btn-primary" onclick="saveToSession()">追加</button>
+                    <button type="button" class="btn btn-lg btn-secondary" data-bs-dismiss="modal">閉じる</button>
                 </div>
             </div>
         </div>
@@ -220,18 +228,15 @@
     <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="cartModalLabel">장바구니</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
                 <div class="modal-body">
                     <div id="cartItemsContainer">
                         <!-- 장바구니 아이템들이 여기에 동적으로 추가됩니다 -->
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="checkout()">결제하기</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    <div id="cartTotalPrice">
+                        合計
+                    </div>
                 </div>
             </div>
         </div>
@@ -278,21 +283,21 @@
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    alert("상품이 세션에 추가되었습니다.");
                     document.getElementById('menuModal').querySelector('.btn-close').click();
                 } else if (xhr.readyState === 4) {
-                    alert("오류가 발생했습니다: " + xhr.status);
                 }
             };
 
             var data = JSON.stringify({"menuId": menuId, "quantity": quantity});
             xhr.send(data);
+            document.getElementById('cartTotalPrice').innerText = '合計 : ' + getTotalPrice();
         }
 
         document.getElementById('orderForm').addEventListener('submit', function (event) {
             var orders = sessionStorage.getItem('orders');
             document.getElementById('orderData').value = orders;
-        });
+        }
+        );
 
         var currentPage = 1;
         var itemsPerPage = 12; // 한 페이지에 보여줄 아이템 수
@@ -374,26 +379,38 @@
         }
 
         function displayCartItems(cartItems) {
-            var container = document.getElementById('cartItemsContainer');
+            const container = document.getElementById('cartItemsContainer');
             container.innerHTML = '';
-            for (var menuId in cartItems) {
-                var item = cartItems[menuId];
-                var itemHtml = `
-                        <div class="row mb-3 align-content-center" data-menu-id="${menuId}">
-                            <div class="col-md-5 pt-2">${item.name}</div>
-                            <div class="col-md-2 pt-2">${item.price} ウォン</div>
-                            <div class="col-md-3">
-                                <div class="input-group">
-                                    <button type="button" class="btn btn-outline-secondary" onclick="changeCartQuantity(${menuId}, ${item.stock}, -1)">-</button>
-                                    <input type="number" class="form-control text-center" id="quantity-${menuId}" value="${item.quantity}" readonly>
-                                    <button type="button" class="btn btn-outline-secondary" onclick="changeCartQuantity(${menuId}, ${item.stock}, 1)">+</button>
-                                </div>
-                            </div>
-                            <div class="col-md-2 pt-2" id="cart-total">${item.price * item.quantity} ウォン</div>
-                        </div>
-                    `;
+            const menuIds = Object.keys(cartItems);
+            menuIds.forEach((menuId, index) => {
+                const item = cartItems[menuId];
+                const formattedPrice = item.price.toLocaleString();
+                const itemHtml = `
+        <div class="d-flex mb-1 align-items-center cart-item" data-menu-id="${menuId}" style="gap: 10px;">
+            <div style="flex: 1;">${item.name}</div>
+            <div style="width: 120px; text-align: end !important;">${formattedPrice} ₩</div>
+            <div style="width: 120px;">
+                <div class="input-group">
+                    <button type="button" class="btn btn-outline-secondary" onclick="changeCartQuantity(${menuId}, ${item.stock}, -1)">-</button>
+                    <input type="number" class="form-control text-center" id="quantity-${menuId}" value="${item.quantity}" readonly>
+                    <button type="button" class="btn btn-outline-secondary" onclick="changeCartQuantity(${menuId}, ${item.stock}, 1)">+</button>
+                </div>
+            </div>
+            <div style="width: 45px;">
+                <a class="text-danger" style="cursor: pointer;" onclick="deleteCartItem(${menuId})">
+                    <i class="bi bi-x fs-2"></i>
+                </a>
+            </div>
+        </div>
+        `;
                 container.insertAdjacentHTML('beforeend', itemHtml);
-            }
+            });
+
+            getTotalPrice().then(totalPrice => {
+                document.getElementById('cartTotalPrice').innerText = '合計 : ' + totalPrice.toLocaleString() + ' ₩';
+            }).catch(error => {
+                console.error("총 가격을 가져오는 중 오류 발생:", error);
+            });
         }
 
         function changeCartQuantity(menuId, stock, amount) {
@@ -414,6 +431,13 @@
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     quantityInput.value = newQuantity;
+
+
+                    getTotalPrice().then(totalPrice => {
+                        document.getElementById('cartTotalPrice').innerText = '合計 : ' + totalPrice.toLocaleString() + ' ₩';
+                    }).catch(error => {
+                        console.error("총 가격을 가져오는 중 오류 발생:", error);
+                    });
                 } else if (xhr.readyState === 4) {
                     alert("오류가 발생했습니다: " + xhr.status);
                 }
@@ -422,6 +446,41 @@
             var data = JSON.stringify({"menuId": menuId, "quantity": newQuantity});
             xhr.send(data);
         }
+
+        function deleteCartItem(menuId) {
+            // AJAX 요청을 통해 서버로 데이터 전송
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/deleteCartItem", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    if (xhr.responseText === "success") {
+                        // 성공적으로 삭제되면 장바구니에서 항목 제거
+                        const itemRow = document.querySelector(`#cartItemsContainer [data-menu-id="${menuId}"]`);
+                        if (itemRow) {
+                            itemRow.remove();
+                        }
+
+
+                        getTotalPrice().then(totalPrice => {
+                            document.getElementById('cartTotalPrice').innerText = '合計 : ' + totalPrice.toLocaleString() + ' ₩';
+                        }).catch(error => {
+                            console.error("총 가격을 가져오는 중 오류 발생:", error);
+                        });
+                    } else {
+                        console.error("오류가 발생했습니다: " + xhr.responseText);
+                        alert("오류가 발생했습니다: " + xhr.responseText);
+                    }
+                } else if (xhr.readyState === 4) {
+                    console.error("오류가 발생했습니다: " + xhr.status, xhr.responseText);
+                    alert("오류가 발생했습니다: " + xhr.status);
+                }
+            };
+
+            const data = JSON.stringify({"menuId": menuId});
+            xhr.send(data);
+        }
+
 
         function checkout() {
             // 결제하기 버튼 클릭 시 동작하는 함수
@@ -432,7 +491,20 @@
         document.getElementById('cartModal').addEventListener('show.bs.modal', function () {
             loadCart();
         });
-
+        function getTotalPrice() {
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: '/order/totalPrice',
+                    type: 'GET',
+                    success: function (data) {
+                        resolve(data);
+                    },
+                    error: function (xhr, status, error) {
+                        reject(error);
+                    }
+                });
+            });
+        }
         // 초기 필터링 설정
         filterMenu('all');
     </script>

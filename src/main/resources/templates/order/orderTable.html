@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/default_layout}">
+>
+<head>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .modal-dialog {
+            display: flex;
+            align-items: center;
+            min-height: calc(100vh - 1rem);
+        }
+
+        .modal-content {
+            margin: auto;
+        }
+    </style>
+</head>
+<th:block layout:fragment="content">
+    <table class="table">
+        <thead>
+        <tr>
+            <th colspan="4" style="text-align: center">Table</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td th:id="TB1">
+                <div th:if="${tableOrders['TB1'] != null}" data-toggle="modal" data-target="#orderDetailModal"
+                     th:onclick="|loadOrderDetail(${tableOrders['TB1']['id']})|">
+                    <p>1번 테이블</p>
+                    <p th:text="'메뉴 이름 : ' + ${tableOrders['TB1']['menuName']}">No Data</p>
+                    <p th:text="'주문 수량 : ' + ${tableOrders['TB1']['quantity']}">No Data</p>
+                    <p th:text="'주문 가격 : ' + ${tableOrders['TB1']['price'] * tableOrders['TB1']['quantity']}">No
+                        Data</p>
+                </div>
+                <div th:if="${tableOrders['TB1'] == null}">
+                    <p>1번 테이블</p>
+                </div>
+            </td>
+            <td></td>
+            <td></td>
+            <td th:id="TB6">
+                <div th:if="${tableOrders['TB6'] != null}" data-toggle="modal" data-target="#orderDetailModal"
+                     th:onclick="|loadOrderDetail(${tableOrders['TB6']['id']})|">
+                    <p>6번 테이블</p>
+                    <p th:text="'메뉴 이름 : ' + ${tableOrders['TB6']['menuName']}">No Data</p>
+                    <p th:text="'주문 수량 : ' + ${tableOrders['TB6']['quantity']}">No Data</p>
+                    <p th:text="'주문 가격 : ' + ${tableOrders['TB6']['price'] * tableOrders['TB6']['quantity']}">No
+                        Data</p>
+                </div>
+                <div th:if="${tableOrders['TB6'] == null}">
+                    <p>6번 테이블</p>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td th:id="TB2">
+                <div th:if="${tableOrders['TB2'] != null}" data-toggle="modal" data-target="#orderDetailModal"
+                     th:onclick="|loadOrderDetail(${tableOrders['TB2']['id']})|">
+                    <p>2번 테이블</p>
+                    <p th:text="'메뉴 이름 : ' + ${tableOrders['TB2']['menuName']}">No Data</p>
+                    <p th:text="'주문 수량 : ' + ${tableOrders['TB2']['quantity']}">No Data</p>
+                    <p th:text="'주문 가격 : ' + ${tableOrders['TB2']['price'] * tableOrders['TB2']['quantity']}">No
+                        Data</p>
+                </div>
+                <div th:if="${tableOrders['TB2'] == null}">
+                    <p>2번 테이블</p>
+                </div>
+            </td>
+            <td th:id="TB4">
+                <div th:if="${tableOrders['TB4'] != null}" data-toggle="modal" data-target="#orderDetailModal"
+                     th:onclick="|loadOrderDetail(${tableOrders['TB4']['id']})|">
+                    <p>4번 테이블</p>
+                    <p th:text="'메뉴 이름 : ' + ${tableOrders['TB4']['menuName']}">No Data</p>
+                    <p th:text="'주문 수량 : ' + ${tableOrders['TB4']['quantity']}">No Data</p>
+                    <p th:text="'주문 가격 : ' + ${tableOrders['TB4']['price'] * tableOrders['TB4']['quantity']}">No
+                        Data</p>
+                </div>
+                <div th:if="${tableOrders['TB4'] == null}">
+                    <p>4번 테이블</p>
+                </div>
+            </td>
+            <td></td>
+            <td th:id="TB7">
+                <div th:if="${tableOrders['TB7'] != null}" data-toggle="modal" data-target="#orderDetailModal"
+                     th:onclick="|loadOrderDetail(${tableOrders['TB7']['id']})|">
+                    <p>7번 테이블</p>
+                    <p th:text="'메뉴 이름 : ' + ${tableOrders['TB7']['menuName']}">No Data</p>
+                    <p th:text="'주문 수량 : ' + ${tableOrders['TB7']['quantity']}">No Data</p>
+                    <p th:text="'주문 가격 : ' + ${tableOrders['TB7']['price'] * tableOrders['TB7']['quantity']}">No
+                        Data</p>
+                </div>
+                <div th:if="${tableOrders['TB7'] == null}">
+                    <p>7번 테이블</p>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td th:id="TB3">
+                <div th:if="${tableOrders['TB3'] != null}" data-toggle="modal" data-target="#orderDetailModal"
+                     th:onclick="|loadOrderDetail(${tableOrders['TB3']['id']})|">
+                    <p>3번 테이블</p>
+                    <p th:text="'메뉴 이름 : ' + ${tableOrders['TB3']['menuName']}">No Data</p>
+                    <p th:text="'주문 수량 : ' + ${tableOrders['TB3']['quantity']}">No Data</p>
+                    <p th:text="'주문 가격 : ' + ${tableOrders['TB3']['price'] * tableOrders['TB3']['quantity']}">No
+                        Data</p>
+                </div>
+                <div th:if="${tableOrders['TB3'] == null}">
+                    <p>3번 테이블</p>
+                </div>
+            </td>
+            <td th:id="TB5">
+                <div th:if="${tableOrders['TB5'] != null}" data-toggle="modal" data-target="#orderDetailModal"
+                     th:onclick="|loadOrderDetail(${tableOrders['TB5']['id']})|">
+                    <p>5번 테이블</p>
+                    <p th:text="'메뉴 이름 : ' + ${tableOrders['TB5']['menuName']}">No Data</p>
+                    <p th:text="'주문 수량 : ' + ${tableOrders['TB5']['quantity']}">No Data</p>
+                    <p th:text="'주문 가격 : ' + ${tableOrders['TB5']['price'] * tableOrders['TB5']['quantity']}">No
+                        Data</p>
+                </div>
+                <div th:if="${tableOrders['TB5'] == null}">
+                    <p>5번 테이블</p>
+                </div>
+            </td>
+            <td></td>
+            <td th:id="TB8">
+                <div th:if="${tableOrders['TB8'] != null}" data-toggle="modal" data-target="#orderDetailModal"
+                     th:onclick="|loadOrderDetail(${tableOrders['TB8']['id']})|">
+                    <p>8번 테이블</p>
+                    <p th:text="'메뉴 이름 : ' + ${tableOrders['TB8']['menuName']}">No Data</p>
+                    <p th:text="'주문 수량 : ' + ${tableOrders['TB8']['quantity']}">No Data</p>
+                    <p th:text="'주문 가격 : ' + ${tableOrders['TB8']['price'] * tableOrders['TB8']['quantity']}">No
+                        Data</p>
+                </div>
+                <div th:if="${tableOrders['TB8'] == null}">
+                    <p>8번 테이블</p>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Modal -->
+    <div class="modal fade" id="orderDetailModal" tabindex="-1" role="dialog" aria-labelledby="orderDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderDetailModalLabel">주문 상세</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="modalContent">
+                    <!-- 모달 내용이 여기 로드됩니다 -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function loadOrderDetail(orderID) {
+            fetch(`/orderDetailTable?orderID=${orderID}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('modalContent').innerHTML = html;
+                });
+        }
+    </script>
+</th:block>
+</html>

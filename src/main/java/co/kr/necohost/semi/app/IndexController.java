@@ -1,7 +1,5 @@
 package co.kr.necohost.semi.app;
 
-import co.kr.necohost.semi.domain.model.dto.AccountRequest;
-import co.kr.necohost.semi.domain.model.entity.Account;
 import co.kr.necohost.semi.domain.service.CategoryService;
 import co.kr.necohost.semi.domain.service.SalesService;
 import jakarta.servlet.http.HttpSession;

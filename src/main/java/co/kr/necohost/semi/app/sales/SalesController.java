@@ -3,15 +3,18 @@ package co.kr.necohost.semi.app.sales;
 import co.kr.necohost.semi.domain.model.dto.SalesRequest;
 import co.kr.necohost.semi.domain.model.entity.Sales;
 import co.kr.necohost.semi.domain.service.SalesService;
+import com.nimbusds.jose.shaded.gson.Gson;
+import org.apache.commons.collections4.bag.SynchronizedSortedBag;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class SalesController {
@@ -23,16 +26,57 @@ public class SalesController {
     }
 
     // 구버전 관리자 판매 메뉴 페이지를 반환하는 메서드(css없음)
-//    @RequestMapping(value = "/adminSalesMenu", method=RequestMethod.GET)
-//    public String getAdminSalesMenu() {
-//        return "/sales/adminSalesMenu.html";
-//    }
+    @RequestMapping(value = "/adminSalesMenu", method=RequestMethod.GET)
+    public String getOldAdminSalesMenu() {
+        return "/sales/adminSalesMenu.html";
+    }
 
     // 신버전 관리자 페이지 - 판매 관리 페이지를 반환하는 메서드(css있음)
-    @RequestMapping(value = "/adminSalesMain", method=RequestMethod.GET)
-    public String getAdminSalesMenu() {
-        return "/sales/adminSalesMain.html";
+    @RequestMapping(value = "/adminSalesMainMenu", method=RequestMethod.GET)
+    public String getAdminSalesMainMenu() {
+        return "/sales/adminSalesMainMenu.html";
     }
+
+    // 신버전 관리자 페이지 - 홈 페이지(오늘의 현재 시간까지의 매출)를 반환하는 메서드(css있음)
+//    @RequestMapping(value = "/adminSalesMainHome", method=RequestMethod.GET)
+//    public String getAdminSalesMainHome(Model model) {
+//        LocalDateTime now = LocalDateTime.now();
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        String formattedNow = now.format(formatter);
+//        model.addAttribute("currentTime", formattedNow);
+//        double totalSalesToday = salesService.getTotalSalesUntilNow(now);
+//        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
+//        String formattedTotalSalesToday = numberFormat.format(totalSalesToday);
+//        model.addAttribute("totalSalesToday", formattedTotalSalesToday);
+//
+//        return "/sales/adminSalesMainHome.html";
+//    }
+
+
+    //6월 11일 확인중. 오늘의 현재 시간까지의 totalSalesToday 보임 / 시간대별 누적 매출 보여주는 차트 안보임 .
+    @RequestMapping(value = "/adminSalesMainHome", method=RequestMethod.GET)
+    public String getAdminSalesHourly(Model model) {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedNow = now.format(formatter);
+        model.addAttribute("currentTime", formattedNow);
+
+        LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = now.withHour(23).withMinute(59).withSecond(59);
+
+        Map<LocalDateTime, Double> hourlySales = salesService.getHourlySalesByDay(startOfDay, endOfDay);
+
+        double totalSalesToday = salesService.getTotalSalesUntilNow(now);
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
+        String formattedTotalSalesToday = numberFormat.format(totalSalesToday);
+        model.addAttribute("totalSalesToday", formattedTotalSalesToday);
+
+        model.addAttribute("hourlySales", hourlySales);
+        System.out.println("hourlySales관련 확인중");
+        System.out.println(hourlySales);
+        return "/sales/adminSalesMainHome.html";
+    }
+
 
 
 
@@ -66,16 +110,8 @@ public class SalesController {
         return "/sales/readSales.html";
     }
 
-    // 각 카테고리별 총 판매액을 반환하는 메서드//6월 10일 작업중
-//    @RequestMapping(value = "/totalSalesbyCategory", method = RequestMethod.GET)
-//    public String getTotalSalesByCategory(Model model) {
-//        Map<Integer, Double> totalByCategory = salesService.getTotalSalesByCategory();
-//        model.addAttribute("totalByCategory", totalByCategory);
-//        System.out.println(totalByCategory);
-//        return "/sales/totalSalesByCategory.html";
-//    }
 
-    //6월 10일 작업중
+    //각 카테고리별 총 판매액을 반환하는 메서드
     @RequestMapping(value = "/totalSalesbyCategory", method = RequestMethod.GET)
     public String getTotalSalesByCategory(Model model) {
         Map<String, Double> totalByCategory = salesService.getTotalSalesByCategory();
@@ -86,15 +122,13 @@ public class SalesController {
 
 
 
-    // 각 메뉴별 총 판매액을 반환하는 메서드. 6월 7일 오후 5시 작업중
-//    @RequestMapping(value = "/totalSalesbyMenu", method = RequestMethod.GET)
-//    public String getTotalSalesByMenu(Model model) {
-//        Map<Integer, Double> totalByMenu = salesService.getTotalSalesByMenu();
-//        model.addAttribute("totalByMenu", totalByMenu);
-//
-//        return "/sales/totalSalesByMenu.html";
-//    }
-    //6월 10일 작업중
+
+
+
+
+
+
+    // 각 메뉴별 총 판매액을 반환하는 메서드
     @RequestMapping(value = "/totalSalesbyMenu", method = RequestMethod.GET)
     public String getTotalSalesByMenu(Model model) {
         Map<String, Double> totalByMenu = salesService.getTotalSalesByMenu();
@@ -103,20 +137,74 @@ public class SalesController {
         return "/sales/totalSalesByMenu.html";
     }
 
-
-
-
-
-
-
+    // 월별 총 판매액을 반환하는 메서드
+//    @RequestMapping(value="/totalSalesByMonth" , method = RequestMethod.GET)
+//    public String getTotalSalesByMonth(Model model) {
+//        Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
+//        Map<String, Double> sortedMonthlySales = new TreeMap<>(monthlySales); // TreeMap을 사용하여 정렬
+//        model.addAttribute("monthlySales", sortedMonthlySales);
+//        return "sales/totalSalesByMonth";
+//    }
     // 연도별 총 판매액을 반환하는 메서드
-    @RequestMapping(value= "/totalSalesByYear", method = RequestMethod.GET)
+//    @RequestMapping(value= "/totalSalesByYear", method = RequestMethod.GET)
+//    public String getTotalSalesByYear(Model model) {
+//        Map<Integer, Double> yearlySales = salesService.getYearlySalesByProcess();
+//        model.addAttribute("yearlySales", yearlySales);
+//        System.out.println(yearlySales);
+//        return "/sales/totalSalesByYear";
+//    }
+    // 연도별 총 판매액을 반환하는 메서드. 6월 10일 오후 4시 수정중
+
+    //연도별 총 판매액을 반환하는 메서드
+    @RequestMapping(value = "/totalSalesByYear", method = RequestMethod.GET)
     public String getTotalSalesByYear(Model model) {
         Map<Integer, Double> yearlySales = salesService.getYearlySalesByProcess();
+
+        // 연도별 오름차순으로 정렬
+        Map<String, String> yearlySalesStringKey = yearlySales.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().toString(),
+                        entry -> String.format("%,d", entry.getValue().longValue()),
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
+
         model.addAttribute("yearlySales", yearlySales);
-        System.out.println(yearlySales);
-        return "/sales/totalSalesByYear.html";
+        System.out.println(yearlySalesStringKey);
+        return "sales/totalSalesByYear";
     }
+
+
+    // 월별 총 판매액을 반환하는 메서드
+//    @RequestMapping(value="/totalSalesByMonth" , method = RequestMethod.GET)
+//    public String getTotalSalesByMonth(Model model) {
+//        Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
+//        Map<String, Double> sortedMonthlySales = new TreeMap<>(monthlySales); // TreeMap을 사용하여 정렬
+//        model.addAttribute("monthlySales", sortedMonthlySales);
+//        return "sales/totalSalesByMonth";
+//    }
+
+    // 월별 총 판매액을 반환하는 메서드 6월 10일 수정중
+    @RequestMapping(value = "/totalSalesByMonth", method = RequestMethod.GET)
+    public String getTotalSalesByMonth(Model model) {
+        Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
+        Map<String, String> formattedMonthlySales = monthlySales.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> String.format("%,d", entry.getValue().longValue()),
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
+        model.addAttribute("monthlySales", monthlySales);
+        model.addAttribute("formattedMonthlySales", formattedMonthlySales); // 포맷팅된 데이터를 따로 추가
+        return "sales/totalSalesByMonth";
+    }
+
+
+
 
     // 입력된 연도의 총 판매액을 반환하는 메서드
     @RequestMapping(value= "/totalSalesByYearInput", method = RequestMethod.GET)
@@ -200,14 +288,9 @@ public class SalesController {
         return "sales/totalSalesByYearAndCategoryInput";
     }
 
-    // 월별 총 판매액을 반환하는 메서드
-    @RequestMapping(value="/totalSalesByMonth" , method = RequestMethod.GET)
-    public String getTotalSalesByMonth(Model model) {
-        Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
-        Map<String, Double> sortedMonthlySales = new TreeMap<>(monthlySales); // TreeMap을 사용하여 정렬
-        model.addAttribute("monthlySales", sortedMonthlySales);
-        return "sales/totalSalesByMonth";
-    }
+
+
+
 
 
 }

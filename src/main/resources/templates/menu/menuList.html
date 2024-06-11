@@ -105,7 +105,7 @@
                         // 데이터가 성공적으로 로드되면 모달에 데이터를 설정
                         $('#modalTitle').text(data.menu.name);
                         $('#modalImage').attr('src', data.menu.image);
-                        $('#modalPrice').text('価格 : ' + data.menu.price + ' ウォン');
+                        $('#modalPrice').text('価格 : ' + data.menu.price + ' ₩');
                         $('#modalCategory').text('カテゴリー : ' + data.category.name);
                         if (data.menu.stockorder > 0) {
                             $('#modalStock').text('ストック : ' + data.menu.stock + ' + ' + data.menu.stockorder);

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/plain_layout}">
+>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIOSK</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+        }
+
+        .container {
+            width: 768px !important;
+            margin: auto;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .headTitle {
+            width: 100% !important;
+            background-color: #ffcc00;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .headTitle img {
+            height: 50px;
+        }
+
+        .menu-section {
+            padding: 20px;
+            min-height: 1110px; /* 최소 높이 설정 (4줄이 나오도록) */
+        }
+
+        .menu-category {
+            margin-bottom: 20px;
+        }
+
+        .menu-category h2 {
+            margin-bottom: 10px;
+            border-bottom: 2px solid #ffcc00;
+            padding-bottom: 5px;
+        }
+
+        .menu-item {
+            width: 30%;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .menu-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .menu-item p {
+            margin: 10px 0 0;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f2f2f2;
+            padding: 10px 20px;
+        }
+
+        #menuContainer::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        #menuContainer::-webkit-scrollbar-track {
+            background-color: #f2f2f2;
+        }
+
+        #menuContainer::-webkit-scrollbar-thumb {
+            background-color: #ffcc00;
+        }
+
+        #menuContainer::-webkit-scrollbar-track,
+        #menuContainer::-webkit-scrollbar-thumb {
+            border-radius: 5px;
+        }
+
+    </style>
+</head>
+<body><th:block layout:fragment="content">
+    <div class="container">
+        <div class="headTitle">
+            KIOSK
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-category">
+                <h2 id="categoryTitle">お支払い</h2>
+                <div class="row align-top ms-2" id="menuContainer" style="width: 645px; max-height: 1057.28px; overflow-y: auto; overflow-x: hidden;">
+                    <div class="menu-item mb-2 me-4" th:each="item : ${orderedItems}"
+                         style="width: 660px; height: 130px;">
+                        <div class="border border-1 rounded-1 d-flex w-100" style="width: 180px;">
+                            <img class="col-4" th:src="${item.key.image}"
+                                 onerror="this.onerror=null; this.src='/img/americano.png'"
+                                 style="width: 8rem; height: auto;">
+                            <div class="col-5" style="text-align: start !important;">
+                                <div class="fw-bold fs-3 mb-5" th:text="${item.key.name}"></div>
+                                <div class="fw-bold fs-4" th:text="|数量 : ${item.value}|"></div>
+                            </div>
+                            <div class="col-5 pe-5" style=" text-align: end !important;">
+                                <div class="fw-bold fs-3" th:text="|${#numbers.formatInteger(item.key.price, 1, 'COMMA')} ₩|">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="order-summary">
+                <div class="fs-2" th:text="|合計 : ${#numbers.formatInteger(totalPrice,1,'COMMA')} ₩|"></div>
+            </div>
+            <div class="d-flex">
+                <a href="/order/kiosk" class="btn btn-lg btn-warning me-3">戻る</a>
+                <form method="post" action="orderPayment" id="orderForm">
+                    <input type="hidden" name="orderData" id="orderData">
+                    <button type="submit" class="btn btn-lg btn-warning">支払い</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>
