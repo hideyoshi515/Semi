@@ -79,7 +79,7 @@ public class DeviceController {
         for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
             Menu menu = entry.getKey();
             int quantity = entry.getValue();
-            totalPrice += menu.getPrice() * quantity;
+            totalPrice += (long) menu.getPrice() * quantity;
         }
 
         model.addAttribute("orderedItems", orders);
@@ -87,8 +87,9 @@ public class DeviceController {
 
         return "order/orderPaymentSelect.html";
     }
+
     @RequestMapping(value = "/orderPayment", method = RequestMethod.GET)
-    public String getOrderPayment(Model model, DeviceRequest deviceRequest,HttpSession session) {
+    public String getOrderPayment(Model model, DeviceRequest deviceRequest, HttpSession session) {
         long totalPrice = 0;
 
         Map<Menu, Integer> orders = (Map<Menu, Integer>) session.getAttribute("orders");
@@ -100,7 +101,7 @@ public class DeviceController {
         for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
             Menu menu = entry.getKey();
             int quantity = entry.getValue();
-            totalPrice += menu.getPrice() * quantity;
+            totalPrice += (long) menu.getPrice() * quantity;
         }
 
         model.addAttribute("orderedItems", orders);
@@ -253,6 +254,7 @@ public class DeviceController {
 
         return "success";
     }
+
     @PostMapping("deleteCartItem")
     @ResponseBody
     public String deleteCartItem(@RequestBody Map<String, Object> data, HttpSession session) {
@@ -265,11 +267,62 @@ public class DeviceController {
         if (orders == null) {
             orders = new HashMap<>();
         }
-        if (orders.containsKey(menu)) {
-            orders.remove(menu);
-        }
+        orders.remove(menu);
         session.setAttribute("orders", orders);
         return "success";
 
     }
+
+    @RequestMapping(value = "/order/kiosk", method = RequestMethod.GET)
+    public String getKiosk(@ModelAttribute DeviceRequest deviceRequest, @RequestParam Map<String, Object> params, HttpSession session, Model model) {
+        model.addAttribute("deviceRequest", deviceRequest);
+        Map<Long, List<Menu>> categorizedMenus = menuService.getCategorizedMenus();
+        model.addAttribute("categorizedMenus", categorizedMenus);
+        List<Menu> menus = menuService.getAllMenus();
+        List<Category> categories = categoryService.getAllCategories();
+        model.addAttribute("menus", menus);
+        model.addAttribute("categories", categories);
+        return "/order/orderKiosk.html";
+    }
+
+    @RequestMapping(value = "/order/kiosk/pay", method = RequestMethod.POST)
+    public String getKioskPayment(Model model, DeviceRequest deviceRequest, HttpSession session) {
+        long totalPrice = 0;
+
+        Map<Menu, Integer> orders = (Map<Menu, Integer>) session.getAttribute("orders");
+        if (orders == null || orders.isEmpty()) {
+            return "redirect:/order/kiosk"; // 주문이 없는 경우
+        }
+
+
+        for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
+            Menu menu = entry.getKey();
+            int quantity = entry.getValue();
+            totalPrice += (long) menu.getPrice() * quantity;
+        }
+
+        model.addAttribute("orderedItems", orders);
+        model.addAttribute("totalPrice", totalPrice);
+
+        return "order/orderKioskPay.html";
+    }
+
+    @ResponseBody
+    @RequestMapping("/order/totalPrice")
+    public long getTotalPrice(HttpSession session) {
+        long totalPrice = 0;
+
+        Map<Menu, Integer> orders = (Map<Menu, Integer>) session.getAttribute("orders");
+        if (orders == null || orders.isEmpty()) {
+            return 0;
+        }
+
+        for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
+            Menu menu = entry.getKey();
+            int quantity = entry.getValue();
+            totalPrice += (long) menu.getPrice() * quantity;
+        }
+        return totalPrice;
+    }
+
 }
