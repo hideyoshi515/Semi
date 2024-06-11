@@ -262,7 +262,7 @@ public class SalesService {
 
     //6월 11일 작업중
     public Map<LocalDateTime, Double> getHourlySalesByDay(LocalDateTime startOfDay, LocalDateTime endOfDay) {
-        List<Sales> salesList = salesRepository.findSalesByDateRange(startOfDay, endOfDay);
+        List<Sales> salesList = salesRepository.findSalesByDateRangeAndProcess(startOfDay, endOfDay);
         Map<LocalDateTime, Double> hourlySales = new TreeMap<>();
 
         // 2시간 단위로 그룹화
@@ -275,10 +275,10 @@ public class SalesService {
 
         return hourlySales;
     }
-    //6월 11일 작업중
+
     public double getTotalSalesUntilNow(LocalDateTime now) {
         LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
-        List<Sales> salesList = salesRepository.findSalesByDateTimeRange(startOfDay, now);
+        List<Sales> salesList = salesRepository.findSalesByDateRangeAndProcess(startOfDay, now);
         return salesList.stream()
                 .mapToDouble(s -> s.getPrice() * s.getQuantity())
                 .sum();
