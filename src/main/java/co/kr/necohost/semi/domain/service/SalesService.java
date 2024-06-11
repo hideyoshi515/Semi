@@ -209,29 +209,63 @@ public class SalesService {
 
 
 
-    // 연도와 카테고리별 총 판매량을 계산
-    public double getTotalSalesByYearAndCategory(int year, int category) {
-        List<Sales> salesList = salesRepository.findSalesByYearAndCategory(year, category);
-        return salesList.stream()
-                .mapToDouble(s -> s.getPrice() * s.getQuantity())
-                .sum();
-    }
-    // 프로세스로 월별 총 판매량을 계산
+    // (구)연도와 카테고리별 총 판매량을 계산 6월 11일 오후 2시 47분 확인중
+//    public double getTotalSalesByYearAndCategory(int year, int category) {
+//        List<Sales> salesList = salesRepository.findSalesByYearAndCategory(year, category);
+//        return salesList.stream()
+//                .mapToDouble(s -> s.getPrice() * s.getQuantity())
+//                .sum();
+//    }
+//    // 프로세스로 월별 총 판매량을 계산
+//    public Map<String, Double> getMonthlySalesByProcess() {
+//        List<Sales> salesList = salesRepository.findYearlySalesByProcess();
+//        return salesList.stream()
+//                .collect(Collectors.groupingBy(
+//                        s -> {
+//                            LocalDate date = s.getDate().atZone(ZoneId.systemDefault()).toLocalDate();
+//                            return date.getYear() + "-" + String.format("%02d", date.getMonthValue());
+//                        },
+//                        Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
+//                ));
+//    }
+
+    // (신)월별 총 판매액을 반환하는 메서드  6월 11일 오후 2시 47분 확인중
     public Map<String, Double> getMonthlySalesByProcess() {
-        List<Sales> salesList = salesRepository.findYearlySalesByProcess();
-        return salesList.stream()
-                .collect(Collectors.groupingBy(
-                        s -> {
-                            LocalDate date = s.getDate().atZone(ZoneId.systemDefault()).toLocalDate();
-                            return date.getYear() + "-" + String.format("%02d", date.getMonthValue());
-                        },
-                        Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
-                ));
+        List<Sales> salesList = salesRepository.findMonthlySalesByProcess();
+        Map<String, Double> monthlySales = new TreeMap<>();
+
+        // 초기값 설정
+        LocalDate currentDate = LocalDate.now();
+        for (int year = salesList.get(0).getDate().getYear(); year <= currentDate.getYear(); year++) {
+            for (int month = 1; month <= 12; month++) {
+                String key = String.format("%d-%02d", year, month);
+                monthlySales.put(key, 0.0);
+            }
+        }
+
+        // 매출 데이터 업데이트
+        for (Sales sales : salesList) {
+            String key = String.format("%d-%02d", sales.getDate().getYear(), sales.getDate().getMonthValue());
+            monthlySales.put(key, monthlySales.get(key) + sales.getPrice() * sales.getQuantity());
+        }
+
+        return monthlySales;
     }
+    // (신)월별 총 판매액을 반환하는 메서드  6월 11일 오후 2시 47분 확인중
+
+
+
+
+
 
     public int getCountByMenuAfterDaysAgo(long menuId,int days){
         return salesRepository.getCountByMenuAfterDaysAgo(menuId, days);
     }
+
+
+
+
+
 
     // 현재 월과 전월의 매출을 계산하여 전월대비 매출 상승률을 계산 6월 7일 추가중
     public double getMonthlySalesGrowthRate(int year, int month) {
@@ -279,6 +313,14 @@ public class SalesService {
     public double getTotalSalesUntilNow(LocalDateTime now) {
         LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
         List<Sales> salesList = salesRepository.findSalesByDateRangeAndProcess(startOfDay, now);
+        return salesList.stream()
+                .mapToDouble(s -> s.getPrice() * s.getQuantity())
+                .sum();
+    }
+
+    // 연도와 카테고리별 총 판매액을 계산 6월 11일 오후 2시 47분 작업중
+    public double getTotalSalesByYearAndCategory(int year, int category) {
+        List<Sales> salesList = salesRepository.findSalesByYearAndCategory(year, category);
         return salesList.stream()
                 .mapToDouble(s -> s.getPrice() * s.getQuantity())
                 .sum();
