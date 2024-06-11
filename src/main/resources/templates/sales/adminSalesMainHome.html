@@ -31,15 +31,40 @@
             今までの売上高：<span th:text="${totalSalesToday}"></span>円
         </div>
 
-        <div class="chart-container">
-            <canvas id="salesChart"></canvas>
-        </div>
 
         現在時間までの売上総額
         時間帯別売上総額
         現在時間までのカテゴリ別 / メニュー別売上
+        확인용확인용확인용확인용확인용확인용
+        <div class="table-container">
+            <table>
+                <thead>
+                <tr>
+                    <th>시간</th>
+                    <th>매출</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="hourlySales : ${hourlySales}">
+                    <td th:text="${hourlySales.key}+'부터 1시간 뒤까지'"></td>
+                    <td th:text="${hourlySales.value} + '円'"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
 
     </div>
+    <div class="chart-wrapper">
+        <div class="chart-container">
+            <canvas id="salesChart"></canvas>
+        </div>
+    </div>
+
+
+
+
+
 
     <script th:inline="javascript">
         // JavaScript로 hourlySales 데이터를 전달

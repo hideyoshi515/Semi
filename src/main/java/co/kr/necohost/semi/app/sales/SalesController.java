@@ -3,6 +3,8 @@ package co.kr.necohost.semi.app.sales;
 import co.kr.necohost.semi.domain.model.dto.SalesRequest;
 import co.kr.necohost.semi.domain.model.entity.Sales;
 import co.kr.necohost.semi.domain.service.SalesService;
+import com.nimbusds.jose.shaded.gson.Gson;
+import org.apache.commons.collections4.bag.SynchronizedSortedBag;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -70,7 +72,8 @@ public class SalesController {
         model.addAttribute("totalSalesToday", formattedTotalSalesToday);
 
         model.addAttribute("hourlySales", hourlySales);
-
+        System.out.println("hourlySales관련 확인중");
+        System.out.println(hourlySales);
         return "/sales/adminSalesMainHome.html";
     }
 
