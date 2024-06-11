@@ -8,7 +8,9 @@ import co.kr.necohost.semi.domain.repository.MenuRepository;
 import co.kr.necohost.semi.domain.repository.OrderNumRepository;
 import co.kr.necohost.semi.domain.repository.OrderRepository;
 import co.kr.necohost.semi.domain.service.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -112,9 +114,31 @@ public class DeviceController {
     }
 
     @RequestMapping(value = "/orderPaymentSelect", method = RequestMethod.POST)
-    public String OrderPaymentSelect(@ModelAttribute DeviceRequest deviceRequest, @RequestParam String paymentMethod, Model model, SalesRequest salesRequest, AccountRequest accountRequest) {
+    public String OrderPaymentSelect(HttpSession session, Model model,@RequestParam String paymentMethod, AccountRequest accountRequest) {
+        Object ordersObj = session.getAttribute("orders");
+        if (ordersObj == null) {
+            System.out.println("오류오류오류");
+        }
+
+        Map<Menu, Integer> orders = (Map<Menu, Integer>) ordersObj;
+
+        DeviceRequest deviceRequest = new DeviceRequest();
+
+
+        Map<Long, Integer> quantities = new HashMap<>();
+        for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
+            quantities.put(entry.getKey().getId(), entry.getValue());
+        }
+        deviceRequest.setQuantities(quantities);
+        deviceRequest.setPhoneNum("defaultPhone");
+        deviceRequest.setPass("defaultPass");
+
         System.out.println("DeviceRequest: " + deviceRequest);
-        Map<Long, Integer> quantities = deviceRequest.getQuantities();
+
+        Device device = new Device();
+        device.setDevice(deviceRequest.getDevice());
+        device.setDeviceNum(deviceRequest.getDeviceNum());
+
         long totalPrice = 0;
         String phone = deviceRequest.getPhoneNum();
         String pass = deviceRequest.getPass();
@@ -133,30 +157,35 @@ public class DeviceController {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String formattedDateTime = localDate.format(formatter);
 
-                accountRequest = new AccountRequest();
-                salesRequest = new SalesRequest();
-                salesRequest.setCategory((int) menu.getCategory());
+                SalesRequest salesRequest = new SalesRequest();
+                salesRequest.setCategory(menu.getCategory());
                 salesRequest.setDate(LocalDateTime.parse(formattedDateTime, formatter));
-                salesRequest.setMenu((int) menu.getId());
+                salesRequest.setMenu( menu.getId());
                 salesRequest.setQuantity(quantity);
-                salesRequest.setDevice((int) deviceRequest.getDevice());
-                salesRequest.setDeviceNum((int) deviceRequest.getDeviceNum());
-                salesRequest.setOrderNum((int) deviceRequest.getOrderNum());
-                salesRequest.setProcess(paymentMethod.equals("CASH") ? 1 : paymentMethod.equals("CARD") ? 2 : 3);
-                salesRequest.setOrderNum((int) orderNum.getOrderNum());
+                salesRequest.setDevice(1);
+                salesRequest.setDeviceNum(0);
+                salesRequest.setOrderNum(deviceRequest.getOrderNum());
+                salesRequest.setProcess(paymentMethod.equals("CASH") ? 0 : 1);
+                salesRequest.setOrderNum(orderNum.getOrderNum());
 
-                salesService.save(salesRequest);
+                try {
+                    salesService.save2(salesRequest);
+                } catch (Exception e){
+                    e.printStackTrace();
+                    System.out.println("Error Saving sales request" + e.getMessage());
+                }
+
 
                 menu.setStock(menu.getStock() - quantity);
                 menuService.saveMenu(menu);
 
-                int pointsEarned = calculatePoints((long) menu.getPrice() * quantity);
-                if (phone.equals(phone)) {
-                    account.setMsPoint(account.getMsPoint() + pointsEarned);
-                    accountService.save(accountRequest);
-                } else {
-                    return "order/orderPoint.html";
-                }
+//                int pointsEarned = calculatePoints((long) menu.getPrice() * quantity);
+//                if (phone.equals(phone)) {
+//                    account.setMsPoint(account.getMsPoint() + pointsEarned);
+//                    accountService.save(accountRequest);
+//                } else {
+//                    return "order/orderPoint.html";
+//                }
             }
         }
         model.addAttribute("orderedItems", quantities);
