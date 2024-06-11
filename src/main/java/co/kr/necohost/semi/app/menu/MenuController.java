@@ -34,7 +34,7 @@ public class MenuController {
     }
 
     // 메뉴 인덱스 페이지를 반환
-    @RequestMapping(value = "/MenuIndex", method = RequestMethod.GET)
+    @RequestMapping(value = "/menuIndex", method = RequestMethod.GET)
     public String getMenuIndex(Model model) {
         return "/menu/menuIndex.html";
     }
@@ -49,6 +49,7 @@ public class MenuController {
         } else {
             menus = menuService.getAllMenus();
         }
+
 
         //최근 days일 간의 판매량
         int days = 7;
@@ -130,7 +131,7 @@ public class MenuController {
         menuService.addStockOrder(id, amount);
         return ResponseEntity.ok().build();
     }
-    
+
     // 발주량을 실제 재고에 추가하고 초기화
     @RequestMapping(value = "/updateStockAndOrder", method = RequestMethod.POST)
     public ResponseEntity<?> updateStockAndOrder(@RequestBody Map<String, Object> payload) {
