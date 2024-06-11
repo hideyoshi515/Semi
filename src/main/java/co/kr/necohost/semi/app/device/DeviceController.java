@@ -69,6 +69,7 @@ public class DeviceController {
     public String postOrderPayment(HttpSession session, Model model, DeviceRequest deviceRequest) {
         long totalPrice = 0;
 
+
         // 세션에서 주문 데이터를 가져옴
         Map<Menu, Integer> orders = (Map<Menu, Integer>) session.getAttribute("orders");
         if (orders == null || orders.isEmpty()) {

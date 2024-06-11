@@ -7,7 +7,7 @@
     <script>
         let idleTime = 0;
         let idleInterval;
-        const maxIdleTime = 5;
+        const maxIdleTime = 300;
 
         function resetIdleTimer() {
             idleTime = 0;
@@ -44,7 +44,8 @@
 
     <div class="">
         <div class="row" id="menuContainer">
-            <div class="mb-3 menuItem" th:each="menu : ${menus}" th:attr="data-category=${menu.category}, data-menu-id=${menu.id}"
+            <div class="mb-3 menuItem" th:each="menu : ${menus}"
+                 th:attr="data-category=${menu.category}, data-menu-id=${menu.id}"
                  style="width: 200px">
                 <a th:if="${menu.stock} > 0"
                    th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ₩'}">
@@ -108,9 +109,9 @@
         </div>
     </div>
 
-    <form method="post" action="orderPayment" id="orderForm">
+    <form method="post" action="orderPayment" id="orderForm" onsubmit="return checkoutForm()">
         <input type="hidden" name="orderData" id="orderData">
-        <button type="submit" class="btn btn-success">결제</button>
+        <button type="submit" class="btn btn-success" >결제</button>
     </form>
 
     <!-- Cart Modal -->
@@ -131,13 +132,14 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                    <button type="button" class="btn btn-primary" onclick="checkout()">결제하기</button>
+                    <button type="button" class="btn btn-primary" onclick="checkout()" id="orderPay">결제하기</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        let cartData = null;
         document.getElementById('menuModal').addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
             const menuName = button.getAttribute('data-menu-name');
@@ -180,19 +182,17 @@
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     alert("상품이 장바구니에 추가되었습니다.");
                     document.getElementById('menuModal').querySelector('.btn-close').click();
+                    loadCart();
                 } else if (xhr.readyState === 4) {
                     alert("오류가 발생했습니다: " + xhr.status);
                 }
             };
 
-            const data = JSON.stringify({ "menuId": menuId, "quantity": quantity });
+            const data = JSON.stringify({"menuId": menuId, "quantity": quantity});
             xhr.send(data);
         }
 
-        document.getElementById('orderForm').addEventListener('submit', function (event) {
-            const orders = sessionStorage.getItem('orders');
-            document.getElementById('orderData').value = orders;
-        });
+
 
         function filterMenu(category) {
             const menuItems = document.querySelectorAll('#menuContainer .menuItem');
@@ -228,6 +228,7 @@
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     const cartItems = JSON.parse(xhr.responseText);
                     displayCartItems(cartItems);
+                    cartData = JSON.parse(xhr.responseText);
                 }
             };
             xhr.send();
@@ -259,9 +260,9 @@
             }
         }
 
-        function checkTotalPrice(){
-            const ajxa
-        }
+        // function checkTotalPrice(){
+        //     const ajxa
+        // }
 
         function changeCartQuantity(menuId, stock, amount) {
             const quantityInput = document.getElementById('quantity-' + menuId);
@@ -286,7 +287,7 @@
                 }
             };
 
-            const data = JSON.stringify({ "menuId": menuId, "quantity": newQuantity });
+            const data = JSON.stringify({"menuId": menuId, "quantity": newQuantity});
             xhr.send(data);
         }
 
@@ -314,19 +315,41 @@
                 }
             };
 
-            const data = JSON.stringify({ "menuId": menuId });
+            const data = JSON.stringify({"menuId": menuId});
             xhr.send(data);
         }
 
+
         function checkout() {
             // 결제하기 버튼 클릭 시 동작하는 함수
-            window.location.href = '/orderPayment';
+            const cartItemsContainer = document.getElementById('cartItemsContainer');
+            const items = cartItemsContainer.querySelectorAll('.cart-item');
+
+            if (items.length === 0) {
+                alert('장바구니에 주문이 없습니다. 주문을 추가해주세요.');
+                return false;
+            } else {
+                window.location.href = '/orderPayment';
+            }
         }
+         function checkoutForm() {
+            if (cartData && Object.keys(cartData).length > 0) {
+                return true;
+            } else {
+                alert('장바구니에 주문이 없습니다. 주문을 추가해주세요.');
+                return false;
+            }
+        }
+
 
         // 장바구니 모달을 열 때 장바구니 데이터를 로드
         document.getElementById('cartModal').addEventListener('show.bs.modal', function () {
             loadCart();
         });
+
+        $().ready(function (){
+            loadCart();
+        })
 
     </script>
 
