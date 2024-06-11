@@ -50,6 +50,7 @@ public class MenuController {
             menus = menuService.getAllMenus();
         }
 
+
         //최근 days일 간의 판매량
         int days = 7;
         Map<Menu, Integer> salesCount = menus.stream()
@@ -130,7 +131,7 @@ public class MenuController {
         menuService.addStockOrder(id, amount);
         return ResponseEntity.ok().build();
     }
-    
+
     // 발주량을 실제 재고에 추가하고 초기화
     @RequestMapping(value = "/updateStockAndOrder", method = RequestMethod.POST)
     public ResponseEntity<?> updateStockAndOrder(@RequestBody Map<String, Object> payload) {
