@@ -1,26 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-    <head>
-        <title th:utext="#{header_title}"></title>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <!-- jQuery 추가 -->
-        <script src="/js/jquery.js"></script>
-        <!-- 사용할 css 추가 -->
-        <link rel="stylesheet" href="/css/bootstrap.css">
-        <link rel="stylesheet" href="/css/layout.css">
-        <!-- 부트스트랩 script 추가 -->
-        <script src="/js/bootstrap.js"></script>
-        <script src="/js/bootstrap.bundle.js"></script>
-        <script src="/js/sidebar.js"></script>
-
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <!-- 폰트 -->
-        <link rel="stylesheet" href="http://fonts.googleapis.com/earlyaccess/notosansjp.css">
-        <link rel="stylesheet" href="http://fonts.googleapis.com/earlyaccess/notosanskr.css">
-        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    </head>
+        <th:block th:replace="~{fragments/head :: headFragment}"></th:block>
     <body>
         <th:block th:replace="~{fragments/headerMenu :: headerMenuFragment}"></th:block>
         <th:block th:replace="~{fragments/sidebar :: sidebarFragment}"></th:block>
