@@ -137,23 +137,7 @@ public class SalesController {
         return "/sales/totalSalesByMenu.html";
     }
 
-    // 월별 총 판매액을 반환하는 메서드
-//    @RequestMapping(value="/totalSalesByMonth" , method = RequestMethod.GET)
-//    public String getTotalSalesByMonth(Model model) {
-//        Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
-//        Map<String, Double> sortedMonthlySales = new TreeMap<>(monthlySales); // TreeMap을 사용하여 정렬
-//        model.addAttribute("monthlySales", sortedMonthlySales);
-//        return "sales/totalSalesByMonth";
-//    }
-    // 연도별 총 판매액을 반환하는 메서드
-//    @RequestMapping(value= "/totalSalesByYear", method = RequestMethod.GET)
-//    public String getTotalSalesByYear(Model model) {
-//        Map<Integer, Double> yearlySales = salesService.getYearlySalesByProcess();
-//        model.addAttribute("yearlySales", yearlySales);
-//        System.out.println(yearlySales);
-//        return "/sales/totalSalesByYear";
-//    }
-    // 연도별 총 판매액을 반환하는 메서드. 6월 10일 오후 4시 수정중
+
 
     //연도별 총 판매액을 반환하는 메서드
     @RequestMapping(value = "/totalSalesByYear", method = RequestMethod.GET)
@@ -161,32 +145,25 @@ public class SalesController {
         Map<Integer, Double> yearlySales = salesService.getYearlySalesByProcess();
 
         // 연도별 오름차순으로 정렬
-        Map<String, String> yearlySalesStringKey = yearlySales.entrySet()
+        Map<String, Double> yearlySalesStringKey = yearlySales.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByKey())
                 .collect(Collectors.toMap(
                         entry -> entry.getKey().toString(),
-                        entry -> String.format("%,d", entry.getValue().longValue()),
+                        Map.Entry::getValue,
                         (e1, e2) -> e1,
                         LinkedHashMap::new
                 ));
 
-        model.addAttribute("yearlySales", yearlySales);
-        System.out.println(yearlySalesStringKey);
+        model.addAttribute("yearlySales", yearlySalesStringKey);
+
         return "sales/totalSalesByYear";
     }
 
 
-    // 월별 총 판매액을 반환하는 메서드
-//    @RequestMapping(value="/totalSalesByMonth" , method = RequestMethod.GET)
-//    public String getTotalSalesByMonth(Model model) {
-//        Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
-//        Map<String, Double> sortedMonthlySales = new TreeMap<>(monthlySales); // TreeMap을 사용하여 정렬
-//        model.addAttribute("monthlySales", sortedMonthlySales);
-//        return "sales/totalSalesByMonth";
-//    }
 
-    // 월별 총 판매액을 반환하는 메서드 6월 10일 수정중
+
+    // 월별 총 판매액을 반환하는 메서드
     @RequestMapping(value = "/totalSalesByMonth", method = RequestMethod.GET)
     public String getTotalSalesByMonth(Model model) {
         Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();

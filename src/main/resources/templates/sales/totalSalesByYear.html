@@ -28,11 +28,7 @@
                     <th>総売上高</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr th:each="yearlySales : ${yearlySales}">
-                    <td th:text="${yearlySales.key}"></td>
-                    <td th:text="${#numbers.formatInteger(yearlySales.value,1,'COMMA')} + '円'"></td>
-                </tr>
+                <tbody id="salesTableBody">
                 </tbody>
             </table>
         </div>
@@ -44,6 +40,8 @@
         </div>
     </div>
     <div>
+        <button class="button" id="prevPageBtn">前の5年間</button>
+        <button class="button" id="nextPageBtn">次の5年間</button>
         <button class="button" onclick="location.href='/totalSalesByYearAndMonthInput'">年度と月を入力して総売上高を検索</button>
         <button class="button" onclick="location.href='/adminSalesMainHome'">管理者メイン画面に復帰</button>
     </div>
@@ -51,38 +49,74 @@
     <!-- ThymeleafをJavaScriptに伝達 -->
     <script th:inline="javascript">
         /*<![CDATA[*/
-        var monthlySalesData = /*[[${yearlySales}]]*/ {};
+        var yearlySalesData = /*[[${yearlySales}]]*/ {};
         /*]]>*/
 
-        // 날짜별 오름차순으로 정렬 (이미 서버에서 정렬됨)
-        var labels = Object.keys(monthlySalesData);
-        var data = Object.values(monthlySalesData);
+        var currentPage = 0;
+        var itemsPerPage = 5;
+
+        function renderTableAndChart(page) {
+            var keys = Object.keys(yearlySalesData);
+            var values = Object.values(yearlySalesData);
+
+            // 페이징 처리
+            var start = page * itemsPerPage;
+            var end = Math.min(start + itemsPerPage, keys.length);
+
+            var paginatedKeys = keys.slice(start, end);
+            var paginatedValues = values.slice(start, end);
+
+            // 테이블 업데이트
+            var tableBody = document.getElementById('salesTableBody');
+            tableBody.innerHTML = '';
+            for (var i = 0; i < paginatedKeys.length; i++) {
+                var row = document.createElement('tr');
+                var yearCell = document.createElement('td');
+                var salesCell = document.createElement('td');
+
+                yearCell.textContent = paginatedKeys[i];
+                salesCell.textContent = new Intl.NumberFormat().format(paginatedValues[i]) + '円';
+
+                row.appendChild(yearCell);
+                row.appendChild(salesCell);
+                tableBody.appendChild(row);
+            }
+
+            // 차트 업데이트
+            monthlySalesChart.data.labels = paginatedKeys;
+            monthlySalesChart.data.datasets[0].data = paginatedValues;
+            updateBarColors(paginatedValues);
+            monthlySalesChart.update();
+        }
+
+        function updateBarColors(data) {
+            var dataset = monthlySalesChart.data.datasets[0];
+            dataset.backgroundColor = data.map((value, index) => {
+                if (index === 0) return 'rgba(54, 162, 235, 0.2)'; // 첫 번째 막대는 파란색
+                return value >= data[index - 1] ? 'rgba(255, 99, 132, 0.2)' : 'rgba(54, 162, 235, 0.2)';
+            });
+            dataset.borderColor = data.map((value, index) => {
+                if (index === 0) return 'rgba(54, 162, 235, 1)'; // 첫 번째 막대는 파란색
+                return value >= data[index - 1] ? 'rgba(255, 99, 132, 1)' : 'rgba(54, 162, 235, 1)';
+            });
+        }
 
         // 차트를 그리는 함수
         var ctx = document.getElementById('monthlySalesChart').getContext('2d');
         var monthlySalesChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: labels,
+                labels: [],
                 datasets: [{
                     label: '総売上高 (棒グラフ)',
-                    data: data,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
+                    data: [],
+                    backgroundColor: [], // 초기 값은 빈 배열
+                    borderColor: [], // 초기 값은 빈 배열
                     borderWidth: 1,
-                    yAxisID: 'y'
-                },
-                    {
-                        label: '総売上高 (折れ線グラフ)',
-                        data: data,
-                        type: 'line',
-                        borderColor: 'rgba(0, 0, 0, 1)',
-                        backgroundColor: 'rgba(0, 0, 0, 0)',
-                        borderWidth: 2,
-                        fill: false,
-                        yAxisID: 'y'
-                    }
-                ]
+                    yAxisID: 'y',
+                    categoryPercentage: 0.6, // 막대 그래프의 너비 조정
+                    barPercentage: 0.8 // 막대 그래프의 너비 조정
+                }]
             },
             options: {
                 responsive: true,
@@ -98,6 +132,24 @@
                 }
             }
         });
+
+        document.getElementById('prevPageBtn').addEventListener('click', function() {
+            if (currentPage > 0) {
+                currentPage--;
+                renderTableAndChart(currentPage);
+            }
+        });
+
+        document.getElementById('nextPageBtn').addEventListener('click', function() {
+            if ((currentPage + 1) * itemsPerPage < Object.keys(yearlySalesData).length) {
+                currentPage++;
+                renderTableAndChart(currentPage);
+            }
+        });
+
+        // 초기 화면에서는 최신 5개년을 보여줌
+        currentPage = Math.floor((Object.keys(yearlySalesData).length - 1) / itemsPerPage);
+        renderTableAndChart(currentPage);
     </script>
 </th:block>
 </body>
