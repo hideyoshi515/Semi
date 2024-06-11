@@ -286,7 +286,7 @@ public class DeviceController {
     }
 
     @RequestMapping(value = "/order/kiosk/pay", method = RequestMethod.GET)
-    public String getKioskPayment(){
+    public String getKioskPayment() {
         return "redirect:/order/kiosk";
     }
 
@@ -328,6 +328,46 @@ public class DeviceController {
             totalPrice += (long) menu.getPrice() * quantity;
         }
         return totalPrice;
+    }
+
+
+    @RequestMapping(value = "/order/kiosk/payment", method = RequestMethod.POST)
+    public String postKioskPayment(Model model, HttpSession session, @RequestParam Map<String, Object> params) {
+        long totalPrice = 0L;
+
+        Map<Menu, Integer> orders = (Map<Menu, Integer>) session.getAttribute("orders");
+        if (orders == null || orders.isEmpty()) {
+            return "redirect:/order/kiosk"; // 주문이 없는 경우
+        }
+
+        LocalDateTime localDate = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateTime = localDate.format(formatter);
+        OrderNum orderNum = orderNumRepository.save(new OrderNum());
+
+        for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
+            Menu menu = entry.getKey();
+            int quantity = entry.getValue();
+            totalPrice += (long) menu.getPrice() * quantity;
+            SalesRequest sales = new SalesRequest();
+            sales.setDate(LocalDateTime.parse(formattedDateTime, formatter));
+            sales.setCategory(menu.getCategory());
+            sales.setMenu(menu.getId());
+            sales.setPrice(menu.getPrice());
+            sales.setQuantity(quantity);
+            sales.setDevice(2);
+            sales.setDeviceNum(1);
+            sales.setOrderNum(orderNum.getOrderNum());
+            sales.setProcess(1);
+            salesService.save(sales);
+        }
+        if (params.get("phone") != null) {
+            String phoneNum = (String) params.get("phone");
+            Account account = accountService.getAccountByPhone(phoneNum);
+            account.setMsPoint((int) (account.getMsPoint() + (totalPrice * 0.01)));
+            accountService.save(account);
+        }
+        return "redirect:/order/kiosk";
     }
 
 }

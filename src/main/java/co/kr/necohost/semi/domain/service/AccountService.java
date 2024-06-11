@@ -45,6 +45,12 @@ public class AccountService {
         accountRepository.save(accountRequest.toEntity());
     }
 
+    @Transactional
+    public void save(Account account){
+        accountRepository.save(account);
+    }
+
+
     public Account getAccountByid(long id) {
         return accountRepository.findById(id).orElse(null);
     }
