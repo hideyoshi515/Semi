@@ -178,16 +178,16 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="membershipModalLabel">멤버쉽 적립</h5>
+                    <h5 class="modal-title" id="membershipModalLabel">ポイント貯める</h5>
                 </div>
                 <div class="modal-body">
-                    <p>멤버쉽 적립을 하시겠습니까?</p>
+                    <p>メンバーシップポイントを貯めますか?</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="skipMembership">아니요</button>
+                    <button type="button" class="btn btn-secondary" id="skipMembership">いいえ</button>
                     <button type="button" onclick="msYes()" class="btn btn-primary" data-toggle="modal"
                             data-target="#phoneNumberModal"
-                            data-dismiss="modal">예
+                    data-dismiss="modal">はい
                     </button>
                 </div>
             </div>
@@ -228,7 +228,7 @@
                             style="width: 300px;">照会
                     </button>
                     <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#paymentModal"
-                            data-dismiss="modal" id="saveMembership" disabled style="width: 300px;" onclick="msNext()">積立
+                            data-dismiss="modal" id="saveMembership" disabled style="width: 300px;" onclick="msNext()">貯める
                     </button>
 
                 </div>
@@ -248,11 +248,11 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="paymentModalLabel">결제 방법</h5>
+                    <h5 class="modal-title" id="paymentModalLabel">お支払方法</h5>
                 </div>
-                <div class="modal-body">
-                    <button type="button" class="btn btn-success btn-lg btn-block" onclick="payEnd()">카드</button>
-                    <button type="button" class="btn btn-warning btn-lg btn-block" onclick="payEnd()">현금</button>
+                <div class="modal-body d-flex justify-content-center flex-row">
+                    <button type="button" class="btn btn-success btn-lg mx-2 fs-4" style="width: 145px; height: 72.5px;" onclick="payEnd()"><i class="bi bi-credit-card me-1"></i>カード</button>
+                    <button type="button" class="btn btn-warning btn-lg mx-2 fs-4" style="width: 145px; height: 72.5px;" onclick="payEnd()"><i class="bi bi-cash me-1"></i>現金</button>
                 </div>
             </div>
         </div>

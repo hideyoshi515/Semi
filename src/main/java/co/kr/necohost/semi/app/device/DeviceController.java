@@ -115,7 +115,7 @@ public class DeviceController {
 
     @RequestMapping(value = "/orderPaymentSelect", method = RequestMethod.POST)
     public String OrderPaymentSelect(HttpSession session, Model model,@RequestParam String paymentMethod, AccountRequest accountRequest) {
-       Object ordersObj = session.getAttribute("orders");
+        Object ordersObj = session.getAttribute("orders");
         if (ordersObj == null) {
             System.out.println("오류오류오류");
         }
@@ -390,6 +390,9 @@ public class DeviceController {
             sales.setOrderNum(orderNum.getOrderNum());
             sales.setProcess(1);
             salesService.save(sales);
+            menu.setStock(menu.getStock() - quantity);
+            menuRepository.save(menu);
+            orders.remove(menu);
         }
         if (params.get("phone") != null) {
             String phoneNum = (String) params.get("phone");
@@ -397,7 +400,12 @@ public class DeviceController {
             account.setMsPoint((int) (account.getMsPoint() + (totalPrice * 0.01)));
             accountService.save(account);
         }
-        return "redirect:/order/kiosk";
+        return "redirect:/order/kiosk/success";
+    }
+
+    @RequestMapping(value = "/order/kiosk/success",method = RequestMethod.GET)
+    public String getSuccess(){
+        return "/order/orderKioskSuccess.html";
     }
 
 }
