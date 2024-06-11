@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,23 +104,56 @@ public class OrderController {
     public String getOrderTable(Model model, @RequestParam Map<String, Object> params) {
         List<Object[]> orderList = orderService.findSalesByProcessAndDevice(0);
 
-        // 주문 목록을 각 자리(TB1 ~ TB8)에 배치하기 위해 초기화
-        Map<String, Object[]> tableOrders = new HashMap<>();
-        for (int i = 1; i <= 8; i++) {
-            tableOrders.put("TB" + i, null);
+        for (int i = 0; i < orderList.size(); i++) {
+            Object[] order = orderList.get(i);
+            Sales sales = (Sales) order[0];
+            System.out.println("Order " + i + ": " + sales.toString() + ", " + Arrays.toString(Arrays.copyOfRange(order, 1, order.length)));
         }
 
-        // 주문 목록을 각 자리에 매핑
+        Map<String, Map<String, Object>> tableOrders = new HashMap<>();
+
         for (int i = 0; i < orderList.size(); i++) {
-            tableOrders.put("TB" + (i + 1), orderList.get(i));
+            Object[] order = orderList.get(i);
+            Map<String, Object> orderDetails = new HashMap<>();
+
+            if (order.length >= 4) {
+                Sales sales = (Sales) order[0];
+                orderDetails.put("id", sales.getId());
+                orderDetails.put("category", sales.getCategory());
+                orderDetails.put("date", sales.getDate());
+                orderDetails.put("device", sales.getDevice());
+                orderDetails.put("deviceNum", sales.getDeviceNum());
+                orderDetails.put("menu", sales.getMenu());
+                orderDetails.put("orderNum", sales.getOrderNum());
+                orderDetails.put("price", sales.getPrice());
+                orderDetails.put("process", sales.getProcess());
+                orderDetails.put("quantity", sales.getQuantity());
+                orderDetails.put("menuName", order[1]);
+                orderDetails.put("categoryName", order[2]);
+                orderDetails.put("stock", order[3]);
+
+                tableOrders.put("TB" + sales.getDeviceNum(), orderDetails);
+            }
         }
 
         model.addAttribute("tableOrders", tableOrders);
 
-        List<Sales> sales = orderList.stream().map(objects -> (Sales) objects[0]).collect(Collectors.toList());
-        List<String> menuNames = orderList.stream().map(objects -> (String) objects[1]).collect(Collectors.toList());
-        List<String> categoryNames = orderList.stream().map(objects -> (String) objects[2]).collect(Collectors.toList());
-        List<Integer> menuStocks = orderList.stream().map(objects -> (Integer) objects[3]).collect(Collectors.toList());
+        List<Sales> sales = orderList.stream()
+                .filter(objects -> objects.length > 0)
+                .map(objects -> (Sales) objects[0])
+                .collect(Collectors.toList());
+        List<String> menuNames = orderList.stream()
+                .filter(objects -> objects.length > 1)
+                .map(objects -> (String) objects[1])
+                .collect(Collectors.toList());
+        List<String> categoryNames = orderList.stream()
+                .filter(objects -> objects.length > 2)
+                .map(objects -> (String) objects[2])
+                .collect(Collectors.toList());
+        List<Integer> menuStocks = orderList.stream()
+                .filter(objects -> objects.length > 3)
+                .map(objects -> (Integer) objects[3])
+                .collect(Collectors.toList());
 
         model.addAttribute("menuStock", menuStocks);
         model.addAttribute("orderList", sales);
@@ -127,7 +161,55 @@ public class OrderController {
         model.addAttribute("categoryName", categoryNames);
         model.addAttribute("orderRequest", new SalesRequest());
 
-
         return ("order/orderTable");
+    }
+
+    @RequestMapping(value = "/orderDetailTable", method = RequestMethod.GET)
+    public String getOrderDetailTable(Model model, @RequestParam Map<String, Object> params) {
+        long ordertID = Long.parseLong(params.get("orderID").toString());
+
+        List<Object[]> productOrder = orderService.findSalesById(ordertID);
+
+        List<Sales> sales = productOrder.stream().map(objects -> (Sales) objects[0]).collect(Collectors.toList());
+
+        List<String> menuNames = productOrder.stream().map(objects -> (String) objects[1]).collect(Collectors.toList());
+
+        List<String> categoryNames = productOrder.stream().map(objects -> (String) objects[2]).collect(Collectors.toList());
+
+        List<Integer> menuStocks = productOrder.stream().map(objects -> (Integer) objects[3]).collect(Collectors.toList());
+
+        model.addAttribute("menuStock", menuStocks);
+        model.addAttribute("orderList", sales);
+        model.addAttribute("menuName", menuNames);
+        model.addAttribute("categoryName", categoryNames);
+        model.addAttribute("orderRequest", new SalesRequest());
+
+        return "order/orderDetailTable.html";
+    }
+
+    @RequestMapping(value = "/orderApprovalTable", method = RequestMethod.GET)
+    public String getOrderApprovalTable(Model model, @RequestParam Map<String, Object> params) {
+        long orderID = Long.parseLong(params.get("orderID").toString());
+        int orderQuantity = Integer.parseInt(params.get("orderQuantity").toString());
+        long menuID = Long.parseLong(params.get("menuID").toString());
+
+        String message = "주문 번호 " + orderID + "가 승인되었습니다.";
+
+        orderService.approveOrder(orderID, message);
+        orderService.updateOrderApproval(orderID, orderQuantity, menuID);
+
+        return ("redirect:/orderTable");
+    }
+
+    @RequestMapping(value = "/orderDenialTable", method = RequestMethod.GET)
+    public String getOrderDenialTable(Model model, @RequestParam Map<String, Object> params) {
+        long orderID = Long.parseLong(params.get("orderID").toString());
+
+        String message = "주문 번호 " + orderID + "가 취소되었습니다.";
+
+        orderService.approveOrder(orderID, message);
+        orderService.updateDenialByProcess(orderID);
+
+        return ("redirect:/orderTable");
     }
 }

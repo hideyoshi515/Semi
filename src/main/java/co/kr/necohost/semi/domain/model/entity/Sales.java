@@ -27,4 +27,20 @@ public class Sales {
     private int deviceNum;
     private int orderNum;
     private int process;
+
+    @Override
+    public String toString() {
+        return "Sales{" +
+                "id=" + id +
+                ", date=" + date +
+                ", category=" + category +
+                ", menu=" + menu +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                ", device=" + device +
+                ", deviceNum=" + deviceNum +
+                ", orderNum=" + orderNum +
+                ", process=" + process +
+                '}';
+    }
 }
