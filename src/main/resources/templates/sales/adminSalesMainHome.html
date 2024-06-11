@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>POSOLDESK 売上管理プログラム</title>
     <style>
-
+        .chart-container {
+            width: 80%;
+            margin: auto;
+        }
     </style>
     <link rel="stylesheet" href="/css/adminSalesCss.css"> <!-- adminSalesCss.css 파일 경로로 수정 -->
 
@@ -21,13 +24,69 @@
     </div>
     <h1 style="width: 100%"><img style="width: 38px;height: 38px;" src="/img/storeownerpage/money.png">今日の売上高</h1>
     <div class="content">
-        現在時間：
+        <div>
+            現在時間：<span th:text="${currentTime}"></span>　<br>
+        </div>
+        <div>
+            今までの売上高：<span th:text="${totalSalesToday}"></span>円
+        </div>
 
+        <div class="chart-container">
+            <canvas id="salesChart"></canvas>
+        </div>
 
+        現在時間までの売上総額
+        時間帯別売上総額
+        現在時間までのカテゴリ別 / メニュー別売上
 
+    </div>
 
-</div>
-</body>
-<th:block layout:fragment="content">
+    <script th:inline="javascript">
+        // JavaScript로 hourlySales 데이터를 전달
+        const hourlySales = /*[[${hourlySales}]]*/ {};
+        const labels = Object.keys(hourlySales).map(dateStr => new Date(dateStr));
+        const data = Object.values(hourlySales);
+
+        const ctx = document.getElementById('salesChart').getContext('2d');
+
+        // Chart.js를 이용하여 꺾은선 그래프 생성
+        const salesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels, // 시간 데이터를 배열로 전달
+                datasets: [{
+                    label: '今日の売上高',
+                    data: data, // 매출 데이터를 배열로 전달
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'hour',
+                            tooltipFormat: 'HH:mm'
+                        },
+                        title: {
+                            display: true,
+                            text: '時間'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '売上高 (円)'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+    </body>
 </th:block>
 </html>
