@@ -50,13 +50,20 @@
             <td th:each="col, colStat : ${#numbers.sequence(row * 4, row * 4 + 3)}" th:id="${tableIDList[col]}">
                 <div th:onclick="|loadOrderDetail(this)|" th:if="${tableOrders[tableIDList[col]] != null}"
                      data-toggle="modal"
-                     data-target="#orderDetailModal">
+                     data-target="#orderDetailModal"
+                     class="not-null">
                     <p th:text="${col + 1} + '번 테이블'"></p>
                     <div th:each="order : ${tableOrders[tableIDList[col]]}" class="not-null">
-                        <p style="display: none" class="menu-detail"
-                           th:utext="'메뉴 이름 : <span>' + ${order['menuName']} + '</span>, 수량 : <span>' + ${order['quantity']} + '</span>'">
-                            No Data
-                        </p>
+                        <div style="display: none" class="menu-detail">
+                            <p th:utext="'메뉴 이름 : <span>' + ${order['menuName']} + '</span>, 수량 : <span>' + ${order['quantity']} + '</span>, 가격 : ' + ${order['totalPrice']} + '원, 전체 개수 : '+ ${order['stock']}"/>
+                            <button th:if="${order['stock'] - order['quantity']} < 0" disabled>수량 부족</button>
+                            <button th:if="${order['stock'] - order['quantity']} >= 0"
+                                    th:onclick="|location.href='orderApprovalTable?orderID=${order['id']}&orderQuantity=${order['stock'] - order['quantity']}&menuID=${order['menu']}'|">
+                                주문 승인
+                            </button>
+                            <button th:onclick="|location.href='orderDenialTable?orderID=${order['id']}'|">주문 거부
+                            </button>
+                        </div>
                     </div>
                     <p th:id="span-count">여기에 span 개수</p>
                 </div>
@@ -104,6 +111,9 @@
         });
 
         function listPerTbl() {
+            console.log(tableOrders);
+            console.log(tableIDList);
+
             tableIDList.forEach(function (tableID) {
                 const details = $(`#${tableID}`).find(".menu-detail");
                 let spanCount = 0;
