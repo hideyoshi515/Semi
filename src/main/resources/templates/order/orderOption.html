@@ -3,18 +3,66 @@
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{layout/default_layout}">
->
+<head>
+    <style>
+        body {
+            background-color: #FFF8DC;
+            font-family: Arial, sans-serif;
+            color: #333333
+            !important;
+        }
+
+        h1 {
+            color: #dc3545;
+            text-align: center;
+            margin-top: 20px;
+        !important;
+        }
+
+        form {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        !important;
+        }
+
+        button {
+            background-color: #FFD700;
+            color: #333333;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        !important;
+        }
+
+        button:hover {
+            background-color: #FFC107;
+        !important;
+        }
+
+        button:active {
+            background-color: #FFB300;
+        !important;
+        }
+
+    </style>
+</head>
 <th:block layout:fragment="content">
-    <h1>注文方法</h1>
-    <div th:each="device : ${orders}"></div>
-    <div>
-        <form th:object="${deviceRequest}" method="post" action="order">
-            <button>キオスク</button>
-            <button>モバイルウェブ注文</button>
-            <button>座席注文</button>
-        </form>
-    </div>
-    <br>
+    <div class="container">
+        <h1>注文方法</h1>
+        <div th:each="device : ${orders}"></div>
+        <div>
+            <form th:object="${deviceRequest}" method="post" action="order">
+                <button id="kiosk">キオスク</button>
+                <button id="mobile">モバイルウェブ注文</button>
+                <button id="seat">座席注文</button>
+            </form>
+        </div>
+        <br>
     </div>
 </th:block>
 </html>

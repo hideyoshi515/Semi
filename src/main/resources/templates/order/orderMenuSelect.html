@@ -41,7 +41,6 @@
         <button type="button" class="btn btn-secondary" th:each="category : ${categories}" th:text="${category.name}"
                 th:onclick="|filterMenu(${category.id})|"></button>
     </div>
-
     <div class="">
         <div class="row" id="menuContainer">
             <div class="mb-3 menuItem" th:each="menu : ${menus}"
@@ -332,7 +331,7 @@
                 window.location.href = '/orderPayment';
             }
         }
-         function checkoutForm() {
+        function checkoutForm() {
             if (cartData && Object.keys(cartData).length > 0) {
                 return true;
             } else {
