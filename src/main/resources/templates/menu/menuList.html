@@ -29,7 +29,7 @@
         </div>
     </div>
     <div id="scrollable-content" class="scrollable-container">
-        <div id="menu-container" class="mt-3 d-flex flex-wrap ">
+        <div id="menu-container" class="mt-3 justify-content-center d-flex flex-wrap ">
             <div th:each="menu : ${menus}" class="menu-item text-center align-content-center"
                  th:id="${menu.id}" style="width: 19%; height: 30%;" th:onclick="|detail(${menu.id})|">
                 <div class="user-select-none">
@@ -96,7 +96,7 @@
                 </div>
                 <div class="modal-footer">
                     <input type="number" id="order-input" placeholder="수량 입력"
-                           style="display: none; margin-right: 10px;">
+                           style="display: none; margin-right: 10px; width: 10rem">
                     <div id="alert-container"
                          style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1050;"></div>
                     <button type="button" class="btn btn-warning d-flex align-items-center" id="order-button"
@@ -242,7 +242,7 @@
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type} alert-dismissible alert-show`;
             alertDiv.role = 'alert';
-            alertDiv.style.width = '300px';  // 너비 설정
+            alertDiv.style.width = '350px';  // 너비 설정
             alertDiv.style.fontSize = '1.25rem';  // 글자 크기 설정
             alertDiv.innerHTML = `
         ${message}
@@ -257,7 +257,7 @@
                 setTimeout(function () {
                     alertDiv.remove();
                 }, 500); // 0.5초 후 요소 제거
-            }, 3000); // 5초 후 자동으로 사라짐
+            }, 3000); // 3초 후 자동으로 사라짐
         }
 
         function updateStockAndOrder() {
@@ -377,6 +377,12 @@
 
         .alert-show {
             opacity: 1;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px; /* 버튼들 간의 간격을 설정 */
         }
     </style>
 </th:block>

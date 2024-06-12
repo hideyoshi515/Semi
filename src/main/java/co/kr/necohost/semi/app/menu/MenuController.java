@@ -9,6 +9,7 @@ import co.kr.necohost.semi.domain.model.entity.Menu;
 import co.kr.necohost.semi.domain.repository.SalesRepository;
 import co.kr.necohost.semi.domain.service.CategoryService;
 import co.kr.necohost.semi.domain.service.MenuService;
+import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
