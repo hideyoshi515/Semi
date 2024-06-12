@@ -2,42 +2,100 @@
 <html
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{layout/default_layout}">
+        layout:decorate="~{layout/plain_layout}">
+<head>
+    <style>
+        .h1 {
+            background-color: yellow;
+            text-align: center;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        @media only screen and (min-width: 768px) and (max-width: 1024px) {
+            .tablet-container {
+                width: 50%;
+                margin: 0 auto;
+            }
+        }
+
+        .tablet-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .tablet-container > div {
+            border: 1px solid black;
+            padding: 10px;
+            margin: 10px;
+        }
+        .point{
+            text-align: center;
+        }
+        .paymentSelect{
+            text-align: center;
+        }
+        .cancel{
+            text-align: center;
+        }
+
+    </style>
+</head>
 <th:block layout:fragment="content">
-    <h1>決済ページ</h1>
+    <div class="h1">
+        <h1>お支払い</h1>
+    </div>
     <form th:object="${deviceRequest}" method="post" action="orderPaymentSelect">
         <br>
-        <div th:each="entry : ${orderedItems}">
-            メニュー : <span th:text="${entry.key.name}"></span>
-            <br>
-            値段 : <span th:text="${#numbers.formatInteger(entry.key.price,1,'COMMA')}"></span>
-            <br>
-            數量 : <span th:text="${entry.value}"></span>
-            <br>
-            總收量　: <span th:text="${#numbers.formatInteger(entry.key.price * entry.value,1,'COMMA')}"></span>
-            <br>
-            <br>
-            <input type="hidden" th:field="*{quantities[__${entry.key.id}__]}" th:value="${entry.value}">
+        <div class="tablet-container">
+            <div th:each="entry : ${orderedItems}">
+                <img th:src="${entry.key.image}"
+                     style="width: 150px" height="150px">
+                <br>
+                <div>
+                    <span th:text="${entry.key.name}"></span>
+                </div>
+                <br>
+                <div>
+                    數量 : <span th:text="${entry.value}"></span>
+                </div>
+                <br>
+                總收量 : <span th:text="${#numbers.formatInteger(entry.key.price * entry.value,1,'COMMA')}"></span>
+                <br>
+                <br>
+                <input type="hidden" th:field="*{quantities[__${entry.key.id}__]}" th:value="${entry.value}">
+            </div>
         </div>
+
         <input type="hidden" th:field="*{device}" th:value="${device}">
         <input type="hidden" th:field="*{deviceNum}" th:value="${deviceNum}">
         <input type="hidden" th:field="*{orderNum}" th:value="${orderNum}">
+
         <h2>合計 : <span th:text="${#numbers.formatInteger(totalPrice,1,'COMMA')}"></span>￦</h2>
         <br>
         <br>
-        <div>
-            メンバーシップポイントを貯める<input type="text" placeholder="携帯番号" th:field="*{phoneNum}" pattern="\d*">
+        <div class="point">
+            ポイントを貯める <br>
+            <input type="text" placeholder="携帯番号" th:field="*{phoneNum}" pattern="\d*"><br>
+            ポイントを使う <br>
             <input type="text" placeholder="pass" th:field="*{pass}">
         </div>
-        <div>
+        <br>
+        <div class="paymentSelect">
             <button type="submit" name="paymentMethod" value="CASH">現金</button>
             <button type="submit" name="paymentMethod" value="CARD">カード</button>
             <button type="submit" name="paymentMethod" value="PAY">PAY</button>
         </div>
     </form>
     <br>
-    <br>
-    <br>
-    <button onclick="location.href='/order'">取り消し</button>
+    <div class="cancel">
+        <button onclick="location.href='/order'">取り消し</button>
+    </div>
 </th:block>
 </html>
