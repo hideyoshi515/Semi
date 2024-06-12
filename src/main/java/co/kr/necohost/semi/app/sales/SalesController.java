@@ -28,6 +28,7 @@ public class SalesController {
         this.salesService = salesService;
     }
 
+
     // 구버전 관리자 판매 메뉴 페이지를 반환하는 메서드(css없음)
     @RequestMapping(value = "/adminSalesMenu", method=RequestMethod.GET)
     public String getOldAdminSalesMenu() {
@@ -39,6 +40,8 @@ public class SalesController {
     public String getAdminSalesMainMenu() {
         return "/sales/adminSalesMainMenu.html";
     }
+
+
 
     // 신버전 관리자 페이지 - 홈 페이지(오늘의 현재 시간까지의 매출)를 반환하는 메서드(css있음)
 //    @RequestMapping(value = "/adminSalesMainHome", method=RequestMethod.GET)
@@ -55,10 +58,83 @@ public class SalesController {
 //        return "/sales/adminSalesMainHome.html";
 //    }
 
+    //관리자 페이지 - 홈 페이지(오늘의 현재 시간까지의 매출)를 반환하는 메서드(css있음)
+    //6월 12일 확인중. 오늘의 현재 시간까지의 totalSalesToday 보임 / 시간대별 누적 매출 보여주는 차트 안보임 .
+//    @RequestMapping(value = "/adminSalesMainHome", method=RequestMethod.GET)
+//    public String getAdminSalesHourly(Model model) {
+//        LocalDateTime now = LocalDateTime.now();
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        String formattedNow = now.format(formatter);
+//        model.addAttribute("currentTime", formattedNow);
+//
+//        LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+//        LocalDateTime endOfDay = now.withHour(23).withMinute(59).withSecond(59);
+//
+//        Map<LocalDateTime, Double> hourlySales = salesService.getHourlySalesByDay(startOfDay, endOfDay);
+//
+//        double totalSalesToday = salesService.getTotalSalesUntilNow(now);
+//        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
+//        String formattedTotalSalesToday = numberFormat.format(totalSalesToday);
+//        model.addAttribute("totalSalesToday", formattedTotalSalesToday);
+//
+//        model.addAttribute("hourlySales", hourlySales);
+//        System.out.println("hourlySales관련 확인중");
+//        System.out.println(hourlySales);
+//        return "/sales/adminSalesMainHome.html";
+//    }
 
-    //6월 11일 확인중. 오늘의 현재 시간까지의 totalSalesToday 보임 / 시간대별 누적 매출 보여주는 차트 안보임 .
-    @RequestMapping(value = "/adminSalesMainHome", method=RequestMethod.GET)
-    public String getAdminSalesHourly(Model model) {
+    //6월 12일 저녁 코드 다시 짜는중 .
+    @RequestMapping(value = "/adminSalesMainHome", method = RequestMethod.GET)
+    public String getAdminSalesMainHome(Model model) {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedNow = now.format(formatter);
+        model.addAttribute("currentTime", formattedNow);
+
+        LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = now.withHour(23).withMinute(59).withSecond(59);
+
+        Map<LocalDateTime, Double> hourlySales = salesService.getHourlySalesByDay(startOfDay, endOfDay);
+
+        // 포맷된 시간 데이터를 담을 Map 생성
+        Map<String, Double> formattedHourlySales = new TreeMap<>();
+        DateTimeFormatter hourFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        for (Map.Entry<LocalDateTime, Double> entry : hourlySales.entrySet()) {
+            formattedHourlySales.put(entry.getKey().format(hourFormatter), entry.getValue());
+        }
+
+        double totalSalesToday = salesService.getTotalSalesUntilNow(now);
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
+        String formattedTotalSalesToday = numberFormat.format(totalSalesToday);
+        model.addAttribute("totalSalesToday", formattedTotalSalesToday);
+
+        model.addAttribute("hourlySales", formattedHourlySales); // 포맷된 시간 데이터 전달
+        System.out.println("hourlySales 확인 중");
+        System.out.println(formattedHourlySales);
+        return "sales/adminSalesMainHome";
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @RequestMapping(value = "/adminSalesMainHome2", method=RequestMethod.GET)
+    public String getAdmininSalesMainHome2(Model model){
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedNow = now.format(formatter);
@@ -77,8 +153,11 @@ public class SalesController {
         model.addAttribute("hourlySales", hourlySales);
         System.out.println("hourlySales관련 확인중");
         System.out.println(hourlySales);
-        return "/sales/adminSalesMainHome.html";
+        return "/sales/adminSalesMainHome2.html";
+
     }
+
+
 
 
 
@@ -131,18 +210,25 @@ public class SalesController {
 
 
 
-    // 각 메뉴별 총 판매액을 반환하는 메서드. 6월 11일 고장남 -> 6월 12일 재시도중
+    //메뉴별 판매액을 기간 검색하여 반환하는 메서드
+//    @RequestMapping(value = "/totalSalesbyMenuAndPeriodInput", method = RequestMethod.GET)
+//    public String getTotalSalesByMenu(Model model) {
+//        Map<String, Double> totalByMenu = salesService.getTotalSalesByMenu();
+//        model.addAttribute("totalByMenu", totalByMenu);
+//
+//        return "/sales/totalSalesbyMenuAndPeriodInput";
+//    }
+    //메뉴별 판매액을 기간 검색하여 반환하는 메서드. 6월 12일 오후 4시 47분 수정중
     @RequestMapping(value = "/totalSalesbyMenuAndPeriodInput", method = RequestMethod.GET)
-    public String getTotalSalesByMenu(Model model) {
-        Map<String, Double> totalByMenu = salesService.getTotalSalesByMenu();
-        model.addAttribute("totalByMenu", totalByMenu);
+    public String getTotalSalesByMenuAndPeriodInput(Model model) {
+//        Map<String, Double> totalByMenu = salesService.getTotalSalesByMenu();
+//        model.addAttribute("totalByMenu", totalByMenu);
 
         return "/sales/totalSalesbyMenuAndPeriodInput";
     }
 
 
-    //메뉴별 판매액을 검색 페이지를 반환하는 메서드 6월 11일 7시 40분 시도중
-    // 각 메뉴별 총 판매액을 반환하는 메서드. 6월 11일 고장남 -> 6월 12일 재시도중
+    //메뉴별 판매액을 기간 검색하여 반환하는 메서드.
     @RequestMapping(value = "/totalSalesbyMenuAndPeriodInput", method = RequestMethod.POST)
     public String getSalesByMenu(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                  @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
@@ -165,6 +251,44 @@ public class SalesController {
 
         return "sales/totalSalesbyMenuAndPeriodInput";
     }
+
+    //6월 12일 오후 5시 4분 추가중
+    @RequestMapping(value = "/totalSalesbyCategoryAndPeriodInput", method = RequestMethod.GET)
+    public String getTotalSalesByCategoryAndPeriodInput(Model model) {
+        return "/sales/totalSalesbyCategoryAndPeriodInput";
+    }
+
+    @RequestMapping(value = "/totalSalesbyCategoryAndPeriodInput", method = RequestMethod.POST)
+    public String getSalesByCategory(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                     @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                                     Model model) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+        Map<String, Double> salesByCategory = salesService.getSalesByCategoryInRange(startDateTime, endDateTime);
+        Map<String, Integer> quantityByCategory = salesService.getQuantityByCategoryInRange(startDateTime, endDateTime);
+
+        model.addAttribute("salesByCategory", salesByCategory);
+        model.addAttribute("quantityByCategory", quantityByCategory);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedStartDate = startDate.format(formatter);
+        String formattedEndDate = endDate.format(formatter);
+
+        model.addAttribute("formattedStartDate", formattedStartDate);
+        model.addAttribute("formattedEndDate", formattedEndDate);
+
+        return "sales/totalSalesbyCategoryAndPeriodInput";
+    }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -298,6 +422,8 @@ public class SalesController {
         }
         return "sales/totalSalesByYearAndCategoryInput";
     }
+
+
 
 
 

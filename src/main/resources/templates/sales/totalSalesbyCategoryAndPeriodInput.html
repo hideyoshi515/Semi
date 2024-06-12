@@ -27,9 +27,9 @@
         <a href="/adminSalesMainMenu">メニュー</a>
     </div>
 
-    <h1><img style="width: 38px;height: 38px;" src="/img/storeownerpage/menurevenueicon.png">メニュー別売上販売の現状</h1>
+    <h1><img style="width: 38px;height: 38px;" src="/img/storeownerpage/menurevenueicon.png">カテゴリ別売上販売の現状</h1>
 
-    <form action="/totalSalesbyMenuAndPeriodInput" method="post">
+    <form action="/totalSalesbyCategoryAndPeriodInput" method="post">
         <h3>
             <label for="startDate">開始日:</label>
             <input type="date" id="startDate" name="startDate" required>
@@ -44,23 +44,20 @@
         </H2>
     </div>
     <div class="content">
-
-
-
         <div class="table-container">
             <table>
                 <thead>
                 <tr>
-                    <th>メニュー</th>
+                    <th>カテゴリ</th>
                     <th>総売上高</th>
                     <th>販売量</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="entry : ${salesByMenu}">
+                <tr th:each="entry : ${salesByCategory}">
                     <td th:text="${entry.key}"></td>
                     <td th:text="${#numbers.formatInteger(entry.value, 1, 'COMMA')} + '円'"></td>
-                    <td th:text="${#numbers.formatInteger(quantityByMenu[entry.key], 1, 'COMMA')}"></td>
+                    <td th:text="${#numbers.formatInteger(quantityByCategory[entry.key], 1, 'COMMA')}"></td>
                 </tr>
                 </tbody>
             </table>
@@ -68,33 +65,33 @@
 
         <div class="chart-wrapper">
             <div class="chart-container">
-                <canvas id="salesChart"></canvas>
-                <div class="chart-label">メニュー別総売上高</div>
+                <canvas id="categorySalesChart"></canvas>
+                <div class="chart-label">カテゴリ別総売上高</div>
             </div>
             <div class="chart-container">
-                <canvas id="quantityChart"></canvas>
-                <div class="chart-label">メニュー別販売量</div>
+                <canvas id="categoryQuantityChart"></canvas>
+                <div class="chart-label">カテゴリ別販売量</div>
             </div>
         </div>
     </div>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
-        var salesData = /*[[${salesByMenu}]]*/ {};
-        var quantityData = /*[[${quantityByMenu}]]*/ {};
+        var salesData = /*[[${salesByCategory}]]*/ {};
+        var quantityData = /*[[${quantityByCategory}]]*/ {};
         /*]]>*/
 
         var labels = Object.keys(salesData);
         var salesValues = Object.values(salesData);
         var quantityValues = Object.values(quantityData);
 
-        var ctxSales = document.getElementById('salesChart').getContext('2d');
+        var ctxSales = document.getElementById('categorySalesChart').getContext('2d');
         var salesChart = new Chart(ctxSales, {
             type: 'pie',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'メニュー別総売上高',
+                    label: 'カテゴリ別総売上高',
                     data: salesValues,
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.8)',
@@ -125,13 +122,13 @@
             }
         });
 
-        var ctxQuantity = document.getElementById('quantityChart').getContext('2d');
+        var ctxQuantity = document.getElementById('categoryQuantityChart').getContext('2d');
         var quantityChart = new Chart(ctxQuantity, {
             type: 'pie',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'メニュー別総販売量',
+                    label: 'カテゴリ別販売量',
                     data: quantityValues,
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.8)',

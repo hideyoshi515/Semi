@@ -15,6 +15,7 @@ public class MenuRequest {
     private MultipartFile image;
     private String description;
     private int stockorder;
+    private int cost;
     private long id;
 
     public Menu toEntity() {
@@ -26,6 +27,7 @@ public class MenuRequest {
         menu.setDescription(description);
         menu.setStockorder(stockorder);
         menu.setId(id);
+        menu.setCost(cost);
         return menu;
     }
 
@@ -39,6 +41,7 @@ public class MenuRequest {
         menu.setImage(img);
         menu.setDescription(description);
         menu.setStockorder(stockorder);
+        menu.setCost(cost);
         menu.setId(id);
 
         return menu;

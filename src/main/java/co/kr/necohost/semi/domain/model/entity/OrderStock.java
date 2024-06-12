@@ -4,25 +4,25 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.sql.Timestamp;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-public class Menu {
+public class OrderStock {
+
+    private int menu;
+    private int quantity;
+    private Timestamp orderDate;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    private String name;
-    private int price;
-    private long category;
-    private int stock;
-    private int stockorder;
-    private int cost;
-    private String image;
-    private String description;
-    private int stockorder;
+    private int id;
+
 }

@@ -56,7 +56,7 @@
         <h1>注文方法</h1>
         <div th:each="device : ${orders}"></div>
         <div>
-            <form th:object="${deviceRequest}" method="post" action="order">
+            <form th:object="${deviceRequest}" method="post" action="orderStart">
                 <button id="kiosk">キオスク</button>
                 <button id="mobile">モバイルウェブ注文</button>
                 <button id="seat">座席注文</button>

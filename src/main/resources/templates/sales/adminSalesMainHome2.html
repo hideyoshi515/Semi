@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POSOLDESK 売上管理プログラム</title>
+  <style>
+    .card-body {
+      display: flex;
+      justify-content: left;
+      align-items: center;
+    }
+    .card-title {
+      width: 300px;
+    }
+
+    .fs-4 {
+      font-size: 1.5rem !important; /* 글씨 크기 1.5rem으로 설정 */
+    }
+    .fs-8 {
+      font-size: 3rem !important;
+    }
+    .left-section {
+      /* 왼쪽 영역 스타일 */
+      background-color: #f1f1f1;
+      padding: 20px;
+      width: 50%;
+      height: 80%;
+    }
+
+    .right-section {
+      /* 오른쪽 영역 스타일 */
+      background-color: #e3e3e3;
+      padding: 20px;
+      width: 50%;
+      height: 80%;
+    }
+    .main-chart-container{
+      display: flex;
+      height: 70vh;
+      padding: 20px;
+    }
+
+  </style>
+  <link rel="stylesheet" href="/css/adminSalesCss.css"> <!-- adminSalesCss.css 파일 경로로 수정 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<th:block layout:fragment="content">
+  <body>
+  <!-- 네비게이션 바 -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" onclick="location.href='/adminSalesMainHome'">ホーム</a>
+    <div class="navbar-nav mr-auto">
+      <a class="nav-item nav-link" onclick="location.href='/adminSalesMainMenu'">メニュー</a>
+    </div>
+  </nav>
+  <h1 style="width: 100%"><img style="width: 38px;height: 38px;" src="/img/storeownerpage/money.png">今日の売上高</h1>
+  <!-- 오늘의 매출 및 현재 시각 -->
+  <div class="container-fluid mt-3">
+    <div class="row">
+      <div class="col-6">
+        <div class="card">
+          <div class="card-body d-flex flex-column align-items-start">
+            <div class="card-title fs-4">日間売上高</div>
+            <span th:text="|${totalSalesToday}円|" class="fs-8"></span>
+          </div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="card">
+          <div class="card-body d-flex flex-column align-items-start">
+            <div class="card-title fs-4">基準現在時間</div>
+            <span th:text="${currentTime}" class="fs-4"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- 2분할/3분할 가능한 커다란 공간 -->
+  <div class="container-fluid mt-3">
+    <div class="main-chart-container">
+      <div class="col-md-6 left-section">
+        <!-- 왼쪽 영역 -->
+      </div>
+      <div class="col-md-6 right-section">
+        <!-- 오른쪽 영역 -->
+      </div>
+    </div>
+  </div>
+
+  </body>
+
+  <script th:inline="javascript">
+    // JavaScript로 hourlySales 데이터를 전달
+    const hourlySales = /*[[${hourlySales}]]*/ {};
+    const labels = Object.keys(hourlySales).map(dateStr => new Date(dateStr));
+    const data = Object.values(hourlySales);
+
+    const ctx = document.getElementById('salesChart').getContext('2d');
+
+    // Chart.js를 이용하여 꺾은선 그래프 생성
+    const salesChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels, // 시간 데이터를 배열로 전달
+        datasets: [{
+          label: '今日の売上高',
+          data: data, // 매출 데이터를 배열로 전달
+          borderColor: 'rgba(75, 192, 192, 1)',
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          fill: true
+        }]
+      },
+      options: {
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              unit: 'hour',
+              tooltipFormat: 'HH:mm'
+            },
+            title: {
+              display: true,
+              text: '時間'
+            }
+          },
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: '売上高 (円)'
+            }
+          }
+        }
+      }
+    });
+  </script>
+</th:block>
+</html>

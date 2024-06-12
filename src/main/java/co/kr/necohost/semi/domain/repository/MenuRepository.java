@@ -9,6 +9,10 @@ import java.util.Optional;
 
 public interface MenuRepository extends JpaRepository<Menu, Long> {
     List<Menu> findAllByOrderByCategory();
+    List<Menu> findAllByOrderByCategoryAscIdDesc();
+    List<Menu> findAllByOrderByIdDescCategoryAsc();
+
+    Menu getMenuById(Long id);
 
     @Override
     @Cacheable("Menu_findById")
@@ -16,4 +20,6 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     @Cacheable("cat_menus")
     List<Menu> findByCategory(int category);
+    @Cacheable("cat_menus")
+    List<Menu> findByCategoryOrderByIdDesc(int category);
 }
