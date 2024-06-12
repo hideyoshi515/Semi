@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -99,10 +100,12 @@ public class OrderController {
 
     @RequestMapping(value = "/orderTable", method = RequestMethod.GET)
     public String getOrderTable(Model model, @RequestParam Map<String, Object> params) {
+        NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+
         ArrayList<Object> tableList = new ArrayList<>();  // 8개
         Map<String, List<Object>> orderWrap = new HashMap<>();
 
-        Set<String> tableIDList = new HashSet<String>();
+        Set<String> tableIDList = new LinkedHashSet<String>();
 
         List<Object[]> orderDetail = orderService.findSalesByProcessAndDevice(0);
 
@@ -112,6 +115,10 @@ public class OrderController {
             Object[] order = orderDetail.get(i);
             Sales sales = (Sales) order[0];
             System.out.println("Order " + i + ": " + sales + ", " + Arrays.toString(Arrays.copyOfRange(order, 1, order.length)));
+        }
+
+        for (int i = 0; i < 8; i++) {
+            tableIDList.add("TB" + (i + 1));
         }
 
         Map<String, Object> orderDetails;
@@ -132,6 +139,7 @@ public class OrderController {
             orderDetails.put("price", sales.getPrice());
             orderDetails.put("process", sales.getProcess());
             orderDetails.put("quantity", sales.getQuantity());
+            orderDetails.put("totalPrice", numberFormat.format(sales.getPrice() * sales.getQuantity()));
             orderDetails.put("menuName", order[1]);
             orderDetails.put("categoryName", order[2]);
             orderDetails.put("stock", order[3]);
@@ -142,38 +150,13 @@ public class OrderController {
             tableIDList.add(tableKey);
         }
 
-        for (int i = 0; i < 8; i++) {
-            tableIDList.add("TB" + (i + 1));
-        }
-
         for (String s : tableIDList) {
-            System.out.printf(s);
+            System.out.print(s + " ");
         }
 
         model.addAttribute("tableIDList", tableIDList);
         model.addAttribute("tableOrders", tableOrders);
 
-        List<Sales> sales = orderDetail.stream()
-                .filter(objects -> objects.length > 0)
-                .map(objects -> (Sales) objects[0])
-                .collect(Collectors.toList());
-        List<String> menuNames = orderDetail.stream()
-                .filter(objects -> objects.length > 1)
-                .map(objects -> (String) objects[1])
-                .collect(Collectors.toList());
-        List<String> categoryNames = orderDetail.stream()
-                .filter(objects -> objects.length > 2)
-                .map(objects -> (String) objects[2])
-                .collect(Collectors.toList());
-        List<Integer> menuStocks = orderDetail.stream()
-                .filter(objects -> objects.length > 3)
-                .map(objects -> (Integer) objects[3])
-                .collect(Collectors.toList());
-
-        model.addAttribute("menuStock", menuStocks);
-        model.addAttribute("orderList", sales);
-        model.addAttribute("menuName", menuNames);
-        model.addAttribute("categoryName", categoryNames);
         model.addAttribute("orderRequest", new SalesRequest());
 
         return ("order/orderTable.html");
