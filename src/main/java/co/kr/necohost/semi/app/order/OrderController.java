@@ -9,10 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -102,55 +99,73 @@ public class OrderController {
 
     @RequestMapping(value = "/orderTable", method = RequestMethod.GET)
     public String getOrderTable(Model model, @RequestParam Map<String, Object> params) {
-        List<Object[]> orderList = orderService.findSalesByProcessAndDevice(0);
+        ArrayList<Object> tableList = new ArrayList<>();  // 8개
+        Map<String, List<Object>> orderWrap = new HashMap<>();
 
-        for (int i = 0; i < orderList.size(); i++) {
-            Object[] order = orderList.get(i);
+        Set<String> tableIDList = new HashSet<String>();
+
+        List<Object[]> orderDetail = orderService.findSalesByProcessAndDevice(0);
+
+        Map<String, List<Map<String, Object>>> tableOrders = new HashMap<>();
+
+        for (int i = 0; i < orderDetail.size(); i++) {
+            Object[] order = orderDetail.get(i);
             Sales sales = (Sales) order[0];
-            System.out.println("Order " + i + ": " + sales.toString() + ", " + Arrays.toString(Arrays.copyOfRange(order, 1, order.length)));
+            System.out.println("Order " + i + ": " + sales + ", " + Arrays.toString(Arrays.copyOfRange(order, 1, order.length)));
         }
 
-        Map<String, Map<String, Object>> tableOrders = new HashMap<>();
+        Map<String, Object> orderDetails;
 
-        for (int i = 0; i < orderList.size(); i++) {
-            Object[] order = orderList.get(i);
-            Map<String, Object> orderDetails = new HashMap<>();
+        for (int i = 0; i < orderDetail.size(); i++) {
+            Object[] order = orderDetail.get(i);
+            orderDetails = new HashMap<>();
 
-            if (order.length >= 4) {
-                Sales sales = (Sales) order[0];
-                orderDetails.put("id", sales.getId());
-                orderDetails.put("category", sales.getCategory());
-                orderDetails.put("date", sales.getDate());
-                orderDetails.put("device", sales.getDevice());
-                orderDetails.put("deviceNum", sales.getDeviceNum());
-                orderDetails.put("menu", sales.getMenu());
-                orderDetails.put("orderNum", sales.getOrderNum());
-                orderDetails.put("price", sales.getPrice());
-                orderDetails.put("process", sales.getProcess());
-                orderDetails.put("quantity", sales.getQuantity());
-                orderDetails.put("menuName", order[1]);
-                orderDetails.put("categoryName", order[2]);
-                orderDetails.put("stock", order[3]);
+            Sales sales = (Sales) order[0];
 
-                tableOrders.put("TB" + sales.getDeviceNum(), orderDetails);
-            }
+            orderDetails.put("id", sales.getId());
+            orderDetails.put("category", sales.getCategory());
+            orderDetails.put("date", sales.getDate());
+            orderDetails.put("device", sales.getDevice());
+            orderDetails.put("deviceNum", sales.getDeviceNum());
+            orderDetails.put("menu", sales.getMenu());
+            orderDetails.put("orderNum", sales.getOrderNum());
+            orderDetails.put("price", sales.getPrice());
+            orderDetails.put("process", sales.getProcess());
+            orderDetails.put("quantity", sales.getQuantity());
+            orderDetails.put("menuName", order[1]);
+            orderDetails.put("categoryName", order[2]);
+            orderDetails.put("stock", order[3]);
+
+            String tableKey = "TB" + sales.getDeviceNum();
+            tableOrders.computeIfAbsent(tableKey, k -> new ArrayList<>()).add(orderDetails);
+
+            tableIDList.add(tableKey);
         }
 
+        for (int i = 0; i < 8; i++) {
+            tableIDList.add("TB" + (i + 1));
+        }
+
+        for (String s : tableIDList) {
+            System.out.printf(s);
+        }
+
+        model.addAttribute("tableIDList", tableIDList);
         model.addAttribute("tableOrders", tableOrders);
 
-        List<Sales> sales = orderList.stream()
+        List<Sales> sales = orderDetail.stream()
                 .filter(objects -> objects.length > 0)
                 .map(objects -> (Sales) objects[0])
                 .collect(Collectors.toList());
-        List<String> menuNames = orderList.stream()
+        List<String> menuNames = orderDetail.stream()
                 .filter(objects -> objects.length > 1)
                 .map(objects -> (String) objects[1])
                 .collect(Collectors.toList());
-        List<String> categoryNames = orderList.stream()
+        List<String> categoryNames = orderDetail.stream()
                 .filter(objects -> objects.length > 2)
                 .map(objects -> (String) objects[2])
                 .collect(Collectors.toList());
-        List<Integer> menuStocks = orderList.stream()
+        List<Integer> menuStocks = orderDetail.stream()
                 .filter(objects -> objects.length > 3)
                 .map(objects -> (Integer) objects[3])
                 .collect(Collectors.toList());
@@ -161,7 +176,7 @@ public class OrderController {
         model.addAttribute("categoryName", categoryNames);
         model.addAttribute("orderRequest", new SalesRequest());
 
-        return ("order/orderTable");
+        return ("order/orderTable.html");
     }
 
     @RequestMapping(value = "/orderDetailTable", method = RequestMethod.GET)
