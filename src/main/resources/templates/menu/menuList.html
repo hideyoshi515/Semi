@@ -66,10 +66,14 @@
         <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalTitle">メニュー詳細</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="modal-header d-flex justify-content-between">
+                        <h5 class="modal-title" id="modalTitle"></h5>
+                        <div>
+                            <a id="salesManagementButton" class="btn btn-primary" role="button" style="margin-left: 10px;">売上管理</a>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
                     </div>
+
                     <div class="modal-body">
                         <img id="modalImage" src="" style="width: 100%; height: auto;">
                         <p id="modalPrice"></p>
@@ -117,6 +121,8 @@
                             $('#modalStock').off('click');
                         }
                         $('#modalDescription').text(data.menu.description);
+
+                        $('#salesManagementButton').attr('href', '/salesManagement?menuId=' + currentMenu);
                         // 모달을 표시
                         var myModal = new bootstrap.Modal(document.getElementById('menuModal'), {});
                         myModal.show();
