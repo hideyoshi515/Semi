@@ -18,7 +18,7 @@
                 idleTime++;
                 if (idleTime >= maxIdleTime) {
                     clearInterval(idleInterval);
-                    window.location.href = '/order';
+                    window.location.href = '/orderStart';
                 }
             }, 1000);
         }
@@ -32,114 +32,123 @@
             startIdleTimer();
         };
     </script>
-<style>
-    body {
-        font-family: Arial, sans-serif !important;
-        background-color: #f8f9fa !important;
-        margin: 0 !important;
-        padding: 20px !important;
-    }
+    <style>
+        body {
+            font-family: Arial, sans-serif !important;
+            background-color: #f8f9fa !important;
+            margin: 0 !important;
+            padding: 20px !important;
+        }
+        #menuContainer{
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
 
-    .btn-group .btn {
-        background-color: #007bff !important;
-        color: white !important;
-        margin-right: 5px !important;
-    }
+        }
+        .btn-group{
+            display: flex;
+        }
 
-    .btn-group .btn:hover {
-        background-color: #0056b3 !important;
-    }
+        .btn-group .btn {
+            background-color: #ffcc00  !important;
+            color: white !important;
+            margin-right: 5px !important;
+        }
 
-    .menuItem {
-        margin-bottom: 20px !important;
-    }
+        .btn-group .btn:hover {
+            background-color: red  !important;
+        }
 
-    .card {
-        border: 1px solid #ced4da !important;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
-    }
+        .menuItem {
+            margin-bottom: 20px !important;
+        }
 
-    .card-body {
-        background-color: white !important;
-        padding: 20px !important;
-    }
+        .card {
+            border: 1px solid #ced4da !important;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+        }
 
-    .card-title {
-        font-size: 1.25rem !important;
-        font-weight: bold !important;
-    }
+        .card-body {
+            background-color: white !important;
+            padding: 20px !important;
+        }
 
-    .card-text {
-        font-size: 1rem !important;
-        color: #495057 !important;
-    }
+        .card-title {
+            font-size: 1.25rem !important;
+            font-weight: bold !important;
+        }
 
-    .card .rounded-3 {
-        overflow: hidden !important;
-        position: relative !important;
-    }
+        .card-text {
+            font-size: 1rem !important;
+            color: #495057 !important;
+        }
 
-    .card .rounded-3 .w-100.h-100 {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        color: white !important;
-        font-size: 1.5rem !important;
-        font-weight: bold !important;
-    }
+        .card .rounded-3 {
+            overflow: hidden !important;
+            position: relative !important;
+        }
 
-    #menuModal .modal-body {
-        padding: 20px !important;
-    }
+        .card .rounded-3 .w-100.h-100 {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: white !important;
+            font-size: 1.5rem !important;
+            font-weight: bold !important;
+        }
 
-    #menuModal img {
-        border-radius: 8px !important;
-        margin-bottom: 15px !important;
-    }
+        #menuModal .modal-body {
+            padding: 20px !important;
+        }
 
-    #menuModal .form-label {
-        margin-bottom: 10px !important;
-        font-size: 1.1rem !important;
-    }
+        #menuModal img {
+            border-radius: 8px !important;
+            margin-bottom: 15px !important;
+        }
 
-    #menuModal .input-group {
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-    }
+        #menuModal .form-label {
+            margin-bottom: 10px !important;
+            font-size: 1.1rem !important;
+        }
 
-    #menuModal .input-group .btn {
-        padding: 0.375rem 0.75rem !important;
-    }
+        #menuModal .input-group {
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
 
-    #cartModal .modal-body {
-        padding: 20px !important;
-    }
+        #menuModal .input-group .btn {
+            padding: 0.375rem 0.75rem !important;
+        }
 
-    .cart-item {
-        background-color: #f8f9fa !important;
-        padding: 10px !important;
-        border-bottom: 1px solid #e9ecef !important;
-    }
+        #cartModal .modal-body {
+            padding: 20px !important;
+        }
 
-    .cart-item:last-child {
-        border-bottom: none !important;
-    }
+        .cart-item {
+            background-color: #f8f9fa !important;
+            padding: 10px !important;
+            border-bottom: 1px solid #e9ecef !important;
+        }
 
-    .cart-item .btn {
-        padding: 0.375rem 0.75rem !important;
-    }
+        .cart-item:last-child {
+            border-bottom: none !important;
+        }
 
-    .cart-item .input-group {
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-    }
+        .cart-item .btn {
+            padding: 0.375rem 0.75rem !important;
+        }
 
-    .modal-footer {
-        justify-content: space-between !important;
-    }
-</style>
+        .cart-item .input-group {
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+
+        .modal-footer {
+            justify-content: space-between !important;
+        }
+    </style>
 </head>
 <body>
 <th:block layout:fragment="content">
@@ -151,38 +160,39 @@
                 th:onclick="|filterMenu('${category.id}')|">
         </button>
     </div>
-    <div class="">
-        <div class="row" id="menuContainer">
-            <div class="mb-3 menuItem" th:each="menu : ${menus}"
-                 th:attr="data-category=${menu.category}, data-menu-id=${menu.id}"
-                 style="width: 200px">
-                <a th:if="${menu.stock} > 0"
-                   th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ₩'}">
-                    <div class="card rounded rounded-3" style="width: 180px;">
-                        <div class="card-body text-center">
-                            <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'"
-                                 style="width: 8rem; height: auto;">
-                            <h5 class="card-title" th:text="${menu.name}"></h5>
-                            <p class="card-text mb-0"><span
-                                    th:text="${#numbers.formatInteger(menu.price, 1, 'COMMA')}+₩"></span></p>
-                        </div>
-                    </div>
-                </a>
-                <div class="card rounded rounded-3" style="width: 180px;" th:if="${menu.stock} <= 0">
-                    <div class="rounded-3 w-100 h-100" style="background: rgba(0, 0, 0, 0.7); position: absolute;">
-                    </div>
+    <h2 id="categoryTitle">すべて</h2>
+    <div class="row" id="menuContainer">
+        <div class="mb-3 menuItem" th:each="menu : ${menus}"
+             th:attr="data-category=${menu.category}, data-menu-id=${menu.id}"
+             style="width: 200px">
+            <a th:if="${menu.stock} > 0"
+               th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ₩'}">
+                <div class="card rounded rounded-3" style="width: 180px;">
                     <div class="card-body text-center">
                         <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'"
                              style="width: 8rem; height: auto;">
                         <h5 class="card-title" th:text="${menu.name}"></h5>
-                        <p class="card-text mb-0" style="color: darkred; font-weight: bold; z-index: 100000;">売れ切り</p>
+                        <p class="card-text mb-0"><span
+                                th:text="${#numbers.formatInteger(menu.price, 1, 'COMMA')}+₩"></span></p>
                     </div>
+                </div>
+            </a>
+            <div class="card rounded rounded-3" style="width: 180px;" th:if="${menu.stock} <= 0">
+                <div class="rounded-3 w-100 h-100" style="background: rgba(0, 0, 0, 0.7); position: absolute;">
+                </div>
+                <div class="card-body text-center">
+                    <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'"
+                         style="width: 8rem; height: auto;">
+                    <h5 class="card-title" th:text="${menu.name}"></h5>
+                    <p class="card-text mb-0" style="color: darkred; font-weight: bold; z-index: 100000;">
+                        売れ切り</p>
                 </div>
             </div>
         </div>
+    </div>
 
 
-        <!-- Modal -->
+    <!-- Modal -->
     <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -198,11 +208,14 @@
                             <div id="modalPrice" class="">価格</div>
                             <label for="quantityInput" class="form-label">数量</label>
                             <div class="input-group">
-                                <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(-1)">-
+                                <button type="button" class="btn btn-outline-secondary"
+                                        onclick="changeQuantity(-1)">-
                                 </button>
-                                <input type="number" class="form-control text-center" id="quantityInput" name="quantity"
+                                <input type="number" class="form-control text-center" id="quantityInput"
+                                       name="quantity"
                                        value="1" min="1" readonly>
-                                <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(1)">+
+                                <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(1)">
+                                    +
                                 </button>
                             </div>
                         </div>
@@ -219,7 +232,7 @@
 
     <form method="post" action="orderPayment" id="orderForm" onsubmit="return checkoutForm()">
         <input type="hidden" name="orderData" id="orderData">
-        <button type="submit" class="btn btn-success" >お支払い</button>
+        <button type="submit" class="btn btn-success">お支払い</button>
     </form>
 
     <!-- Cart Modal -->
@@ -240,7 +253,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
-                    <button type="button" class="btn btn-primary" onclick="checkout()" id="orderPay">お支払い</button>
+                    <button type="button" class="btn btn-primary" onclick="checkout()" id="orderPay">お支払い
+                    </button>
                 </div>
             </div>
         </div>
@@ -299,7 +313,6 @@
             const data = JSON.stringify({"menuId": menuId, "quantity": quantity});
             xhr.send(data);
         }
-
 
 
         function filterMenu(category) {
@@ -444,6 +457,7 @@
                 window.location.href = '/orderPayment';
             }
         }
+
         function checkoutForm() {
             if (cartData && Object.keys(cartData).length > 0) {
                 return true;
@@ -459,12 +473,36 @@
             loadCart();
         });
 
-        $().ready(function (){
+        $().ready(function () {
             loadCart();
         })
+        function filterMenu(category) {
+            const menuItems = document.querySelectorAll('#menuContainer .menuItem');
+            const title = document.getElementById('categoryTitle');
+            const getTitle = document.querySelector(`button[onclick="filterMenu('${category}')"]`);
+
+            if (category === 'all') {
+                title.innerText = "すべて";
+            } else {
+                title.innerText = getTitle.textContent;
+            }
+
+            menuItems.forEach(function (item) {
+                const itemCategory = item.getAttribute('data-category');
+                if (category === 'all' || itemCategory === category.toString()) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        window.onload = function () {
+            startIdleTimer();
+            filterMenu('all'); // 초기 로드 시 모든 카테고리 표시
+        };
 
     </script>
-
 </th:block>
 </body>
 </html>

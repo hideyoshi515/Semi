@@ -55,7 +55,7 @@ public class DeviceController {
         return "order/orderOption.html";
     }
 
-    @RequestMapping(value = "/order", method = RequestMethod.POST)
+    @RequestMapping(value = "/orderStart", method = RequestMethod.POST)
     public String postOrder(DeviceRequest deviceRequest, Model model, @RequestParam Map<String, Object> params) {
         model.addAttribute("deviceRequest", deviceRequest);
         Map<Long, List<Menu>> categorizedMenus = menuService.getCategorizedMenus();

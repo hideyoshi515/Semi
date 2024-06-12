@@ -2,8 +2,79 @@
 <html
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{layout/default_layout}">
+        layout:decorate="~{layout/plain_layout}">
+<head>
+    <style>
+        @media only screen and (min-width: 768px) and (max-width: 1024px) {
+            .complete-container {
+                width: 50%;
+                margin: 0 auto;
+                text-align: center;
+                padding: 50px;
+                font-family: Arial, sans-serif;
+            }
+        }
+            .complete-container {
+                text-align: center;
+                padding: 50px;
+                font-family: 'Arial', sans-serif;
+            }
+
+            .complete-container h1 {
+                color: #4CAF50;
+                font-size: 3em;
+                margin-bottom: 20px;
+            }
+
+            .image-text-container {
+                position: relative;
+                display: inline-block;
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .image-text-container img {
+                width: 100%;
+                border-radius: 8px;
+            }
+
+            .image-text-container .text {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: white;
+                font-size: 2em;
+                font-weight: bold;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            }
+
+            .complete-container p {
+                font-size: 1.2em;
+                color: #333;
+            }
+
+            .complete-container .hidden {
+                display: none;
+            }
+    </style>
+</head>
 <th:block layout:fragment="content">
-<h1>결제완료!</h1>
+    <div class="complete-container">
+        <div class="image-text-container">
+            <img src="https://i.namu.wiki/i/Ri5jtdRbLUp4S2OsLoRVlQl4xnMxagEdAmE74F0kXwioKP6YtiwNL4zPkgW4LhB0ni0R2REYRvkjWmPoevlxH2ulPHC_bMeZTnqrgB-lzpdzzgJl2xRmMjuKMQOwKLBEwGaUM6L9iNWXA5CsqEizCQ.webp" style="width: 100%">
+            <div class="text">결제가 성공적으로 완료되었습니다!</div>
+            <audio id="completeAudio" class="" controls autoplay>
+                <source src="mp3/trap.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+    </div>
 </th:block>
+<script>
+    window.onload = function () {
+        var audio = document.getElementById('completeAudio');
+        audio.play();
+    };
+</script>
 </html>
