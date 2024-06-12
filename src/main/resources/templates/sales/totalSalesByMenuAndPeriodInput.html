@@ -1,14 +1,25 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>POSOLDESK 売上管理プログラム</title>
     <link rel="stylesheet" href="/css/adminSalesCss.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            height: 400px; /* 차트 높이를 설정 */
+            width: 100%; /* 차트 너비를 설정 */
+            margin-bottom: 20px; /* 차트 간격을 설정 */
+        }
+        .chart-label {
+            text-align: center;
+            font-size: 1.2em;
+            margin-top: -10px;
+        }
+    </style>
 </head>
-
 <body>
 <th:block layout:fragment="content">
     <div class="navbar">
@@ -37,12 +48,14 @@
                 <tr>
                     <th>メニュー</th>
                     <th>総売上高</th>
+                    <th>販売量</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="entry : ${salesByMenu}">
                     <td th:text="${entry.key}"></td>
                     <td th:text="${#numbers.formatInteger(entry.value, 1, 'COMMA')} + '円'"></td>
+                    <td th:text="${quantityByMenu[entry.key]}"></td>
                 </tr>
                 </tbody>
             </table>
@@ -51,6 +64,11 @@
         <div class="chart-wrapper">
             <div class="chart-container">
                 <canvas id="salesChart"></canvas>
+                <div class="chart-label">メニュー別総売上高</div>
+            </div>
+            <div class="chart-container">
+                <canvas id="quantityChart"></canvas>
+                <div class="chart-label">メニュー別販売量</div>
             </div>
         </div>
     </div>
@@ -58,19 +76,21 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         var salesData = /*[[${salesByMenu}]]*/ {};
+        var quantityData = /*[[${quantityByMenu}]]*/ {};
         /*]]>*/
 
         var labels = Object.keys(salesData);
-        var data = Object.values(salesData);
+        var salesValues = Object.values(salesData);
+        var quantityValues = Object.values(quantityData);
 
-        var ctx = document.getElementById('salesChart').getContext('2d');
-        var salesChart = new Chart(ctx, {
+        var ctxSales = document.getElementById('salesChart').getContext('2d');
+        var salesChart = new Chart(ctxSales, {
             type: 'pie',
             data: {
                 labels: labels,
                 datasets: [{
                     label: 'メニュー別総売上高',
-                    data: data,
+                    data: salesValues,
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.8)',
                         'rgba(54, 162, 235, 0.8)',
@@ -92,7 +112,44 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: true, // 비율을 유지하도록 설정
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+
+        var ctxQuantity = document.getElementById('quantityChart').getContext('2d');
+        var quantityChart = new Chart(ctxQuantity, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'メニュー別総販売量',
+                    data: quantityValues,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 206, 86, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)',
+                        'rgba(255, 159, 64, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true, // 비율을 유지하도록 설정
                 animation: {
                     duration: 1000,
                     easing: 'easeOutQuart'
@@ -102,5 +159,4 @@
     </script>
 </th:block>
 </body>
-
 </html>
