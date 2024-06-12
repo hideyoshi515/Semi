@@ -25,10 +25,13 @@
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <div style="text-align: start; margin: 6px 0;">メニュー価格</div>
-                                <div class="mb-3 mb-md-0">
-                                    <input class="form-control" th:field="*{price}"
-                                           type="number" min="0">
+                                <div class="col-md-6">
+                                    <div style="text-align: start; margin: 6px 0;">メニュー価格</div>
+                                    <input class="form-control" th:field="*{price}" type="number" min="0">
+                                </div>
+                                <div class="col-md-6">
+                                    <div style="text-align: start; margin: 6px 0;">原価</div>
+                                    <input class="form-control" th:field="*{cost}" type="text">
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -55,13 +58,10 @@
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <div style="text-align: start; margin: 6px 0;">在庫</div>
-                                    <input class="form-control" th:field="*{stock}" type="number" min="0">
-                                </div>
-                                <div class="col-md-6">
-                                    <div style="text-align: start; margin: 6px 0;">原価</div>
-                                    <input class="form-control" th:field="*{cost}" type="text">
+                                <div style="text-align: start; margin: 6px 0;">在庫</div>
+                                <div class="mb-3 mb-md-0">
+                                    <input class="form-control" th:field="*{stock}"
+                                           type="text">
                                 </div>
                             </div>
                             <div class="mt-4 mb-0">
