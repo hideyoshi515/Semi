@@ -102,12 +102,11 @@ public class OrderController {
         ArrayList<Object> tableList = new ArrayList<>();  // 8개
         Map<String, List<Object>> orderWrap = new HashMap<>();
 
+        Set<String> tableIDList = new HashSet<String>();
+
         List<Object[]> orderDetail = orderService.findSalesByProcessAndDevice(0);
 
         Map<String, List<Map<String, Object>>> tableOrders = new HashMap<>();
-        Map<String, Integer> totalOrders = new HashMap<>();
-        Map<String, String> viewMenus = new HashMap<>();
-        Map<String, Integer> totalPrices = new HashMap<>();
 
         for (int i = 0; i < orderDetail.size(); i++) {
             Object[] order = orderDetail.get(i);
@@ -115,21 +114,11 @@ public class OrderController {
             System.out.println("Order " + i + ": " + sales + ", " + Arrays.toString(Arrays.copyOfRange(order, 1, order.length)));
         }
 
-        int totalCnt;
-        int totalPrice;
-        String viewMenu;
-
-//        viewMenu = orderDetail.get(0)[1].toString() + "외 " + (orderDetail.size() - 1) + "개";
-
         Map<String, Object> orderDetails;
 
         for (int i = 0; i < orderDetail.size(); i++) {
             Object[] order = orderDetail.get(i);
             orderDetails = new HashMap<>();
-
-            totalCnt = 0;
-            totalPrice = 0;
-            viewMenu = "";
 
             Sales sales = (Sales) order[0];
 
@@ -147,26 +136,21 @@ public class OrderController {
             orderDetails.put("categoryName", order[2]);
             orderDetails.put("stock", order[3]);
 
-            totalCnt += sales.getQuantity();
-            totalPrice += sales.getPrice() * sales.getQuantity();
-
             String tableKey = "TB" + sales.getDeviceNum();
             tableOrders.computeIfAbsent(tableKey, k -> new ArrayList<>()).add(orderDetails);
 
-
-
-            totalOrders.put(tableKey+"Cnt", totalCnt);
-            totalPrices.put(tableKey+"Price", totalPrice);
-            totalPrices.put(tableKey+"View", totalPrice);
-
-            model.addAttribute(tableKey+"Cnt", totalCnt);
-            model.addAttribute(tableKey+"Price", totalPrices);
+            tableIDList.add(tableKey);
         }
 
-//        for (int i = 0; i < 8; i++) {
-//            tableList.add();
-//        }
+        for (int i = 0; i < 8; i++) {
+            tableIDList.add("TB" + (i + 1));
+        }
 
+        for (String s : tableIDList) {
+            System.out.printf(s);
+        }
+
+        model.addAttribute("tableIDList", tableIDList);
         model.addAttribute("tableOrders", tableOrders);
 
         List<Sales> sales = orderDetail.stream()
