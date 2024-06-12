@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Map;
@@ -50,7 +51,6 @@ public class MenuController {
         } else {
             menus = menuService.getAllMenus();
         }
-
 
         //최근 days일 간의 판매량
         int days = 7;
@@ -100,8 +100,13 @@ public class MenuController {
 
     // 메뉴 업데이트 요청을 처리
     @RequestMapping(value = "/menuUpdate", method = RequestMethod.POST)
-    public String postMenuUpdate(Model model, @ModelAttribute("menuRequest") MenuRequest menuRequest) {
-        menuService.saveMenuWithImage(menuRequest, menuRequest.getImage());
+    public String postMenuUpdate(Model model, @ModelAttribute("menuRequest") MenuRequest menuRequest, RedirectAttributes redirectAttributes) {
+        try {
+            menuService.saveMenuWithImage(menuRequest, menuRequest.getImage());
+            redirectAttributes.addFlashAttribute("successMessage", "メニューのアップデートが成功しました。");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "メニューのアップデートが失敗しました。");
+        }
         return "redirect:/menuList";
     }
 
