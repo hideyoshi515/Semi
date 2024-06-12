@@ -103,9 +103,21 @@ public class MenuController {
     public String postMenuUpdate(Model model, @ModelAttribute("menuRequest") MenuRequest menuRequest, RedirectAttributes redirectAttributes) {
         try {
             menuService.saveMenuWithImage(menuRequest, menuRequest.getImage());
-            redirectAttributes.addFlashAttribute("successMessage", "メニューのアップデートが成功しました。");
+            redirectAttributes.addFlashAttribute("successMessage", "メニューがアップデートされました。");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "メニューのアップデートが失敗しました。");
+        }
+        return "redirect:/menuList";
+    }
+
+    // 메뉴 삭제 요청을 처리
+    @RequestMapping(value = "/menuDelete", method = RequestMethod.GET)
+    public String getMenuDelete(Model model, @RequestParam Map<String, Object> params, RedirectAttributes redirectAttributes) {
+        try {
+            menuService.deleteMenuById(Long.parseLong(params.get("id").toString()));
+            redirectAttributes.addFlashAttribute("successMessage", "メニューが削除されました。");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "メニューの削除が失敗しました。");
         }
         return "redirect:/menuList";
     }
@@ -122,12 +134,6 @@ public class MenuController {
         return MWCR;
     }
 
-    // 메뉴 삭제 요청을 처리
-    @RequestMapping(value = "/menuDelete", method = RequestMethod.GET)
-    public String getMenuDelete(Model model, @RequestParam Map<String, Object> params) {
-        menuService.deleteMenuById(Long.parseLong(params.get("id").toString()));
-        return "redirect:/menuList";
-    }
 
     // 입력받은 발주량 값을 메뉴 속성에 추가
     @RequestMapping(value = "/orderStock", method = RequestMethod.POST)
