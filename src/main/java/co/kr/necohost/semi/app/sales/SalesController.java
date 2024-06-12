@@ -144,16 +144,17 @@ public class SalesController {
     //메뉴별 판매액을 검색 페이지를 반환하는 메서드 6월 11일 7시 40분 시도중
     // 각 메뉴별 총 판매액을 반환하는 메서드. 6월 11일 고장남 -> 6월 12일 재시도중
     @RequestMapping(value = "/totalSalesbyMenuAndPeriodInput", method = RequestMethod.POST)
-
-    public String getSalesByMenu(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate startDate,
-                                 @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate endDate,
+    public String getSalesByMenu(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                 @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
                                  Model model) {
-        //시작일의 시작시간은 00시 00분/ 종료일의 시간은 23시 59분
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
 
         Map<String, Double> salesByMenu = salesService.getSalesByMenuInRange(startDateTime, endDateTime);
+        Map<String, Integer> quantityByMenu = salesService.getQuantityByMenuInRange(startDateTime, endDateTime);
+
         model.addAttribute("salesByMenu", salesByMenu);
+        model.addAttribute("quantityByMenu", quantityByMenu);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedStartDate = startDate.format(formatter);
@@ -164,7 +165,6 @@ public class SalesController {
 
         return "sales/totalSalesbyMenuAndPeriodInput";
     }
-
 
 
 
