@@ -27,6 +27,7 @@ public class MenuController {
     private final CategoryService categoryService;
     private final SalesRepository salesRepository;
 
+
     public MenuController(MenuService menuService, CategoryService categoryService, SalesRepository salesRepository) {
         this.menuService = menuService;
         this.categoryService = categoryService;

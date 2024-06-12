@@ -69,7 +69,7 @@
                     <div class="modal-header d-flex justify-content-between align-items-center">
                         <h5 class="modal-title" id="modalTitle"></h5>
                         <div class="btn-group">
-                            <a id="salesManagementButton" class="btn btn-primary d-flex align-items-center" role="button">売上管理</a>
+                            <button id="salesManagementButton" class="btn btn-primary d-flex align-items-center">売上管理</button>
                             <button type="button" class="btn btn-close d-flex align-items-center" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                     </div>
@@ -125,7 +125,7 @@
                         $('#modalDescription').text(data.menu.description);
 
                         // 상품별 매상관리 페이지로 보냄.
-                        $('#salesManagementButton').attr('href', '/임시주소?menuId=' + currentMenu);
+                        $('#salesManagementButton').attr('onclick', 'toSalesAnalysis()');
 
                         // 모달을 표시
                         var myModal = new bootstrap.Modal(document.getElementById('menuModal'), {});
@@ -135,6 +135,10 @@
                         alert('メニューロードエラー');
                     }
                 });
+            }
+
+            function toSalesAnalysis() {
+                location.href="/salesAnalysisByMenuInput?menuId=" + currentMenu;
             }
 
             function update() {

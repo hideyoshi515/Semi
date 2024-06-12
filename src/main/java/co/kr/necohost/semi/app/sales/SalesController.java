@@ -1,7 +1,10 @@
 package co.kr.necohost.semi.app.sales;
 
+import co.kr.necohost.semi.app.menu.MenuController;
 import co.kr.necohost.semi.domain.model.dto.SalesRequest;
+import co.kr.necohost.semi.domain.model.entity.Menu;
 import co.kr.necohost.semi.domain.model.entity.Sales;
+import co.kr.necohost.semi.domain.repository.MenuRepository;
 import co.kr.necohost.semi.domain.service.SalesService;
 import com.nimbusds.jose.shaded.gson.Gson;
 import org.apache.commons.collections4.bag.SynchronizedSortedBag;
@@ -21,11 +24,20 @@ import java.util.stream.Collectors;
 
 @Controller
 public class SalesController {
-
+    private final MenuRepository menuRepository;
     private final SalesService salesService;
 
-    public SalesController(SalesService salesService) {
+    public SalesController(MenuRepository menuRepository, SalesService salesService) {
+        this.menuRepository = menuRepository;
         this.salesService = salesService;
+    }
+
+    // 개별 메뉴 매상관리 페이지로
+    @RequestMapping(value = "/salesAnalysisByMenuInput", method = RequestMethod.GET)
+    public String getSalesAnalysisByMenuInput(Model model, @RequestParam Map<String, String> params) {
+        Menu menu = menuRepository.getMenuById(Long.parseLong(params.get("menuId")));
+        model.addAttribute("Menu", menu);
+        return "/sales/salesAnalysisByMenuInput.html";
     }
 
     // 구버전 관리자 판매 메뉴 페이지를 반환하는 메서드(css없음)
@@ -79,10 +91,6 @@ public class SalesController {
         System.out.println(hourlySales);
         return "/sales/adminSalesMainHome2.html";
     }
-
-
-
-
 
     // 판매 데이터베이스 컨트롤러 메뉴 페이지를 반환하는 메서드
     @RequestMapping(value = "/salesDataBaseControllerMenu", method=RequestMethod.GET)

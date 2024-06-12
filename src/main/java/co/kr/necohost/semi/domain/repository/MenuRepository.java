@@ -12,6 +12,8 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     List<Menu> findAllByOrderByCategoryAscIdDesc();
     List<Menu> findAllByOrderByIdDescCategoryAsc();
 
+    Menu getMenuById(Long id);
+
     @Override
     @Cacheable("Menu_findById")
     public Optional<Menu> findById(Long id);
