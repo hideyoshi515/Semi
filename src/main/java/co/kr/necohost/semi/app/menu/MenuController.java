@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ public class MenuController {
     private final MenuService menuService;
     private final CategoryService categoryService;
     private final SalesRepository salesRepository;
+
 
     public MenuController(MenuService menuService, CategoryService categoryService, SalesRepository salesRepository) {
         this.menuService = menuService;
@@ -49,7 +51,6 @@ public class MenuController {
         } else {
             menus = menuService.getAllMenus();
         }
-
 
         //최근 days일 간의 판매량
         int days = 7;
@@ -99,8 +100,25 @@ public class MenuController {
 
     // 메뉴 업데이트 요청을 처리
     @RequestMapping(value = "/menuUpdate", method = RequestMethod.POST)
-    public String postMenuUpdate(Model model, @ModelAttribute("menuRequest") MenuRequest menuRequest) {
-        menuService.saveMenuWithImage(menuRequest, menuRequest.getImage());
+    public String postMenuUpdate(Model model, @ModelAttribute("menuRequest") MenuRequest menuRequest, RedirectAttributes redirectAttributes) {
+        try {
+            menuService.saveMenuWithImage(menuRequest, menuRequest.getImage());
+            redirectAttributes.addFlashAttribute("successMessage", "メニューがアップデートされました。");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "メニューのアップデートが失敗しました。");
+        }
+        return "redirect:/menuList";
+    }
+
+    // 메뉴 삭제 요청을 처리
+    @RequestMapping(value = "/menuDelete", method = RequestMethod.GET)
+    public String getMenuDelete(Model model, @RequestParam Map<String, Object> params, RedirectAttributes redirectAttributes) {
+        try {
+            menuService.deleteMenuById(Long.parseLong(params.get("id").toString()));
+            redirectAttributes.addFlashAttribute("successMessage", "メニューが削除されました。");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "メニューの削除が失敗しました。");
+        }
         return "redirect:/menuList";
     }
 
@@ -116,12 +134,6 @@ public class MenuController {
         return MWCR;
     }
 
-    // 메뉴 삭제 요청을 처리
-    @RequestMapping(value = "/menuDelete", method = RequestMethod.GET)
-    public String getMenuDelete(Model model, @RequestParam Map<String, Object> params) {
-        menuService.deleteMenuById(Long.parseLong(params.get("id").toString()));
-        return "redirect:/menuList";
-    }
 
     // 입력받은 발주량 값을 메뉴 속성에 추가
     @RequestMapping(value = "/orderStock", method = RequestMethod.POST)
@@ -180,4 +192,7 @@ public class MenuController {
     public void getCategoryDelete(Model model, @RequestParam Map<String, Object> params) {
         categoryService.deleteCategory(Integer.parseInt((String) params.get("id")));
     }
+
+    // 발주 관련 컨트롤러
+
 }

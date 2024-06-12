@@ -22,7 +22,7 @@ public class MenuService {
     }
 
     public List<Menu> getAllMenus() {
-        return menuRepository.findAllByOrderByCategory();
+        return menuRepository.findAllByOrderByIdDescCategoryAsc();
     }
 
     public void deleteMenuById(Long id) {
@@ -34,7 +34,7 @@ public class MenuService {
     }
 
     public List<Menu> getMenuByCategory(int category) {
-        return menuRepository.findByCategory(category);
+        return menuRepository.findByCategoryOrderByIdDesc(category);
     }
 
     public Menu saveMenu(Menu menu) {
