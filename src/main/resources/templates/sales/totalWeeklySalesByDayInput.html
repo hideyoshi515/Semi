@@ -1,35 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/default_layout}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-    <title>Total Sales by Year and Month</title>
-    <style>
-        table {
-            width: 50%;
-            border-collapse: collapse;
-            margin: 25px 0;
-            font-size: 18px;
-            text-align: left;
-        }
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            height: auto;
-        }
-        canvas {
-            width: 100% !important;
-            height: auto !important;
-        }
-    </style>
+    <title>POSOLDESK 売上管理プログラム</title>
     <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         function formatGrowthRate() {
             const growthRateElement = document.getElementById('growthRate');
@@ -53,111 +27,119 @@
 
         window.onload = formatGrowthRate;
     </script>
+    <link rel="stylesheet" href="/css/adminSalesCss.css">
 </head>
 <body>
-<div layout:fragment="content">
-    <h1>週別日商</h1>
-    <form action="/totalSalesByDayInput" method="get">
-        <label for="year">年度を入力:</label>
-        <input type="number" id="year" name="year" th:value="${year}">
-        <label for="month">月を入力:</label>
-        <input type="number" id="month" name="month" th:value="${month}">
-        <label for="day">日を入力:</label>
-        <input type="number" id="day" name="day" th:value="${day}">
+<th:block layout:fragment="content">
+    <div class="navbar">
+        <a href="#main">ホーム</a>
+        <a href="#menu" onclick="location.href='/adminSalesMainMenu'">メニュー</a>
+    </div>
 
-        <button type="submit">日商閲覧</button>
+    <h1><img style="width: 38px;height: 38px;" src="/img/storeownerpage/dailyrevenueicon.png">日商/週間売上</h1>
+
+    <form action="/totalSalesByDayInput" method="get">
+        <h3>
+            <label for="year">年度を入力:</label>
+            <input style="font-size:1.17em;" type="number" id="year" name="year" th:value="${year}">
+            <label for="month">月を入力:</label>
+            <input style="font-size:1.17em;" type="number" id="month" name="month" th:value="${month}">
+            <label for="day">日を入力:</label>
+            <input style="font-size:1.17em;" type="number" id="day" name="day" th:value="${day}">
+        </h3>
+        <button class="button" type="submit">日商閲覧</button>
     </form>
 
     <div th:if="${year != null && month != null && day != null}">
-        <h3>年度: <span th:text="${year}"></span>
-            月: <span th:text="${month}"></span>
-            日: <span th:text="${day}"></span>
+        <h3>
+            <span th:text="${year}"></span>年
+            <span th:text="${month}"></span>月
+            <span th:text="${day}"></span>日
         </h3>
-
     </div>
-
-    <button type="button" onclick="redirectToWeeklySales()">その日が属している一週間の総売上高</button>
-    <button type="button" onclick="location.href='/adminSalesMenu'">管理者画面に復帰</button>
 
     <div th:if="${weeklySales != null}">
         <h3>週別総売上高: <span th:text="${totalWeeklySales}"></span>円</h3>
-        <table>
-            <thead>
-            <tr>
-                <th>日付</th>
-                <th>総売上高 (円)</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="entry : ${weeklySales}">
-                <td th:text="${#temporals.format(entry.key, 'yyyy-MM-dd')}"></td>
-                <td th:text="${entry.value}"></td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+        <div class="content">
+            <div class="table-container">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>日付</th>
+                        <th>総売上高 (円)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="entry : ${weeklySales}">
+                        <td th:text="${#temporals.format(entry.key, 'yyyy-MM-dd')}"></td>
+                        <td th:text="${entry.value} + '円'"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
 
-    <div class="chart-container">
-        <canvas id="weeklySalesChart"></canvas>
-    </div>
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        var weeklySalesData = /*[[${weeklySales}]]*/ {};
-        /*]]>*/
+            <div class="chart-wrapper">
+                <div class="chart-container">
+                    <canvas id="weeklySalesChart"></canvas>
+                </div>
+            </div>
 
-        var labels = Object.keys(weeklySalesData);
-        var data = Object.values(weeklySalesData);
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                var weeklySalesData = /*[[${weeklySales}]]*/ {};
+                /*]]>*/
 
-        // 차트를 그리는 함수
-        var ctx = document.getElementById('weeklySalesChart').getContext('2d');
-        var weeklySalesChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: '総売上高 (棒グラフ)',
-                        data: data,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1,
-                        yAxisID: 'y'
+                var labels = Object.keys(weeklySalesData);
+                var data = Object.values(weeklySalesData).map(function(value) {
+                    return parseFloat(value.replace(/,/g, '')); // 콤마 제거 및 숫자로 변환
+                });
+
+                // 차트를 그리는 함수
+                var ctx = document.getElementById('weeklySalesChart').getContext('2d');
+                var weeklySalesChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: '総売上高 (棒グラフ)',
+                                data: data,
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 1,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: '総売上高 (折れ線グラフ)',
+                                data: data,
+                                type: 'line',
+                                borderColor: 'rgba(0, 0, 0, 1)',
+                                backgroundColor: 'rgba(0, 0, 0, 0)',
+                                borderWidth: 2,
+                                fill: false,
+                                yAxisID: 'y'
+                            }
+                        ]
                     },
-                    {
-                        label: '総売上高 (折れ線グラフ)',
-                        data: data,
-                        type: 'line',
-                        borderColor: 'rgba(0, 0, 0, 1)',
-                        backgroundColor: 'rgba(0, 0, 0, 0)',
-                        borderWidth: 2,
-                        fill: false,
-                        yAxisID: 'y'
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 500,
+                            easing: 'easeInOutBounce'
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
                     }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                animation: {
-                    duration: 500,
-                    easing: 'easeInOutBounce'
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    </script>
-
-
-
-
-
-
-
-
-</div>
+                });
+            </script>
+        </div>
+    </div>
+    <button class="button" type="button" onclick="redirectToWeeklySales()">その日が属している一週間の総売上高</button>
+    <button class="button" type="button" onclick="location.href='/adminSalesMainMenu'">管理者画面に復帰</button>
+</th:block>
 </body>
 </html>

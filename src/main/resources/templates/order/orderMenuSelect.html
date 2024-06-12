@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/user_layout}">
+      layout:decorate="~{layout/plain_layout}">
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     <script>
         let idleTime = 0;
         let idleInterval;
-        const maxIdleTime = 5;
+        const maxIdleTime = 300;
 
         function resetIdleTimer() {
             idleTime = 0;
@@ -32,19 +32,129 @@
             startIdleTimer();
         };
     </script>
+<style>
+    body {
+        font-family: Arial, sans-serif !important;
+        background-color: #f8f9fa !important;
+        margin: 0 !important;
+        padding: 20px !important;
+    }
 
+    .btn-group .btn {
+        background-color: #007bff !important;
+        color: white !important;
+        margin-right: 5px !important;
+    }
+
+    .btn-group .btn:hover {
+        background-color: #0056b3 !important;
+    }
+
+    .menuItem {
+        margin-bottom: 20px !important;
+    }
+
+    .card {
+        border: 1px solid #ced4da !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .card-body {
+        background-color: white !important;
+        padding: 20px !important;
+    }
+
+    .card-title {
+        font-size: 1.25rem !important;
+        font-weight: bold !important;
+    }
+
+    .card-text {
+        font-size: 1rem !important;
+        color: #495057 !important;
+    }
+
+    .card .rounded-3 {
+        overflow: hidden !important;
+        position: relative !important;
+    }
+
+    .card .rounded-3 .w-100.h-100 {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: white !important;
+        font-size: 1.5rem !important;
+        font-weight: bold !important;
+    }
+
+    #menuModal .modal-body {
+        padding: 20px !important;
+    }
+
+    #menuModal img {
+        border-radius: 8px !important;
+        margin-bottom: 15px !important;
+    }
+
+    #menuModal .form-label {
+        margin-bottom: 10px !important;
+        font-size: 1.1rem !important;
+    }
+
+    #menuModal .input-group {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+
+    #menuModal .input-group .btn {
+        padding: 0.375rem 0.75rem !important;
+    }
+
+    #cartModal .modal-body {
+        padding: 20px !important;
+    }
+
+    .cart-item {
+        background-color: #f8f9fa !important;
+        padding: 10px !important;
+        border-bottom: 1px solid #e9ecef !important;
+    }
+
+    .cart-item:last-child {
+        border-bottom: none !important;
+    }
+
+    .cart-item .btn {
+        padding: 0.375rem 0.75rem !important;
+    }
+
+    .cart-item .input-group {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+
+    .modal-footer {
+        justify-content: space-between !important;
+    }
+</style>
 </head>
 <body>
 <th:block layout:fragment="content">
     <div class="btn-group mb-3" role="group" aria-label="Category filter">
         <button type="button" class="btn btn-secondary" onclick="filterMenu('all')">すべて</button>
-        <button type="button" class="btn btn-secondary" th:each="category : ${categories}" th:text="${category.name}"
-                th:onclick="|filterMenu(${category.id})|"></button>
+        <button type="button" class="btn btn-secondary"
+                th:each="category : ${categories}"
+                th:text="${category.name}"
+                th:onclick="|filterMenu('${category.id}')|">
+        </button>
     </div>
-
     <div class="">
         <div class="row" id="menuContainer">
-            <div class="mb-3 menuItem" th:each="menu : ${menus}" th:attr="data-category=${menu.category}, data-menu-id=${menu.id}"
+            <div class="mb-3 menuItem" th:each="menu : ${menus}"
+                 th:attr="data-category=${menu.category}, data-menu-id=${menu.id}"
                  style="width: 200px">
                 <a th:if="${menu.stock} > 0"
                    th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ₩'}">
@@ -65,15 +175,14 @@
                         <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'"
                              style="width: 8rem; height: auto;">
                         <h5 class="card-title" th:text="${menu.name}"></h5>
-                        <p class="card-text mb-0" style="color: darkred; font-weight: bold; z-index: 100000;">
-                            売れ切り</p>
+                        <p class="card-text mb-0" style="color: darkred; font-weight: bold; z-index: 100000;">売れ切り</p>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Modal -->
+
+        <!-- Modal -->
     <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -108,14 +217,14 @@
         </div>
     </div>
 
-    <form method="post" action="orderPayment" id="orderForm">
+    <form method="post" action="orderPayment" id="orderForm" onsubmit="return checkoutForm()">
         <input type="hidden" name="orderData" id="orderData">
-        <button type="submit" class="btn btn-success">결제</button>
+        <button type="submit" class="btn btn-success" >お支払い</button>
     </form>
 
     <!-- Cart Modal -->
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cartModal">
-        장바구니 열기
+        カーゴ
     </button>
     <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -130,14 +239,15 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                    <button type="button" class="btn btn-primary" onclick="checkout()">결제하기</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+                    <button type="button" class="btn btn-primary" onclick="checkout()" id="orderPay">お支払い</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        let cartData = null;
         document.getElementById('menuModal').addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
             const menuName = button.getAttribute('data-menu-name');
@@ -180,27 +290,29 @@
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     alert("상품이 장바구니에 추가되었습니다.");
                     document.getElementById('menuModal').querySelector('.btn-close').click();
+                    loadCart();
                 } else if (xhr.readyState === 4) {
                     alert("오류가 발생했습니다: " + xhr.status);
                 }
             };
 
-            const data = JSON.stringify({ "menuId": menuId, "quantity": quantity });
+            const data = JSON.stringify({"menuId": menuId, "quantity": quantity});
             xhr.send(data);
         }
 
-        document.getElementById('orderForm').addEventListener('submit', function (event) {
-            const orders = sessionStorage.getItem('orders');
-            document.getElementById('orderData').value = orders;
-        });
+
 
         function filterMenu(category) {
             const menuItems = document.querySelectorAll('#menuContainer .menuItem');
+            console.log('Filtering menu for category', category);
             menuItems.forEach(function (item) {
-                if (category === 'all' || item.getAttribute('data-category') === category) {
+                const itemCategory = item.getAttribute('data-category');
+                if (category === 'all' || itemCategory === category.toString()) {
                     item.style.display = 'block';
+                    console.log(`Displaying item with category: ${itemCategory}`);
                 } else {
                     item.style.display = 'none';
+                    console.log(`Hiding item with category: ${itemCategory}`);
                 }
             });
         }
@@ -228,6 +340,7 @@
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     const cartItems = JSON.parse(xhr.responseText);
                     displayCartItems(cartItems);
+                    cartData = JSON.parse(xhr.responseText);
                 }
             };
             xhr.send();
@@ -259,9 +372,9 @@
             }
         }
 
-        function checkTotalPrice(){
-            const ajxa
-        }
+        // function checkTotalPrice(){
+        //     const ajxa
+        // }
 
         function changeCartQuantity(menuId, stock, amount) {
             const quantityInput = document.getElementById('quantity-' + menuId);
@@ -286,7 +399,7 @@
                 }
             };
 
-            const data = JSON.stringify({ "menuId": menuId, "quantity": newQuantity });
+            const data = JSON.stringify({"menuId": menuId, "quantity": newQuantity});
             xhr.send(data);
         }
 
@@ -314,19 +427,41 @@
                 }
             };
 
-            const data = JSON.stringify({ "menuId": menuId });
+            const data = JSON.stringify({"menuId": menuId});
             xhr.send(data);
         }
 
+
         function checkout() {
             // 결제하기 버튼 클릭 시 동작하는 함수
-            window.location.href = '/orderPayment';
+            const cartItemsContainer = document.getElementById('cartItemsContainer');
+            const items = cartItemsContainer.querySelectorAll('.cart-item');
+
+            if (items.length === 0) {
+                alert('장바구니에 주문이 없습니다. 주문을 추가해주세요.');
+                return false;
+            } else {
+                window.location.href = '/orderPayment';
+            }
         }
+        function checkoutForm() {
+            if (cartData && Object.keys(cartData).length > 0) {
+                return true;
+            } else {
+                alert('장바구니에 주문이 없습니다. 주문을 추가해주세요.');
+                return false;
+            }
+        }
+
 
         // 장바구니 모달을 열 때 장바구니 데이터를 로드
         document.getElementById('cartModal').addEventListener('show.bs.modal', function () {
             loadCart();
         });
+
+        $().ready(function (){
+            loadCart();
+        })
 
     </script>
 

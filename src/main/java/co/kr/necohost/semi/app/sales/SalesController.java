@@ -5,13 +5,16 @@ import co.kr.necohost.semi.domain.model.entity.Sales;
 import co.kr.necohost.semi.domain.service.SalesService;
 import com.nimbusds.jose.shaded.gson.Gson;
 import org.apache.commons.collections4.bag.SynchronizedSortedBag;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -128,32 +131,43 @@ public class SalesController {
 
 
 
-    // 각 메뉴별 총 판매액을 반환하는 메서드
-    @RequestMapping(value = "/totalSalesbyMenu", method = RequestMethod.GET)
+    // 각 메뉴별 총 판매액을 반환하는 메서드. 6월 11일 고장남 -> 6월 12일 재시도중
+    @RequestMapping(value = "/totalSalesbyMenuAndPeriodInput", method = RequestMethod.GET)
     public String getTotalSalesByMenu(Model model) {
         Map<String, Double> totalByMenu = salesService.getTotalSalesByMenu();
         model.addAttribute("totalByMenu", totalByMenu);
 
-        return "/sales/totalSalesByMenu.html";
+        return "/sales/totalSalesbyMenuAndPeriodInput";
     }
 
-    // 월별 총 판매액을 반환하는 메서드
-//    @RequestMapping(value="/totalSalesByMonth" , method = RequestMethod.GET)
-//    public String getTotalSalesByMonth(Model model) {
-//        Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
-//        Map<String, Double> sortedMonthlySales = new TreeMap<>(monthlySales); // TreeMap을 사용하여 정렬
-//        model.addAttribute("monthlySales", sortedMonthlySales);
-//        return "sales/totalSalesByMonth";
-//    }
-    // 연도별 총 판매액을 반환하는 메서드
-//    @RequestMapping(value= "/totalSalesByYear", method = RequestMethod.GET)
-//    public String getTotalSalesByYear(Model model) {
-//        Map<Integer, Double> yearlySales = salesService.getYearlySalesByProcess();
-//        model.addAttribute("yearlySales", yearlySales);
-//        System.out.println(yearlySales);
-//        return "/sales/totalSalesByYear";
-//    }
-    // 연도별 총 판매액을 반환하는 메서드. 6월 10일 오후 4시 수정중
+
+    //메뉴별 판매액을 검색 페이지를 반환하는 메서드 6월 11일 7시 40분 시도중
+    // 각 메뉴별 총 판매액을 반환하는 메서드. 6월 11일 고장남 -> 6월 12일 재시도중
+    @RequestMapping(value = "/totalSalesbyMenuAndPeriodInput", method = RequestMethod.POST)
+    public String getSalesByMenu(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                 @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                                 Model model) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+        Map<String, Double> salesByMenu = salesService.getSalesByMenuInRange(startDateTime, endDateTime);
+        Map<String, Integer> quantityByMenu = salesService.getQuantityByMenuInRange(startDateTime, endDateTime);
+
+        model.addAttribute("salesByMenu", salesByMenu);
+        model.addAttribute("quantityByMenu", quantityByMenu);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedStartDate = startDate.format(formatter);
+        String formattedEndDate = endDate.format(formatter);
+
+        model.addAttribute("formattedStartDate", formattedStartDate);
+        model.addAttribute("formattedEndDate", formattedEndDate);
+
+        return "sales/totalSalesbyMenuAndPeriodInput";
+    }
+
+
+
 
     //연도별 총 판매액을 반환하는 메서드
     @RequestMapping(value = "/totalSalesByYear", method = RequestMethod.GET)
@@ -161,45 +175,28 @@ public class SalesController {
         Map<Integer, Double> yearlySales = salesService.getYearlySalesByProcess();
 
         // 연도별 오름차순으로 정렬
-        Map<String, String> yearlySalesStringKey = yearlySales.entrySet()
+        Map<String, Double> yearlySalesStringKey = yearlySales.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByKey())
                 .collect(Collectors.toMap(
                         entry -> entry.getKey().toString(),
-                        entry -> String.format("%,d", entry.getValue().longValue()),
+                        Map.Entry::getValue,
                         (e1, e2) -> e1,
                         LinkedHashMap::new
                 ));
 
-        model.addAttribute("yearlySales", yearlySales);
-        System.out.println(yearlySalesStringKey);
+        model.addAttribute("yearlySales", yearlySalesStringKey);
+
         return "sales/totalSalesByYear";
     }
 
 
-    // 월별 총 판매액을 반환하는 메서드
-//    @RequestMapping(value="/totalSalesByMonth" , method = RequestMethod.GET)
-//    public String getTotalSalesByMonth(Model model) {
-//        Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
-//        Map<String, Double> sortedMonthlySales = new TreeMap<>(monthlySales); // TreeMap을 사용하여 정렬
-//        model.addAttribute("monthlySales", sortedMonthlySales);
-//        return "sales/totalSalesByMonth";
-//    }
 
-    // 월별 총 판매액을 반환하는 메서드 6월 10일 수정중
+    //월별 총 판매액을 반환하는 메서드
     @RequestMapping(value = "/totalSalesByMonth", method = RequestMethod.GET)
     public String getTotalSalesByMonth(Model model) {
         Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
-        Map<String, String> formattedMonthlySales = monthlySales.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> String.format("%,d", entry.getValue().longValue()),
-                        (e1, e2) -> e1,
-                        LinkedHashMap::new
-                ));
         model.addAttribute("monthlySales", monthlySales);
-        model.addAttribute("formattedMonthlySales", formattedMonthlySales); // 포맷팅된 데이터를 따로 추가
         return "sales/totalSalesByMonth";
     }
 
@@ -241,10 +238,14 @@ public class SalesController {
 
         if (year != null && month != null && day != null) {
             double totalSales = salesService.getTotalSalesByDay(year, month, day);
+            DecimalFormat decimalFormat = new DecimalFormat("#,##0");
+            String formattedTotalSales = decimalFormat.format(totalSales);
+
+
             model.addAttribute("year", year);
             model.addAttribute("month", month);
             model.addAttribute("day", day);
-            model.addAttribute("totalSales", totalSales);
+            model.addAttribute("totalSales", formattedTotalSales);
         }
         return "/sales/totalSalesByDayInput.html";
     }
@@ -261,11 +262,21 @@ public class SalesController {
             Map<LocalDate, Double> weeklySales = salesService.getWeeklySalesByDay(year, month, day);
             double totalWeeklySales = weeklySales.values().stream().mapToDouble(Double::doubleValue).sum();
 
+            // 매출 금액 형식 지정
+            DecimalFormat decimalFormat = new DecimalFormat("#,###");
+
+            // 천단위 콤마 추가 및 소수점 생략
+            Map<LocalDate, String> formattedWeeklySales = new TreeMap<>();
+            for (Map.Entry<LocalDate, Double> entry : weeklySales.entrySet()) {
+                formattedWeeklySales.put(entry.getKey(), decimalFormat.format(entry.getValue()));
+            }
+            String formattedTotalWeeklySales = decimalFormat.format(totalWeeklySales);
+
             model.addAttribute("year", year);
             model.addAttribute("month", month);
             model.addAttribute("day", day);
-            model.addAttribute("weeklySales", weeklySales);
-            model.addAttribute("totalWeeklySales", totalWeeklySales);
+            model.addAttribute("weeklySales", formattedWeeklySales);
+            model.addAttribute("totalWeeklySales", formattedTotalWeeklySales);
         }
         return "/sales/totalWeeklySalesByDayInput";
     }

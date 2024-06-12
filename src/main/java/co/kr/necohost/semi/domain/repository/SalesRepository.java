@@ -61,6 +61,8 @@ public interface SalesRepository extends JpaRepository<Sales, Long> {
     @Query("SELECT s FROM Sales s WHERE s.date BETWEEN :startOfWeek AND :endOfWeek AND s.process = 1")
     List<Sales> findSalesByDateRange(@Param("startOfWeek") LocalDateTime startOfWeek, @Param("endOfWeek") LocalDateTime endOfWeek);
 
+
+
     // 연도와 카테고리별로 프로세스가 1인 판매 기록을 조회 (연도 및 카테고리별 총 판매량 계산에 사용)
     @Query("SELECT s FROM Sales s WHERE s.process = 1 AND YEAR(s.date) = :year AND s.category = :category")
     List<Sales> findSalesByYearAndCategory(@Param("year") int year, @Param("category") int category);
@@ -77,8 +79,19 @@ public interface SalesRepository extends JpaRepository<Sales, Long> {
     @Query("SELECT s FROM Sales s WHERE s.date >= :start AND s.date <= :end AND s.process = 1 ORDER BY s.date")
     List<Sales> findSalesByDateAndTimeRange(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
-    //특정 날짜의 시간대별 매출을 조회하는 쿼리 6월 11일 작업중
+    //특정 날짜의 시간대별 매출을 조회하는 쿼리
     @Query("SELECT s FROM Sales s WHERE s.process = 1 AND s.date BETWEEN :start AND :end ORDER BY s.date")
     List<Sales> findSalesByDateRangeAndProcess(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    //해당 연도의 모든 월을 반환하는 쿼리(해당 월의 매출이 0이더라도) 6월 11일 오후 2시 47분 작업중
+    @Query("SELECT s FROM Sales s WHERE s.process = 1 ORDER BY s.date")
+    List<Sales> findMonthlySalesByProcess();
+
+    //날짜범위에 따른 메뉴별 매출액 도출 위한 쿼리 6월 11일 오후 7시 반
+    @Query("SELECT s FROM Sales s WHERE s.date BETWEEN :startDate AND :endDate AND s.process = 1")
+    List<Sales> findSalesByDateRangeWithProcess(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+
+
 
 }

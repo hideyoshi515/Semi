@@ -19,13 +19,13 @@ public class Sales {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDateTime date;
-    private int category;
-    private int menu;
+    private long category;
+    private long menu;
     private int price;
     private int quantity;
-    private int device;
-    private int deviceNum;
-    private int orderNum;
+    private long device;
+    private long deviceNum;
+    private long orderNum;
     private int process;
 
     @Override

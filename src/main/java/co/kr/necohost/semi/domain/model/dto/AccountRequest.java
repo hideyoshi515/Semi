@@ -34,7 +34,6 @@ public class AccountRequest {
     @Pattern(regexp = "^[0-9]{4}$", message = "暗証番号は半角数字４文字で入力してください")
     private String msPass;
     private String OAuth;
-
     public Account toEntity() {
         Account account = new Account();
 
