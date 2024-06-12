@@ -9,7 +9,7 @@
         <div class="menu-list-navi">
             <label>
                 <select class="mt-3 ms-3" onchange="(location.href = this.value);" style="width: 180px; height: 30px">
-                    <option value="/menuList">전체</option>
+                    <option value="/menuList">全カテゴリー</option>
                     <option th:each="category : ${categories}"
                             th:value="|/menuList?category=${category.id}|"
                             th:text="${category.name}"
@@ -18,8 +18,8 @@
                 </select>
             </label>
             <input type="text" id="search-input" placeholder="メニュー名で検索" oninput="filterMenusByName()">
-            <button id="filterLowStock" class="btn btn-warning" onclick="filterMenusByStockStatus()">不足状態のみ</button>
-            <button class="btn btn-primary" onclick="location.href='/menuCreate'">メニュー登録</button>
+            <button id="filterLowStock" class="btn btn-warning d-flex align-items-center" onclick="filterMenusByStockStatus()">不足状態のみ</button>
+            <button class="btn btn-primary d-flex align-items-center" onclick="location.href='/menuCreate'">メニュー登録</button>
         </div>
         <div id="scrollable-content" class="scrollable-container">
             <div id="menu-container" class="mt-3 d-flex flex-wrap justify-content-around">
@@ -66,13 +66,14 @@
         <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header d-flex justify-content-between">
+                    <div class="modal-header d-flex justify-content-between align-items-center">
                         <h5 class="modal-title" id="modalTitle"></h5>
-                        <div>
-                            <a id="salesManagementButton" class="btn btn-primary" role="button" style="margin-left: 10px;">売上管理</a>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="btn-group">
+                            <a id="salesManagementButton" class="btn btn-primary d-flex align-items-center" role="button">売上管理</a>
+                            <button type="button" class="btn btn-close d-flex align-items-center" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                     </div>
+
 
                     <div class="modal-body">
                         <img id="modalImage" src="" style="width: 100%; height: auto;">
@@ -86,16 +87,17 @@
                                style="display: none; margin-right: 10px;">
                         <div id="alert-container"
                              style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1050;"></div>
-                        <button type="button" class="btn btn-warning" id="order-button" onclick="toggleOrderInput()">
+                        <button type="button" class="btn btn-warning d-flex align-items-center" id="order-button" onclick="toggleOrderInput()">
                             発注
                         </button>
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="update()">修正
+                        <button type="button" class="btn btn-primary d-flex align-items-center" data-bs-dismiss="modal" onclick="update()">修正
                         </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                        <button type="button" class="btn btn-secondary d-flex align-items-center" data-bs-dismiss="modal">キャンセル</button>
                     </div>
                 </div>
             </div>
         </div>
+
 
         <script>
             let currentMenu;
@@ -122,7 +124,9 @@
                         }
                         $('#modalDescription').text(data.menu.description);
 
-                        $('#salesManagementButton').attr('href', '/salesManagement?menuId=' + currentMenu);
+                        // 상품별 매상관리 페이지로 보냄.
+                        $('#salesManagementButton').attr('href', '/임시주소?menuId=' + currentMenu);
+
                         // 모달을 표시
                         var myModal = new bootstrap.Modal(document.getElementById('menuModal'), {});
                         myModal.show();

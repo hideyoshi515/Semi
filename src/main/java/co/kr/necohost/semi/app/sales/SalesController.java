@@ -74,7 +74,7 @@ public class SalesController {
         model.addAttribute("hourlySales", hourlySales);
         System.out.println("hourlySales관련 확인중");
         System.out.println(hourlySales);
-        return "/sales/adminSalesMainHome.html";
+        return "/sales/adminSalesMainHome2.html";
     }
 
 
