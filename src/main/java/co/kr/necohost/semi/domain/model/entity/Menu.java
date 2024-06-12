@@ -23,6 +23,7 @@ public class Menu {
     private long category;
     private int stock;
     private int stockorder;
+    private int cost;
     private String image;
     private String description;
 
