@@ -348,6 +348,23 @@ public class SalesService {
                 .sum();
     }
 
+    //날짜범위에 따른 메뉴별 매출액 도출 위한 쿼리  6월 11일 오후 7시 반
+    public Map<String, Double> getSalesByMenuInRange(LocalDateTime startDate, LocalDateTime endDate) {
+        List<Sales> salesList = salesRepository.findSalesByDateRangeWithProcess(startDate, endDate);
+        List<Menu> menuList = menuRepository.findAll();
+
+        Map<Long, String> menuMap = menuList.stream()
+                .collect(Collectors.toMap(Menu::getId, Menu::getName));
+
+        return salesList.stream()
+                .filter(sales -> menuMap.containsKey(sales.getMenu()))
+                .collect(Collectors.groupingBy(
+                        sales -> menuMap.get(sales.getMenu()),
+                        Collectors.summingDouble(sales -> sales.getPrice() * sales.getQuantity())
+                ));
+    }
+
+
 
 
 

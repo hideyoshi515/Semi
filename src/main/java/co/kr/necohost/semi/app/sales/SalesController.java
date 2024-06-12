@@ -5,6 +5,7 @@ import co.kr.necohost.semi.domain.model.entity.Sales;
 import co.kr.necohost.semi.domain.service.SalesService;
 import com.nimbusds.jose.shaded.gson.Gson;
 import org.apache.commons.collections4.bag.SynchronizedSortedBag;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -129,14 +131,41 @@ public class SalesController {
 
 
 
-    // 각 메뉴별 총 판매액을 반환하는 메서드
-    @RequestMapping(value = "/totalSalesbyMenu", method = RequestMethod.GET)
+    // 각 메뉴별 총 판매액을 반환하는 메서드. 6월 11일 고장남 -> 6월 12일 재시도중
+    @RequestMapping(value = "/totalSalesbyMenuAndPeriodInput", method = RequestMethod.GET)
     public String getTotalSalesByMenu(Model model) {
         Map<String, Double> totalByMenu = salesService.getTotalSalesByMenu();
         model.addAttribute("totalByMenu", totalByMenu);
 
-        return "/sales/totalSalesByMenu.html";
+        return "/sales/totalSalesbyMenuAndPeriodInput";
     }
+
+
+    //메뉴별 판매액을 검색 페이지를 반환하는 메서드 6월 11일 7시 40분 시도중
+    // 각 메뉴별 총 판매액을 반환하는 메서드. 6월 11일 고장남 -> 6월 12일 재시도중
+    @RequestMapping(value = "/totalSalesbyMenuAndPeriodInput", method = RequestMethod.POST)
+
+    public String getSalesByMenu(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate startDate,
+                                 @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate endDate,
+                                 Model model) {
+        //시작일의 시작시간은 00시 00분/ 종료일의 시간은 23시 59분
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+        Map<String, Double> salesByMenu = salesService.getSalesByMenuInRange(startDateTime, endDateTime);
+        model.addAttribute("salesByMenu", salesByMenu);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedStartDate = startDate.format(formatter);
+        String formattedEndDate = endDate.format(formatter);
+
+        model.addAttribute("formattedStartDate", formattedStartDate);
+        model.addAttribute("formattedEndDate", formattedEndDate);
+
+        return "sales/totalSalesbyMenuAndPeriodInput";
+    }
+
+
 
 
 
@@ -163,32 +192,14 @@ public class SalesController {
 
 
 
-
-    // (구)월별 총 판매액을 반환하는 메서드 6월 11일 오후 2시 47분 작업중
-//    @RequestMapping(value = "/totalSalesByMonth", method = RequestMethod.GET)
-//    public String getTotalSalesByMonth(Model model) {
-//        Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
-//        Map<String, String> formattedMonthlySales = monthlySales.entrySet().stream()
-//                .sorted(Map.Entry.comparingByKey())
-//                .collect(Collectors.toMap(
-//                        Map.Entry::getKey,
-//                        entry -> String.format("%,d", entry.getValue().longValue()),
-//                        (e1, e2) -> e1,
-//                        LinkedHashMap::new
-//                ));
-//        model.addAttribute("monthlySales", monthlySales);
-//        model.addAttribute("formattedMonthlySales", formattedMonthlySales); // 포맷팅된 데이터를 따로 추가
-//        return "sales/totalSalesByMonth";
-//    }
-
-    // (신)월별 총 판매액을 반환하는 메서드 6월 11일 오후 2시 47분 작업중
+    //월별 총 판매액을 반환하는 메서드
     @RequestMapping(value = "/totalSalesByMonth", method = RequestMethod.GET)
     public String getTotalSalesByMonth(Model model) {
         Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
         model.addAttribute("monthlySales", monthlySales);
         return "sales/totalSalesByMonth";
     }
-    // 월별 총 판매액을 반환하는 메서드 6월 11일 오후 2시 47분 작업중
+
 
 
 
@@ -255,7 +266,7 @@ public class SalesController {
             DecimalFormat decimalFormat = new DecimalFormat("#,###");
 
             // 천단위 콤마 추가 및 소수점 생략
-            Map<LocalDate, String> formattedWeeklySales = new HashMap<>();
+            Map<LocalDate, String> formattedWeeklySales = new TreeMap<>();
             for (Map.Entry<LocalDate, Double> entry : weeklySales.entrySet()) {
                 formattedWeeklySales.put(entry.getKey(), decimalFormat.format(entry.getValue()));
             }

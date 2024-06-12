@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POSOLDESK 売上管理プログラム</title>
+    <link rel="stylesheet" href="/css/adminSalesCss.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+<th:block layout:fragment="content">
+    <div class="navbar">
+        <a href="/adminSalesMainHome">ホーム</a>
+        <a href="/adminSalesMainMenu">メニュー</a>
+    </div>
+
+    <h1><img style="width: 38px;height: 38px;" src="/img/storeownerpage/salesicon.png"> メニュー別売上高</h1>
+
+    <div class="content">
+        <form action="/salesByMenu" method="get">
+            <label for="startDate">開始日:</label>
+            <input type="datetime-local" id="startDate" name="startDate" required>
+            <label for="endDate">終了日:</label>
+            <input type="datetime-local" id="endDate" name="endDate" required>
+            <button type="submit" class="button">検索</button>
+        </form>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                <tr>
+                    <th>メニュー</th>
+                    <th>総売上高</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="entry : ${salesByMenu}">
+                    <td th:text="${entry.key}"></td>
+                    <td th:text="${#numbers.formatInteger(entry.value, 1, 'COMMA')} + '円'"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="chart-wrapper">
+            <div class="chart-container">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var salesData = /*[[${salesByMenu}]]*/ {};
+        /*]]>*/
+
+        var labels = Object.keys(salesData);
+        var data = Object.values(salesData);
+
+        var ctx = document.getElementById('salesChart').getContext('2d');
+        var salesChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'メニュー別総売上高',
+                    data: data,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 206, 86, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)',
+                        'rgba(255, 159, 64, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+    </script>
+</th:block>
+</body>
+
+</html>
