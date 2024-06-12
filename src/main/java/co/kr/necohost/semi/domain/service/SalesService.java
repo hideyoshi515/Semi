@@ -367,7 +367,7 @@ public class SalesService {
                         Collectors.summingDouble(sales -> sales.getPrice() * sales.getQuantity())
                 ));
     }
-    //날짜범위에 따른 메뉴별 판매량 도출 위한 쿼리  6월 12일 오전 11시 반
+    //날짜범위에 따른 메뉴별 판매량 도출 위한 쿼리
     public Map<String, Integer> getQuantityByMenuInRange(LocalDateTime startDate, LocalDateTime endDate) {
         List<Sales> salesList = salesRepository.findSalesByDateRangeWithProcess(startDate, endDate);
         List<Menu> menuList = menuRepository.findAll();
@@ -382,6 +382,43 @@ public class SalesService {
                         Collectors.summingInt(Sales::getQuantity)
                 ));
     }
+
+
+    // 날짜 범위에 따른 카테고리별 매출액 도출 위한 쿼리 6월 12일 오후 5시 5분
+    public Map<String, Double> getSalesByCategoryInRange(LocalDateTime startDate, LocalDateTime endDate) {
+        List<Sales> salesList = salesRepository.findSalesByDateRangeWithProcess(startDate, endDate);
+        List<Category> categoryList = categoryRepository.findAll();
+
+        Map<Long, String> categoryMap = categoryList.stream()
+                .collect(Collectors.toMap(Category::getId, Category::getName));
+
+        return salesList.stream()
+                .filter(sales -> categoryMap.containsKey(sales.getCategory()))
+                .collect(Collectors.groupingBy(
+                        sales -> categoryMap.get(sales.getCategory()),
+                        Collectors.summingDouble(sales -> sales.getPrice() * sales.getQuantity())
+                ));
+    }
+
+    // 날짜 범위에 따른 카테고리별 판매량 도출 위한 쿼리  6월 12일 오후 5시 5분
+    public Map<String, Integer> getQuantityByCategoryInRange(LocalDateTime startDate, LocalDateTime endDate) {
+        List<Sales> salesList = salesRepository.findSalesByDateRangeWithProcess(startDate, endDate);
+        List<Category> categoryList = categoryRepository.findAll();
+
+        Map<Long, String> categoryMap = categoryList.stream()
+                .collect(Collectors.toMap(Category::getId, Category::getName));
+
+        return salesList.stream()
+                .filter(sales -> categoryMap.containsKey(sales.getCategory()))
+                .collect(Collectors.groupingBy(
+                        sales -> categoryMap.get(sales.getCategory()),
+                        Collectors.summingInt(Sales::getQuantity)
+                ));
+    }
+
+
+
+
 
 
 
