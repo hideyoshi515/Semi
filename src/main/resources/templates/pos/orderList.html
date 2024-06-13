@@ -150,8 +150,15 @@
                     btn.classList.add("btn-secondary");
                     btn.textContent = '承認済み';
                     btn.setAttribute('disabled', '');
-                    // const index = orderList.findIndex(order => order.pk === pk);
+                    const index = orderList.findIndex(order => order.pk === pk);
+                    orderList[index].process = 1;
                     // deleteItem(index);
+
+                    const allClear = orderList.every(order => order.process !== 0);
+                    if(allClear){
+                        clearNumber();
+                    }
+
                     updateOrderDates();
                     getOrderNums(date);
                 }
