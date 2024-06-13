@@ -1,0 +1,87 @@
+body {
+    background: linear-gradient(to right, #4CA1AF, #C4E0E5); /* Aqua to Light Blue */
+}
+
+.navbar {
+    background-color: whitesmoke; /* Light Slate Gray */
+    padding: 10px;
+    display: flex;
+    align-items: center; /* Vertically center the items */
+    justify-content: flex-start; /* Align items to the left */
+}
+
+.navbar a {
+    color: black;
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 1.5rem; /* Increase font size */
+    transition: background-color 0.3s, font-size 0.3s, transform 0.3s; /* Smooth transition for color and font size */
+    padding: 8px 16px; /* Add padding for better click area */
+    display: inline-block;
+    position: relative; /* Allow transform without affecting layout */
+}
+
+.navbar a:hover {
+    background-color: #ADD8E6; /* Light Blue */
+    color: white;
+    transform: scale(1.05); /* Increase size on hover */
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.button {
+    width: 22%; /* Adjusted width for 4 buttons per row with margins */
+    margin: 1%;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s, border 0.3s; /* Add transform and border transition */
+    color: white;
+    font-size: 1.2rem; /* Increase font size */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: none; /* Initial border state */
+    position: relative; /* Allow transform without affecting layout */
+}
+
+.button:hover {
+    transform: scale(1.05); /* Slightly increase the size */
+    border: 2px solid white; /* Add white border */
+    transition: transform 0.3s, border 0.3s; /* Add smooth transition for border */
+}
+
+.button p {
+    margin: 0;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.button img {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+}
+
+.button:nth-child(1) { background-color: #4CAF50; } /* Green */
+.button:nth-child(2) { background-color: #2196F3; } /* Blue */
+.button:nth-child(3) { background-color: #FF5722; } /* Orange */
+.button:nth-child(4) { background-color: #FFC107; } /* Amber */
+.button:nth-child(5) { background-color: #9C27B0; } /* Purple */
+.button:nth-child(6) { background-color: #3F51B5; } /* Indigo */
+.button:nth-child(7) { background-color: #00BCD4; } /* Cyan */
+.button:nth-child(8) { background-color: #E91E63; } /* Pink */
+.button:nth-child(9) { background-color: #FF9800; } /* Deep Orange */
+.button:nth-child(10) { background-color: #8BC34A; } /* Light Green */
+.button:nth-child(11) { background-color: #673AB7; } /* Deep Purple */
+.button:nth-child(12) { background-color: #03A9F4; } /* Light Blue */
+.button:nth-child(13) { background-color: #CDDC39; } /* Lime */
+.button:nth-child(14) { background-color: #FFEB3B; } /* Yellow */
+.button:nth-child(15) { background-color: #795548; } /* Brown */
+.button:nth-child(16) { background-color: #607D8B; } /* Blue Grey */
