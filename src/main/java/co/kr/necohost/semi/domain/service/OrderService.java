@@ -11,8 +11,8 @@ import java.util.List;
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
-    private MenuRepository menuRepository;
     private final DiscordBotService discordBotService;
+    private final MenuRepository menuRepository;
 
     public OrderService(OrderRepository orderRepository, MenuRepository menuRepository, DiscordBotService discordBotService) {
         this.orderRepository = orderRepository;

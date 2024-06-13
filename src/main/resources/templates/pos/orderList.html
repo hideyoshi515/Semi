@@ -20,33 +20,33 @@
 
         <main class="main-content">
             <section class="order-summary scrollable">
-                <h2 class="user-select-none">注文</h2>
+                <h2 class="user-select-none">未承認リスト</h2>
                 <div class="order-list" id="order-list" style="overflow-x: hidden">
                     <!-- Order items will go here -->
                 </div>
             </section>
 
             <section class="menu scrollable">
-                <h2 class="user-select-none">カテゴリー</h2>
+                <h2 class="user-select-none">日付別</h2>
                 <div class="menu-categories">
-                    <div th:each="category : ${categories}">
+                    <div th:each="dates : ${orderDate}">
                         <button class="btn btn-primary w-100 mb-2 user-select-none"
-                                th:onclick="|getMenu(${category.id})|"
-                                th:text="${category.name}"></button>
+                                th:text="${dates}" th:attr="data-date=${dates}"
+                                onclick="handleDateClick(this)"></button>
                     </div>
                 </div>
             </section>
 
             <section class="sales-menu scrollable">
-                <h2 class="user-select-none">メニュー</h2>
+                <h2 class="user-select-none">注文番号</h2>
                 <div class="sales-items" id="sales-items">
-                    <!-- Sales items will go here -->
+
                 </div>
             </section>
         </main>
 
         <footer class="footer">
-            <div class="d-flex" style="width: 628px">
+            <div class="order-summary d-flex" style="width: 628px">
                 <div style="width: 328px">
                     <div class="payment-amount" id="payment-amount" style="height: 44px;">
                         合計 : 0 ₩
@@ -155,55 +155,80 @@
 
     <script>
         let orderList = [];
-        let paymentMethod = '';
-        let totalAmount = 0;
-        let currentIndex = -1;
-        let maxStock = 0;
 
-        function getMenu(category) {
-            // AJAX 요청을 통해 서버로 데이터 전송
+        function getOrderNums(date) {
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", "/pos/getMenu?category=" + category, true);
+            xhr.open("GET", "/pos/orderList/getOrderNum?date=" + date, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    menu = JSON.parse(xhr.responseText);
+                    var orderNums = JSON.parse(xhr.responseText);
                     var salesItemsDiv = document.getElementById('sales-items');
-                    salesItemsDiv.innerHTML = '';
-                    menu.forEach(function (menuItem) {
-                        let price = menuItem.price.toLocaleString();
-                        if (menuItem.stock > 0) {
-                            var itemButton = document.createElement('button');
-                            itemButton.className = 'btn btn-outline-primary w-100 mb-2 user-select-none';
-                            itemButton.textContent = menuItem.name + ' - ' + price + ' ₩';
-                            itemButton.setAttribute('onclick', `addItem('${menuItem.name}', ${menuItem.price}, ${menuItem.id}, ${menuItem.stock})`);
-                            salesItemsDiv.appendChild(itemButton);
-                        } else {
-                            var itemButton = document.createElement('button');
-                            itemButton.className = 'btn btn-outline-primary w-100 mb-2 user-select-none';
-                            itemButton.textContent = menuItem.name + ' - 売切り';
-                            itemButton.setAttribute('disabled', true);
-                            salesItemsDiv.appendChild(itemButton);
-                        }
+                    salesItemsDiv.innerHTML = ''; // 기존 내용 삭제
+
+                    orderNums.forEach(function (orderNum) {
+                        var itemButton = document.createElement('button');
+                        console.log("orderNum:" + orderNum);
+                        itemButton.className = 'btn btn-outline-primary w-100 mb-2 user-select-none';
+                        itemButton.textContent = '注文番号 : ' + orderNum; // 버튼에 표시할 텍스트
+                        itemButton.setAttribute('onclick', `getOrders(${orderNum}, '` + date + `')`); // 버튼 클릭 시 실행할 함수
+                        salesItemsDiv.appendChild(itemButton);
                     });
-
-
                 }
             };
             xhr.send();
         }
 
-        function addItem(item, price, itemId, stock) {
-            // 이미 존재하는 항목인지 확인
-            const existingItem = orderList.find(order => order.itemId === itemId);
-            if (existingItem) {
-                if (stock >= existingItem.quantity + 1)
-                    existingItem.quantity += 1; // 존재하는 항목이면 개수 증가
-                else
-                    existingItem.quantity = stock;
-            } else {
-                orderList.push({item, price, itemId: itemId, quantity: 1, stock: stock}); // 새로운 항목 추가
-            }
+
+        function getOrders(orderNum, date) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/pos/orderList/getOrder?orderNum=" + orderNum + "&date=" + date, true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var orders = JSON.parse(xhr.responseText);
+                    clearNumber();
+                    orders.forEach(function (order) {
+                        getName(order.menu).then(function (name) {
+                            console.log(name);
+                            addItem(name, order.price, order.menu, order.quantity);
+                            console.log(name, order.price, order.menu, order.quantity);
+                        }).catch(function (error) {
+                            console.error("Error fetching name:", error);
+                        });
+                    });
+                }
+            };
+            xhr.send();
+        }
+
+
+        function getName(menuId) {
+            return new Promise(function (resolve, reject) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "/menu/getName?id=" + menuId, true);
+                xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            resolve(xhr.responseText);
+                        } else {
+                            reject("Failed to fetch name");
+                        }
+                    }
+                };
+                xhr.send();
+            });
+        }
+
+
+        function handleDateClick(button) {
+            var date = button.getAttribute('data-date');
+            getOrderNums(date);
+        }
+
+        function addItem(item, price, itemId, quantity) {
+            orderList.push({item, price, itemId: itemId, quantity: quantity});
             updateOrderList();
             updateTotalAmount();
         }
