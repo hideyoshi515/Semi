@@ -33,6 +33,7 @@
         };
     </script>
     <style>
+
         body {
             background-color: #f8f9fa !important;
             margin: 0 !important;
@@ -52,10 +53,11 @@
         }
         #sidebarMein{
             text-align: center;
+
         }
 
         #sidebar {
-            background-color: #343a40;
+            background-color: gray;
             padding: 10px;
             display: flex;
             flex-direction: column;
@@ -63,27 +65,37 @@
             position: sticky;
             top: 0;
             width: 200px;
-            transition: top 0.3s ease-in-out;
+            transition: top 0.3s ease-in-out, background-color 0.3s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
         }
 
         #sidebar .btn-group-vertical {
-            width: 100%;
-            height: 100vh;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         #sidebar .btn {
             background-color: #ffcc00; !important;
             color: white; !important;
-            margin-bottom: 5px; !important;
-            padding: 10px;
+            padding: 15px;
             font-size: 30px;
             width: 100%;
             box-sizing: border-box;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            border-radius: 5px;
+            flex-grow: 1;
+        }
+        #sidebar .btn i{
+            margin-right: 10px;
+            font-size: 24px;
         }
 
         #sidebar .btn:hover {
-            background-color: red;
-        !important;
+            background-color: red !important;
+            transform: scale(1.05);
         }
 
         #content {
@@ -91,11 +103,6 @@
             flex-direction: column;
             flex: 1;
             margin-left: 20px;
-
-        }
-
-        .btn-group {
-            display: flex;
         }
 
         .btn-group .btn {
@@ -145,6 +152,13 @@
             font-size: 1.5rem !important;
             font-weight: bold !important;
         }
+
+        #categoryTitle{
+            border-bottom: solid #ffcc00;
+            width: 1380px;
+        }
+
+
 
         #menuModal .modal-body {
             padding: 20px !important;
@@ -198,31 +212,64 @@
             justify-content: space-between !important;
         }
 
-        #buttonContainer{
-            display: ;
-            justify-content: end;
-            width: 100%;
+        #paymentbuttonContainer{
+            transform: translateX(1650px);
+            width: 5%;
+            position: sticky;
+            bottom: 0;
+        }
+
+        @media (min-width: 1100px) and (max-width: 1250px) and (min-height: 750px) and (max-height: 850px) {
+            #categoryTitle{
+                border-bottom: solid #ffcc00;
+                width: 780px;
+            }
+            #paymentbuttonContainer{
+                transform: translateX(1020px);
+                width: 20%;
+                position: sticky;
+                bottom: 0;
+            }
+
+
+        }
+        @keyframes hoverAnimation {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .menuItem:hover {
+            animation: hoverAnimation 0.3s ease-in-out;
         }
     </style>
 </head>
 <body>
 <th:block layout:fragment="content">
     <div id="wrapper">
-        <div>
-            <div id="sidebarMein">
-                <h2>座席注文</h2>
-            </div>
-            <div id="sidebar">
-                <div class="btn-group-vertical" role="group" aria-label="Category filter">
-                    <button type="button" class="btn btn-secondary" onclick="filterMenu('all')">すべて</button>
-                    <button type="button" class="btn btn-secondary"
-                            th:each="category : ${categories}"
-                            th:text="${category.name}"
-                            th:onclick="|filterMenu('${category.id}')|">
-                    </button>
-                </div>
+
+        <div id="sidebarMein"></div>
+
+        <div id="sidebar">
+            <div class="btn-group-vertical" role="group" aria-label="Category filter">
+                <button type="button" class="btn btn-secondary" onclick="filterMenu('all')">すべて</button>
+                <button type="button" class="btn btn-secondary"
+                        th:each="category : ${categories}"
+                        th:text="${category.name}"
+                        th:onclick="|filterMenu('${category.id}')|">
+                    <i class="fas fa-clipboard-list"></i>
+                </button>
             </div>
         </div>
+
+
+
 
         <div id="content">
             <h2 id="categoryTitle">すべて</h2>
@@ -256,7 +303,7 @@
                 </div>
             </div>
         </div>
-        <div> daskdaskk</div>
+        <p>어서오세요.>-<</p>
     </div>
 
 
@@ -297,7 +344,7 @@
             </div>
         </div>
     </div>
-    <div id="buttonContainer">
+    <div id="paymentbuttonContainer">
         <form method="post" action="orderPayment" id="orderForm" onsubmit="return checkoutForm()">
             <input type="hidden" name="orderData" id="orderData">
             <button type="submit" class="btn btn-success" id="paymentBtn">お支払い</button>
@@ -308,7 +355,7 @@
             カーゴ
         </button>
     </div>
-<!-- cart Modal 위에랑 이어짐 버튼 이동때문에 div로 감쌌음-->
+    <!-- cart Modal 위에랑 이어짐 버튼 이동때문에 div로 감쌌음-->
     <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -329,7 +376,24 @@
             </div>
         </div>
     </div>
-
+<!-- 장바구니 잘 들어갔다는 모달-->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successModalLabel">알림</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    상품이 장바구니에 추가되었습니다.<br>
+                    <div id="countdown" class="mt-2"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         let cartData = null;
         document.getElementById('menuModal').addEventListener('show.bs.modal', function (event) {
@@ -372,7 +436,23 @@
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    alert("상품이 장바구니에 추가되었습니다.");
+                    var successModal = new bootstrap.Modal(document.getElementById('successModal'),{
+                        keyboard: false
+                    });
+
+                    successModal.show();
+
+                    let remainingTime = 3; // 3초를 설정할거면 3초 이건 상황에 맞춰서
+                    document.getElementById('countdown').innerText = `이 창은 ${remainingTime}초 후에 창이닫힙니다.`
+                    const countdownInterval =setInterval(function (){
+                        remainingTime -= 1;
+                        document.getElementById('countdown').innerText = `이 창은 ${remainingTime}초 후에 창이닫힙니다.`
+                        if (remainingTime <= 0){
+                            clearInterval(countdownInterval);
+                            successModal.hide();
+                        }
+                    }, 1000);
+
                     document.getElementById('menuModal').querySelector('.btn-close').click();
                     loadCart();
                 } else if (xhr.readyState === 4) {
@@ -572,6 +652,7 @@
             startIdleTimer();
             filterMenu('all'); // 초기 로드 시 모든 카테고리 표시
         };
+
 
     </script>
 </th:block>
