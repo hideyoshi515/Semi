@@ -102,5 +102,11 @@ public class MenuService {
         menuRepository.save(menu);
     }
 
+    public void cancelUpdateStockAndOrder(long id) {
+        Menu menu = menuRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid menu ID"));
+        menu.setStockorder(0);
+        menuRepository.save(menu);
+    }
+
 
 }

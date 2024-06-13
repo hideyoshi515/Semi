@@ -9,7 +9,6 @@ import co.kr.necohost.semi.domain.model.entity.Menu;
 import co.kr.necohost.semi.domain.repository.SalesRepository;
 import co.kr.necohost.semi.domain.service.CategoryService;
 import co.kr.necohost.semi.domain.service.MenuService;
-import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +43,7 @@ public class MenuController {
 
     // 메뉴 리스트를 가져와서 보여줌
     @RequestMapping(value = "/menuList", method = RequestMethod.GET)
-    public String getMenuList(Model model, @RequestParam Map<String, String> params) {
+    public String getMenuList(Model model, @RequestParam Map<String, String> params, @ModelAttribute("successMessage") String successMessage, @ModelAttribute("errorMessage") String errorMessage) {
         List<Menu> menus;
         List<Category> categories = categoryService.getAllCategories();
         if (params.get("category") != null) {
@@ -65,6 +64,9 @@ public class MenuController {
         model.addAttribute("salesCount", salesCount);
         model.addAttribute("menus", menus);
         model.addAttribute("categories", categories);
+        model.addAttribute("successMessage", successMessage);
+        model.addAttribute("errorMessage", errorMessage);
+
         return "/menu/menuList.html";
     }
 
@@ -150,6 +152,14 @@ public class MenuController {
     public ResponseEntity<?> updateStockAndOrder(@RequestBody Map<String, Object> payload) {
         long id = ((Number) payload.get("id")).longValue();
         menuService.updateStockAndOrder(id);
+        return ResponseEntity.ok().build();
+    }
+
+    // 발주량을 0으로 되돌림
+    @RequestMapping(value = "/cancelUpdateStockAndOrder", method = RequestMethod.POST)
+    public ResponseEntity<?> cancelUpdateStockAndOrder(@RequestBody Map<String, Object> payload) {
+        long id = ((Number) payload.get("id")).longValue();
+        menuService.cancelUpdateStockAndOrder(id);
         return ResponseEntity.ok().build();
     }
 
