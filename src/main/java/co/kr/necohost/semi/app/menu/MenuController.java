@@ -64,6 +64,8 @@ public class MenuController {
         model.addAttribute("salesCount", salesCount);
         model.addAttribute("menus", menus);
         model.addAttribute("categories", categories);
+        System.out.println(successMessage);
+        System.out.println(errorMessage);
         model.addAttribute("successMessage", successMessage);
         model.addAttribute("errorMessage", errorMessage);
 
@@ -152,14 +154,6 @@ public class MenuController {
     public ResponseEntity<?> updateStockAndOrder(@RequestBody Map<String, Object> payload) {
         long id = ((Number) payload.get("id")).longValue();
         menuService.updateStockAndOrder(id);
-        return ResponseEntity.ok().build();
-    }
-
-    // 발주량을 0으로 되돌림
-    @RequestMapping(value = "/cancelUpdateStockAndOrder", method = RequestMethod.POST)
-    public ResponseEntity<?> cancelUpdateStockAndOrder(@RequestBody Map<String, Object> payload) {
-        long id = ((Number) payload.get("id")).longValue();
-        menuService.cancelUpdateStockAndOrder(id);
         return ResponseEntity.ok().build();
     }
 
