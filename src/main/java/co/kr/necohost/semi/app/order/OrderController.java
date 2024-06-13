@@ -74,12 +74,11 @@ public class OrderController {
 
 	@RequestMapping(value = "/orderApproval", method = RequestMethod.GET)
 	public String getOrderApproval(Model model, @RequestParam Map<String, Object> params) {
-		NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
-
 		long orderID = Long.parseLong(params.get("orderID").toString());
 		int orderQuantity = Integer.parseInt(params.get("orderQuantity").toString());
 		long menuID = Long.parseLong(params.get("menuID").toString());
 
+		NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
 		List<Object[]> orderDetail = orderService.findByIdAndShowDeviceName(orderID);
 
 		Object[] order = orderDetail.get(0);
@@ -128,14 +127,11 @@ public class OrderController {
 
 	@RequestMapping(value = "/orderTable", method = RequestMethod.GET)
 	public String getOrderTable(Model model, @RequestParam Map<String, Object> params) {
+		List<Object[]> orderDetail = orderService.findSalesByProcessAndDevice(0);
+
 		NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
 
-		ArrayList<Object> tableList = new ArrayList<>();  // 8개
-		Map<String, List<Object>> orderWrap = new HashMap<>();
-
 		Set<String> tableIDList = new LinkedHashSet<String>();
-
-		List<Object[]> orderDetail = orderService.findSalesByProcessAndDevice(0);
 
 		Map<String, List<Map<String, Object>>> tableOrders = new HashMap<>();
 

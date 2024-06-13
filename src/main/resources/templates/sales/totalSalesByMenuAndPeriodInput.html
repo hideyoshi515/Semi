@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>POSOLDESK 売上管理プログラム</title>
-    <link rel="stylesheet" href="/css/adminSalesCss.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/metroStyle.css"> <!-- metroStyle.css 파일 경로로 수정 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .chart-container {
@@ -19,6 +20,27 @@
             margin-top: -10px;
         }
     </style>
+    <script>
+        function validateDates() {
+            const startDate = document.getElementById('startDate');
+            const endDate = document.getElementById('endDate');
+
+            startDate.addEventListener('change', function() {
+                endDate.min = startDate.value;
+            });
+
+            endDate.addEventListener('change', function() {
+                if (endDate.value < startDate.value) {
+                    alert('終了日は開始日より前の日付にはできません。');
+                    endDate.value = '';
+                }
+            });
+        }
+
+        window.onload = function() {
+            validateDates();
+        };
+    </script>
 </head>
 <body>
 <th:block layout:fragment="content">
@@ -27,56 +49,61 @@
         <a href="/adminSalesMainMenu">メニュー</a>
     </div>
 
-    <h1><img style="width: 38px;height: 38px;" src="/img/storeownerpage/menurevenueicon.png">メニュー別売上販売の現状</h1>
+    <h1 style="color: white;"><img style="width: 38px;height: 38px;" src="/img/storeownerpage/menurevenueicon.png">メニュー別売上販売の現状</h1>
 
     <form action="/totalSalesbyMenuAndPeriodInput" method="post">
         <h3>
             <label for="startDate">開始日:</label>
-            <input type="date" id="startDate" name="startDate" required>
+            <input type="date" id="startDate" name="startDate" required lang="ja">
             <label for="endDate">終了日:</label>
-            <input type="date" id="endDate" name="endDate" required>
-            <button type="submit" class="button">検索</button>
+            <input type="date" id="endDate" name="endDate" required lang="ja">
         </h3>
+
+        <div th:if="${formattedStartDate != null && formattedEndDate != null}">
+            <div class="date-range">
+                <h2>
+                    <p>検索期間: <span th:text="${formattedStartDate}"></span> ~ <span th:text="${formattedEndDate}"></span></p>
+                </h2>
+            </div>
+
+            <div class="content">
+                <div class="table-container limited-width">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>メニュー</th>
+                            <th>総売上高</th>
+                            <th>販売量</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="entry : ${salesByMenu}">
+                            <td th:text="${entry.key}"></td>
+                            <td th:text="${#numbers.formatInteger(entry.value, 1, 'COMMA')} + '円'"></td>
+                            <td th:text="${#numbers.formatInteger(quantityByMenu[entry.key], 1, 'COMMA')}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="chart-wrapper">
+                    <div class="chart-container">
+                        <canvas id="salesChart"></canvas>
+                        <div class="chart-label">メニュー別総売上高</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="quantityChart"></canvas>
+                        <div class="chart-label">メニュー別販売量</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="button-container" style="margin-top: 20px; text-align: center; justify-content: space-around">
+            <button type="submit" class="button">検索</button>
+            <button class="button" type="button" onclick="location.href='/adminSalesMainMenu'"><p>管理者画面に復帰</p>
+        </div>
     </form>
-    <div class="date-range">
-        <H2>
-            <p>検索期間: <span th:text="${formattedStartDate}"></span> ~ <span th:text="${formattedEndDate}"></span></p>
-        </H2>
-    </div>
-    <div class="content">
-
-
-
-        <div class="table-container">
-            <table>
-                <thead>
-                <tr>
-                    <th>メニュー</th>
-                    <th>総売上高</th>
-                    <th>販売量</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="entry : ${salesByMenu}">
-                    <td th:text="${entry.key}"></td>
-                    <td th:text="${#numbers.formatInteger(entry.value, 1, 'COMMA')} + '円'"></td>
-                    <td th:text="${#numbers.formatInteger(quantityByMenu[entry.key], 1, 'COMMA')}"></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="chart-wrapper">
-            <div class="chart-container">
-                <canvas id="salesChart"></canvas>
-                <div class="chart-label">メニュー別総売上高</div>
-            </div>
-            <div class="chart-container">
-                <canvas id="quantityChart"></canvas>
-                <div class="chart-label">メニュー別販売量</div>
-            </div>
-        </div>
-    </div>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
