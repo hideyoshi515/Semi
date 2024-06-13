@@ -15,199 +15,223 @@ import java.util.stream.Collectors;
 
 @Controller
 public class OrderController {
-    private final CategoryService categoryService;
-    private final MenuService menuService;
-    private final OrderService orderService;
+	private final CategoryService categoryService;
+	private final MenuService menuService;
+	private final OrderService orderService;
 
-    private final DiscordBotService discordBotService;
+	private final DiscordBotService discordBotService;
 
-    public OrderController(CategoryService categoryService, MenuService menuService, OrderService orderService, DiscordBotService discordBotService) {
-        this.categoryService = categoryService;
-        this.menuService = menuService;
-        this.orderService = orderService;
-        this.discordBotService = discordBotService;
-    }
+	public OrderController(CategoryService categoryService, MenuService menuService, OrderService orderService, DiscordBotService discordBotService) {
+		this.categoryService = categoryService;
+		this.menuService = menuService;
+		this.orderService = orderService;
+		this.discordBotService = discordBotService;
+	}
 
-    @RequestMapping(value = "/orderList", method = RequestMethod.GET)
-    public String getProductOredr(Model model) {
-        List<Object[]> orderList = orderService.findSalesByProcess(0);
+	@RequestMapping(value = "/orderList", method = RequestMethod.GET)
+	public String getProductOredr(Model model) {
+		List<Object[]> orderList = orderService.findSalesByProcess(0);
 
-        List<Sales> sales = orderList.stream().map(objects -> (Sales) objects[0]).collect(Collectors.toList());
+		List<Sales> sales = orderList.stream().map(objects -> (Sales) objects[0]).collect(Collectors.toList());
 
-        List<String> menuNames = orderList.stream().map(objects -> (String) objects[1]).collect(Collectors.toList());
+		List<String> menuNames = orderList.stream().map(objects -> (String) objects[1]).collect(Collectors.toList());
 
-        List<String> categoryNames = orderList.stream().map(objects -> (String) objects[2]).collect(Collectors.toList());
+		List<String> categoryNames = orderList.stream().map(objects -> (String) objects[2]).collect(Collectors.toList());
 
-        List<Integer> menuStocks = orderList.stream().map(objects -> (Integer) objects[3]).collect(Collectors.toList());
+		List<Integer> menuStocks = orderList.stream().map(objects -> (Integer) objects[3]).collect(Collectors.toList());
 
-        model.addAttribute("menuStock", menuStocks);
-        model.addAttribute("orderList", sales);
-        model.addAttribute("menuName", menuNames);
-        model.addAttribute("categoryName", categoryNames);
-        model.addAttribute("orderRequest", new SalesRequest());
+		model.addAttribute("menuStock", menuStocks);
+		model.addAttribute("orderList", sales);
+		model.addAttribute("menuName", menuNames);
+		model.addAttribute("categoryName", categoryNames);
+		model.addAttribute("orderRequest", new SalesRequest());
 
-        return "order/orderList.html";
-    }
+		return "order/orderList.html";
+	}
 
-    @RequestMapping(value = "/orderDetail", method = RequestMethod.GET)
-    public String getOrderDetail(Model model, @RequestParam Map<String, Object> params) {
-        long ordertID = Long.parseLong(params.get("orderID").toString());
+	@RequestMapping(value = "/orderDetail", method = RequestMethod.GET)
+	public String getOrderDetail(Model model, @RequestParam Map<String, Object> params) {
+		long ordertID = Long.parseLong(params.get("orderID").toString());
 
-        List<Object[]> productOrder = orderService.findSalesById(ordertID);
+		List<Object[]> productOrder = orderService.findSalesById(ordertID);
 
-        List<Sales> sales = productOrder.stream().map(objects -> (Sales) objects[0]).collect(Collectors.toList());
+		List<Sales> sales = productOrder.stream().map(objects -> (Sales) objects[0]).collect(Collectors.toList());
 
-        List<String> menuNames = productOrder.stream().map(objects -> (String) objects[1]).collect(Collectors.toList());
+		List<String> menuNames = productOrder.stream().map(objects -> (String) objects[1]).collect(Collectors.toList());
 
-        List<String> categoryNames = productOrder.stream().map(objects -> (String) objects[2]).collect(Collectors.toList());
+		List<String> categoryNames = productOrder.stream().map(objects -> (String) objects[2]).collect(Collectors.toList());
 
-        List<Integer> menuStocks = productOrder.stream().map(objects -> (Integer) objects[3]).collect(Collectors.toList());
+		List<Integer> menuStocks = productOrder.stream().map(objects -> (Integer) objects[3]).collect(Collectors.toList());
 
-        model.addAttribute("menuStock", menuStocks);
-        model.addAttribute("orderList", sales);
-        model.addAttribute("menuName", menuNames);
-        model.addAttribute("categoryName", categoryNames);
-        model.addAttribute("orderRequest", new SalesRequest());
+		model.addAttribute("menuStock", menuStocks);
+		model.addAttribute("orderList", sales);
+		model.addAttribute("menuName", menuNames);
+		model.addAttribute("categoryName", categoryNames);
+		model.addAttribute("orderRequest", new SalesRequest());
 
-        return "order/orderDetail.html";
-    }
+		return "order/orderDetail.html";
+	}
 
-    @RequestMapping(value = "/orderApproval", method = RequestMethod.GET)
-    public String getOrderApproval(Model model, @RequestParam Map<String, Object> params) {
-        long orderID = Long.parseLong(params.get("orderID").toString());
-        int orderQuantity = Integer.parseInt(params.get("orderQuantity").toString());
-        long menuID = Long.parseLong(params.get("menuID").toString());
+	@RequestMapping(value = "/orderApproval", method = RequestMethod.GET)
+	public String getOrderApproval(Model model, @RequestParam Map<String, Object> params) {
+		NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
 
-        String message = "주문 번호 " + orderID + "가 승인되었습니다.";
+		long orderID = Long.parseLong(params.get("orderID").toString());
+		int orderQuantity = Integer.parseInt(params.get("orderQuantity").toString());
+		long menuID = Long.parseLong(params.get("menuID").toString());
 
-        orderService.approveOrder(orderID, message);
-        orderService.updateOrderApproval(orderID, orderQuantity, menuID);
+		List<Object[]> orderDetail = orderService.findByIdAndShowDeviceName(orderID);
 
-        return ("redirect:/orderList");
-    }
+		Object[] order = orderDetail.get(0);
+		Sales sales = (Sales) order[0];
 
-    @RequestMapping(value = "/orderDenial", method = RequestMethod.GET)
-    public String getOrderDenial(Model model, @RequestParam Map<String, Object> params) {
-        long orderID = Long.parseLong(params.get("orderID").toString());
+		String formattedPrice = numberFormat.format(sales.getPrice() * sales.getQuantity());
 
-        String message = "주문 번호 " + orderID + "가 취소되었습니다.";
+		String message = "```주문 번호 " + sales.getOrderNum() + "이/가 승인되었습니다.\n" +
+				"===================================\n" +
+				"            주문번호 " + sales.getOrderNum() + "\n" +
+				"===================================\n";
+		if (sales.getDevice() == 3) {
+			message += "주문 기기 " + order[2] + "\t수량\t\t" + "가격\n" +
+					"테이블 번호 " + sales.getDeviceNum() + "\n";
+		} else {
+			message += "주문 기기 " + order[2] + "\t수량\t\t" + "가격\n";
+		}
 
-        orderService.approveOrder(orderID, message);
-        orderService.updateDenialByProcess(orderID);
+		message += "-----------------------------------\n" +
+				"주문 메뉴\n" +
+				order[1] + "\t\t\t" + sales.getQuantity() + "개\t\t" + formattedPrice + "원\n" +
+				"-----------------------------------\n" +
+				"주문 시간 " + sales.getDate() + "\n" +
+				"총 가격 " + formattedPrice + "원\n" +
+				"===================================```";
 
-        return ("redirect:/orderList");
-    }
+		orderService.approveOrder(orderID, message);
+		orderService.updateOrderApproval(orderID, orderQuantity, menuID);
 
-    @RequestMapping(value = "/orderTable", method = RequestMethod.GET)
-    public String getOrderTable(Model model, @RequestParam Map<String, Object> params) {
-        NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+		System.out.println("Order " + sales.getOrderNum() + ": " + sales + ", " + Arrays.toString(Arrays.copyOfRange(order, 1, order.length)));
 
-        ArrayList<Object> tableList = new ArrayList<>();  // 8개
-        Map<String, List<Object>> orderWrap = new HashMap<>();
+		return ("redirect:/orderList");
+	}
 
-        Set<String> tableIDList = new LinkedHashSet<String>();
+	@RequestMapping(value = "/orderDenial", method = RequestMethod.GET)
+	public String getOrderDenial(Model model, @RequestParam Map<String, Object> params) {
+		long orderID = Long.parseLong(params.get("orderID").toString());
 
-        List<Object[]> orderDetail = orderService.findSalesByProcessAndDevice(0);
+		String message = "주문 번호 " + orderID + "가 취소되었습니다.";
 
-        Map<String, List<Map<String, Object>>> tableOrders = new HashMap<>();
+		orderService.approveOrder(orderID, message);
+		orderService.updateDenialByProcess(orderID);
 
-        for (int i = 0; i < orderDetail.size(); i++) {
-            Object[] order = orderDetail.get(i);
-            Sales sales = (Sales) order[0];
-            System.out.println("Order " + i + ": " + sales + ", " + Arrays.toString(Arrays.copyOfRange(order, 1, order.length)));
-        }
+		return ("redirect:/orderList");
+	}
 
-        for (int i = 0; i < 8; i++) {
-            tableIDList.add("TB" + (i + 1));
-        }
+	@RequestMapping(value = "/orderTable", method = RequestMethod.GET)
+	public String getOrderTable(Model model, @RequestParam Map<String, Object> params) {
+		NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
 
-        Map<String, Object> orderDetails;
+		ArrayList<Object> tableList = new ArrayList<>();  // 8개
+		Map<String, List<Object>> orderWrap = new HashMap<>();
 
-        for (int i = 0; i < orderDetail.size(); i++) {
-            Object[] order = orderDetail.get(i);
-            orderDetails = new HashMap<>();
+		Set<String> tableIDList = new LinkedHashSet<String>();
 
-            Sales sales = (Sales) order[0];
+		List<Object[]> orderDetail = orderService.findSalesByProcessAndDevice(0);
 
-            orderDetails.put("id", sales.getId());
-            orderDetails.put("category", sales.getCategory());
-            orderDetails.put("date", sales.getDate());
-            orderDetails.put("device", sales.getDevice());
-            orderDetails.put("deviceNum", sales.getDeviceNum());
-            orderDetails.put("menu", sales.getMenu());
-            orderDetails.put("orderNum", sales.getOrderNum());
-            orderDetails.put("price", sales.getPrice());
-            orderDetails.put("process", sales.getProcess());
-            orderDetails.put("quantity", sales.getQuantity());
-            orderDetails.put("totalPrice", numberFormat.format(sales.getPrice() * sales.getQuantity()));
-            orderDetails.put("menuName", order[1]);
-            orderDetails.put("categoryName", order[2]);
-            orderDetails.put("stock", order[3]);
+		Map<String, List<Map<String, Object>>> tableOrders = new HashMap<>();
 
-            String tableKey = "TB" + sales.getDeviceNum();
-            tableOrders.computeIfAbsent(tableKey, k -> new ArrayList<>()).add(orderDetails);
+		for (int i = 0; i < orderDetail.size(); i++) {
+			Object[] order = orderDetail.get(i);
+			Sales sales = (Sales) order[0];
+			System.out.println("Order " + i + ": " + sales + ", " + Arrays.toString(Arrays.copyOfRange(order, 1, order.length)));
+		}
 
-            tableIDList.add(tableKey);
-        }
+		for (int i = 0; i < 8; i++) {
+			tableIDList.add("TB" + (i + 1));
+		}
 
-        for (String s : tableIDList) {
-            System.out.print(s + " ");
-        }
+		Map<String, Object> orderDetails;
 
-        model.addAttribute("tableIDList", tableIDList);
-        model.addAttribute("tableOrders", tableOrders);
+		for (int i = 0; i < orderDetail.size(); i++) {
+			Object[] order = orderDetail.get(i);
+			orderDetails = new HashMap<>();
 
-        model.addAttribute("orderRequest", new SalesRequest());
+			Sales sales = (Sales) order[0];
 
-        return ("order/orderTable.html");
-    }
+			orderDetails.put("id", sales.getId());
+			orderDetails.put("category", sales.getCategory());
+			orderDetails.put("date", sales.getDate());
+			orderDetails.put("device", sales.getDevice());
+			orderDetails.put("deviceNum", sales.getDeviceNum());
+			orderDetails.put("menu", sales.getMenu());
+			orderDetails.put("orderNum", sales.getOrderNum());
+			orderDetails.put("price", sales.getPrice());
+			orderDetails.put("process", sales.getProcess());
+			orderDetails.put("quantity", sales.getQuantity());
+			orderDetails.put("totalPrice", numberFormat.format(sales.getPrice() * sales.getQuantity()));
+			orderDetails.put("menuName", order[1]);
+			orderDetails.put("categoryName", order[2]);
+			orderDetails.put("stock", order[3]);
 
-    @RequestMapping(value = "/orderDetailTable", method = RequestMethod.GET)
-    public String getOrderDetailTable(Model model, @RequestParam Map<String, Object> params) {
-        long ordertID = Long.parseLong(params.get("orderID").toString());
+			String tableKey = "TB" + sales.getDeviceNum();
+			tableOrders.computeIfAbsent(tableKey, k -> new ArrayList<>()).add(orderDetails);
 
-        List<Object[]> productOrder = orderService.findSalesById(ordertID);
+			tableIDList.add(tableKey);
+		}
 
-        List<Sales> sales = productOrder.stream().map(objects -> (Sales) objects[0]).collect(Collectors.toList());
+		model.addAttribute("tableIDList", tableIDList);
+		model.addAttribute("tableOrders", tableOrders);
 
-        List<String> menuNames = productOrder.stream().map(objects -> (String) objects[1]).collect(Collectors.toList());
+		model.addAttribute("orderRequest", new SalesRequest());
 
-        List<String> categoryNames = productOrder.stream().map(objects -> (String) objects[2]).collect(Collectors.toList());
+		return ("order/orderTable.html");
+	}
 
-        List<Integer> menuStocks = productOrder.stream().map(objects -> (Integer) objects[3]).collect(Collectors.toList());
+	@RequestMapping(value = "/orderDetailTable", method = RequestMethod.GET)
+	public String getOrderDetailTable(Model model, @RequestParam Map<String, Object> params) {
+		long ordertID = Long.parseLong(params.get("orderID").toString());
 
-        model.addAttribute("menuStock", menuStocks);
-        model.addAttribute("orderList", sales);
-        model.addAttribute("menuName", menuNames);
-        model.addAttribute("categoryName", categoryNames);
-        model.addAttribute("orderRequest", new SalesRequest());
+		List<Object[]> productOrder = orderService.findSalesById(ordertID);
 
-        return "order/orderDetailTable.html";
-    }
+		List<Sales> sales = productOrder.stream().map(objects -> (Sales) objects[0]).collect(Collectors.toList());
 
-    @RequestMapping(value = "/orderApprovalTable", method = RequestMethod.GET)
-    public String getOrderApprovalTable(Model model, @RequestParam Map<String, Object> params) {
-        long orderID = Long.parseLong(params.get("orderID").toString());
-        int orderQuantity = Integer.parseInt(params.get("orderQuantity").toString());
-        long menuID = Long.parseLong(params.get("menuID").toString());
+		List<String> menuNames = productOrder.stream().map(objects -> (String) objects[1]).collect(Collectors.toList());
 
-        String message = "주문 번호 " + orderID + "가 승인되었습니다.";
+		List<String> categoryNames = productOrder.stream().map(objects -> (String) objects[2]).collect(Collectors.toList());
 
-        orderService.approveOrder(orderID, message);
-        orderService.updateOrderApproval(orderID, orderQuantity, menuID);
+		List<Integer> menuStocks = productOrder.stream().map(objects -> (Integer) objects[3]).collect(Collectors.toList());
 
-        return ("redirect:/orderTable");
-    }
+		model.addAttribute("menuStock", menuStocks);
+		model.addAttribute("orderList", sales);
+		model.addAttribute("menuName", menuNames);
+		model.addAttribute("categoryName", categoryNames);
+		model.addAttribute("orderRequest", new SalesRequest());
 
-    @RequestMapping(value = "/orderDenialTable", method = RequestMethod.GET)
-    public String getOrderDenialTable(Model model, @RequestParam Map<String, Object> params) {
-        long orderID = Long.parseLong(params.get("orderID").toString());
+		return "order/orderDetailTable.html";
+	}
 
-        String message = "주문 번호 " + orderID + "가 취소되었습니다.";
+	@RequestMapping(value = "/orderApprovalTable", method = RequestMethod.GET)
+	public String getOrderApprovalTable(Model model, @RequestParam Map<String, Object> params) {
+		long orderID = Long.parseLong(params.get("orderID").toString());
+		int orderQuantity = Integer.parseInt(params.get("orderQuantity").toString());
+		long menuID = Long.parseLong(params.get("menuID").toString());
 
-        orderService.approveOrder(orderID, message);
-        orderService.updateDenialByProcess(orderID);
+		String message = "주문 번호 " + orderID + "가 승인되었습니다.";
 
-        return ("redirect:/orderTable");
-    }
+		orderService.approveOrder(orderID, message);
+		orderService.updateOrderApproval(orderID, orderQuantity, menuID);
+
+		return ("redirect:/orderTable");
+	}
+
+	@RequestMapping(value = "/orderDenialTable", method = RequestMethod.GET)
+	public String getOrderDenialTable(Model model, @RequestParam Map<String, Object> params) {
+		long orderID = Long.parseLong(params.get("orderID").toString());
+
+		String message = "주문 번호 " + orderID + "가 취소되었습니다.";
+
+		orderService.approveOrder(orderID, message);
+		orderService.updateDenialByProcess(orderID);
+
+		return ("redirect:/orderTable");
+	}
 }

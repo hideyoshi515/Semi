@@ -1,0 +1,68 @@
+/* metro-ui.css */
+
+/* 고유한 네임스페이스를 사용하여 충돌 방지 */
+.metro-ui-body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+
+.metro-ui-order-category, .metro-ui-order-menu {
+    display: block;
+    margin: 10px 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.metro-ui-order-category {
+    font-weight: bold;
+    color: #0078D7;
+}
+
+.metro-ui-order-menu {
+    font-style: italic;
+    color: #2B5797;
+}
+
+.metro-ui-span {
+    padding: 5px 10px;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.metro-ui-button {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #0078D7;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+}
+
+.metro-ui-button:hover {
+    background-color: #005A9E;
+}
+
+.metro-ui-button:disabled, .metro-ui-button[disabled] {
+    background-color: #A0A0A0;
+    cursor: not-allowed;
+}
+
+.metro-ui-button:focus {
+    outline: none;
+}
+
+.metro-ui-div {
+    padding: 20px;
+    margin: 20px 0;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}

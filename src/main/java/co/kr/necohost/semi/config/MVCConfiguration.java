@@ -50,7 +50,8 @@ public class MVCConfiguration implements WebMvcConfigurer {
                 "categories",
                 "cat_menus",
                 "findByEmail",
-                "Menu_findById"
+                "Menu_findById",
+                "getName"
         );
     }
 }

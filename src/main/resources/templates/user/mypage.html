@@ -15,8 +15,10 @@
                                 <div class="row justify-content-center">
                                     <div class="col-lg-7">
                                         <div class="card shadow-lg border-0 rounded-lg mt-md-5 mt-3">
-                                            <div class="card-header"><h3 class="text-center font-weight-light my-4">
-                                                情報修正</h3></div>
+                                            <div class="card-header">
+                                                <h3 class="text-center font-weight-light my-4">
+                                                情報修正</h3>
+                                            </div>
                                             <div class="card-body">
                                                 <form th:object="${accountRequest}" method="post">
                                                     <div class="row mb-3">
@@ -100,7 +102,7 @@
                                                     </div>
                                                     <div class="mt-4 mb-0">
                                                         <div class="d-grid">
-                                                            <button class="btn btn-primary btn-block">修正</button>
+                                                            <button class="btn btn-primary btn-block" id="editBtn" disabled>修正</button>
                                                         </div>
                                                     </div>
                                                     <input th:field="${accountRequest.OAuth}" style="display: none">
@@ -133,6 +135,11 @@
                 }else{
                     $(id).val("");
                 }
+            }
+            if (!$('#passEdit').is(":checked") && !$('#msPassEdit').is(":checked") && !$('#phoneEdit').is(":checked")) {
+                $('#editBtn').attr('disabled', true);
+            } else {
+                $('#editBtn').attr('disabled', false);
             }
 
         }

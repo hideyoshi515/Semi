@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/plain_layout}">
+>
+<th:block layout:fragment="content">
+    <div class="container">
+        <header class="header" style="height:42px !important;">
+            <div>
+                POS
+            </div>
+            <!--        <div class="settings">-->
+            <!--            <button onclick="printReceipt('receipt')">영수증 출력여부</button>-->
+            <!--            <button onclick="printReceipt('order')">고객주문서 출력여부</button>-->
+            <!--            <button onclick="printReceipt('kitchen')">주방주문서 출력여부</button>-->
+            <!--            <button onclick="toggleMenuPrint()">영수증에 메뉴출력여부</button>-->
+            <!--        </div>-->
+        </header>
+
+        <main class="main-content">
+            <section class="order-summary scrollable">
+                <h2 class="user-select-none">未承認リスト</h2>
+                <div class="order-list" id="order-list" style="overflow-x: hidden">
+                    <!-- Order items will go here -->
+                </div>
+            </section>
+
+            <section class="menu scrollable">
+                <h2 class="user-select-none">日付別</h2>
+                <div class="menu-categories">
+                    <div th:each="dates : ${orderDate}">
+                        <button class="btn btn-primary w-100 mb-2 user-select-none"
+                                th:text="${dates}" th:attr="data-date=${dates}"
+                                onclick="handleDateClick(this)"></button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="sales-menu scrollable">
+                <h2 class="user-select-none">注文番号</h2>
+                <div class="sales-items" id="sales-items">
+
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="order-summary d-flex" style="width: 628px">
+                <div style="width: 328px">
+                    <div class="payment-amount" id="payment-amount" style="height: 44px;">
+                        合計 : 0 ₩
+                    </div>
+                    <div class="payment-amount mt-2" id="payment-method" style="height: 44px;">
+                        お支払方法:
+                    </div>
+                </div>
+                <div class="numeric-keypad" style="width: 300px;">
+                    <button type="button" class="btn btn-light border border-1 user-select-none"
+                            th:each="number : ${#numbers.sequence(1,9)}" th:onclick="|appendNumber('${number}')|"
+                            th:text="${number}"></button>
+                    <button type="button" class="btn btn-light border border-1 user-select-none"
+                            onclick="clearNumber()">削除
+                    </button>
+                    <button type="button" class="btn btn-light border border-1 user-select-none"
+                            onclick="appendNumber('0')">0
+                    </button>
+                    <button type="button" class="btn btn-light border border-1 user-select-none"
+                            onclick="deleteNumber()">←
+                    </button>
+
+                    <button type="button" class="btn btn-light border border-1 user-select-none"
+                            onclick="selectPaymentMethod('card')">
+                        カード
+                    </button>
+                    <button type="button" class="btn btn-light border border-1 user-select-none"
+                            onclick="selectPaymentMethod('cash')">
+                        現金
+                    </button>
+                    <button type="button" class="btn btn-light border border-1 user-select-none" onclick="payment()">
+                        会計
+                    </button>
+                </div>
+            </div>
+            <section class="menu" style="width: 314px;">
+                <a class="btn btn-primary w-100 mb-2 user-select-none" href="/pos">POS</a>
+                <a class="btn btn-primary w-100 mb-2 user-select-none" href="/pos/orderList">注文リスト</a>
+            </section>
+            <section class="sales-menu" style="width: 314px;">
+            </section>
+        </footer>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="quantityModal" tabindex="-1" aria-labelledby="quantityModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title user-select-none" id="quantityModalLabel">数量調整</h5>
+                    <button type="button" class="btn-close user-select-none" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="modal-quantity-input" class="form-control mb-2 text-center fs-4" readonly>
+                    <div class="numeric-keypad">
+                        <button type="button" class="btn btn-light border border-1 user-select-none"
+                                th:each="number : ${#numbers.sequence(1, 9)}"
+                                th:onclick="|appendNumberModal(${number})|"
+                                th:text="${number}"></button>
+                        <button type="button" class="btn btn-light border border-1 user-select-none"
+                                onclick="clearNumberModal()">削除
+                        </button>
+                        <button type="button" class="btn btn-light border border-1 user-select-none"
+                                onclick="appendNumberModal(0)">0
+                        </button>
+                        <button type="button" class="btn btn-light border border-1 user-select-none"
+                                onclick="deleteNumberModal()">←
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary user-select-none" data-bs-dismiss="modal">閉じる
+                    </button>
+                    <button type="button" class="btn btn-primary user-select-none" onclick="saveQuantity()">調整
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 결제 확인 모달 -->
+    <div class="modal fade" id="confirmPaymentModal" tabindex="-1" aria-labelledby="confirmPaymentModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title user-select-none" id="confirmPaymentModalLabel">確認</h5>
+                    <button type="button" class="btn-close user-select-none" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body user-select-none">
+                    本当に決済しますか？
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary user-select-none" data-bs-dismiss="modal">
+                        キャンセル
+                    </button>
+                    <button type="button" class="btn btn-primary user-select-none" onclick="processPayment()">確認
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let orderList = [];
+
+        function getOrderNums(date) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/pos/orderList/getOrderNum?date=" + date, true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var orderNums = JSON.parse(xhr.responseText);
+                    var salesItemsDiv = document.getElementById('sales-items');
+                    salesItemsDiv.innerHTML = ''; // 기존 내용 삭제
+
+                    orderNums.forEach(function (orderNum) {
+                        var itemButton = document.createElement('button');
+                        console.log("orderNum:" + orderNum);
+                        itemButton.className = 'btn btn-outline-primary w-100 mb-2 user-select-none';
+                        itemButton.textContent = '注文番号 : ' + orderNum; // 버튼에 표시할 텍스트
+                        itemButton.setAttribute('onclick', `getOrders(${orderNum}, '` + date + `')`); // 버튼 클릭 시 실행할 함수
+                        salesItemsDiv.appendChild(itemButton);
+                    });
+                }
+            };
+            xhr.send();
+        }
+
+
+        function getOrders(orderNum, date) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/pos/orderList/getOrder?orderNum=" + orderNum + "&date=" + date, true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var orders = JSON.parse(xhr.responseText);
+                    clearNumber();
+                    orders.forEach(function (order) {
+                        getName(order.menu).then(function (name) {
+                            console.log(name);
+                            addItem(name, order.price, order.menu, order.quantity);
+                            console.log(name, order.price, order.menu, order.quantity);
+                        }).catch(function (error) {
+                            console.error("Error fetching name:", error);
+                        });
+                    });
+                }
+            };
+            xhr.send();
+        }
+
+
+        function getName(menuId) {
+            return new Promise(function (resolve, reject) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "/menu/getName?id=" + menuId, true);
+                xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            resolve(xhr.responseText);
+                        } else {
+                            reject("Failed to fetch name");
+                        }
+                    }
+                };
+                xhr.send();
+            });
+        }
+
+
+        function handleDateClick(button) {
+            var date = button.getAttribute('data-date');
+            getOrderNums(date);
+        }
+
+        function addItem(item, price, itemId, quantity) {
+            orderList.push({item, price, itemId: itemId, quantity: quantity});
+            updateOrderList();
+            updateTotalAmount();
+        }
+
+        function deleteItem(index) {
+            orderList.splice(index, 1);
+            updateOrderList();
+            updateTotalAmount();
+        }
+
+        function clearNumber() {
+            for (let i = orderList.length; i >= 0; i--) {
+                deleteItem(i);
+            }
+        }
+
+        function updateOrderList() {
+            const orderListDiv = document.getElementById('order-list');
+            orderListDiv.innerHTML = '';
+            orderList.forEach((order, index) => {
+                const orderItem = document.createElement('div');
+                orderItem.className = 'row mb-2 user-select-none';
+
+                const itemName = document.createElement('div');
+                itemName.className = 'col-2 user-select-none';
+                itemName.textContent = order.item;
+
+                const itemPrice = document.createElement('div');
+                itemPrice.className = 'col-2 user-select-none text-end';
+                itemPrice.textContent = `${order.price.toLocaleString()} ₩`;
+
+                const itemQuantity = document.createElement('div');
+                itemQuantity.className = 'col-2 user-select-none text-end';
+                itemQuantity.textContent = order.quantity + ' 個';
+
+                const itemTotal = document.createElement('div');
+                itemTotal.className = 'col-3 user-select-none text-end';
+                itemTotal.textContent = `${(order.price * order.quantity).toLocaleString()} ₩`;
+
+                const buttonGroup = document.createElement('div');
+                buttonGroup.className = 'col-3 user-select-none d-flex justify-content-end';
+
+                const quantityButton = document.createElement('button');
+                quantityButton.className = 'btn btn-secondary btn-sm me-2 user-select-none';
+                quantityButton.textContent = '個数';
+                quantityButton.setAttribute('onclick', `showQuantityModal(${index}, ${order.stock})`);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'btn btn-danger btn-sm user-select-none';
+                deleteButton.textContent = '削除';
+                deleteButton.setAttribute('onclick', `deleteItem(${index})`);
+
+                buttonGroup.appendChild(quantityButton);
+                buttonGroup.appendChild(deleteButton);
+
+                orderItem.appendChild(itemName);
+                orderItem.appendChild(itemPrice);
+                orderItem.appendChild(itemQuantity);
+                orderItem.appendChild(itemTotal);
+                orderItem.appendChild(buttonGroup);
+
+                orderListDiv.appendChild(orderItem);
+            });
+        }
+
+        let modalJustOpen = false;
+
+        function showQuantityModal(index, stock) {
+            currentIndex = index;
+            maxStock = stock;
+            document.getElementById('modal-quantity-input').value = orderList[index].quantity;
+            var quantityModal = new bootstrap.Modal(document.getElementById('quantityModal'));
+            quantityModal.show();
+            modalJustOpen = true;
+        }
+
+        function saveQuantity() {
+            const newQuantity = document.getElementById('modal-quantity-input').value;
+            if (newQuantity !== null && !isNaN(newQuantity) && newQuantity > 0) {
+                orderList[currentIndex].quantity = parseInt(newQuantity, 10);
+                updateOrderList();
+                updateTotalAmount();
+            } else {
+                deleteItem(currentIndex);
+            }
+            var quantityModal = bootstrap.Modal.getInstance(document.getElementById('quantityModal'));
+            quantityModal.hide();
+        }
+
+        function appendNumberModal(number) {
+            const quantityInput = document.getElementById('modal-quantity-input');
+            if (modalJustOpen) {
+                quantityInput.value = number;
+                modalJustOpen = false;
+            } else {
+                const newQuantity = parseInt(quantityInput.value + number, 10);
+                if (newQuantity <= maxStock) {
+                    quantityInput.value = newQuantity;
+                } else {
+                    quantityInput.value = maxStock;
+                }
+            }
+        }
+
+        function clearNumberModal() {
+            document.getElementById('modal-quantity-input').value = '0';
+        }
+
+        function deleteNumberModal() {
+            const quantityInput = document.getElementById('modal-quantity-input');
+            quantityInput.value = quantityInput.value.slice(0, -1) || '0';
+        }
+
+        function updateTotalAmount() {
+            const totalAmount = orderList.reduce((total, order) => total + order.price * order.quantity, 0);
+            document.getElementById('payment-amount').textContent = `合計 : ${totalAmount.toLocaleString()} ₩`;
+        }
+
+        function selectPaymentMethod(method) {
+            paymentMethod = method;
+            document.getElementById('payment-method').textContent = `お支払方法: ${method === 'card' ? 'カード' : '現金'}`;
+        }
+
+        function appendNumber(number) {
+            // This function can be extended to handle number pad input
+            console.log(`Number entered: ${number}`);
+        }
+
+        function payment() {
+            showPaymentConfirmation();
+        }
+
+        function showPaymentConfirmation() {
+            var confirmPaymentModal = new bootstrap.Modal(document.getElementById('confirmPaymentModal'));
+            confirmPaymentModal.show();
+        }
+
+        function processPayment() {
+            var confirmPaymentModal = bootstrap.Modal.getInstance(document.getElementById('confirmPaymentModal'));
+            confirmPaymentModal.hide();
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/pos/order", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+            const orderData = orderList.map(order => ({
+                id: order.itemId,
+                quantity: order.quantity,
+            }));
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        showToast('注文が成功しました。', 'success');
+                        // POS 내용을 초기화
+                        orderList = [];
+                        updateOrderList();
+                        updateTotalAmount();
+                    } else {
+                        showToast('通信エラーが発生しました。', 'error');
+                    }
+                }
+            };
+            xhr.send(JSON.stringify(orderData));
+        }
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+
+            const toastBody = document.createElement('div');
+            toastBody.className = 'd-flex';
+            toastBody.innerHTML = `
+        <div class="toast-body">${message}</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    `;
+
+            toast.appendChild(toastBody);
+            document.body.appendChild(toast);
+
+            const toastElement = new bootstrap.Toast(toast);
+            toastElement.show();
+
+            setTimeout(() => {
+                toastElement.hide();
+                toast.remove();
+            }, 3000);
+        }
+
+
+    </script>
+    <style>
+        .numeric-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        body {
+            background-color: #f0f0f0;
+        }
+
+        .scrollable {
+            max-height: 530px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #004080;
+            color: white;
+            padding: 10px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+            padding: 10px;
+            height: 530px;
+        }
+
+        .order-summary,
+        .menu,
+        .sales-menu {
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-dialog-centered {
+            display: flex;
+            align-items: center;
+            min-height: calc(100% - 5rem);
+        }
+
+        .modal-dialog-centered::before {
+            display: block;
+            height: calc(100vh - 5rem);
+            content: "";
+        }
+
+        .order-summary h2,
+        .menu h2,
+        .sales-menu h2 {
+            margin-bottom: 10px;
+            color: #004080;
+        }
+
+        .footer {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .footer div {
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</th:block>
+</html>

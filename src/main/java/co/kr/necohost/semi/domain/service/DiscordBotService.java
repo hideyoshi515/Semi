@@ -1,5 +1,6 @@
 package co.kr.necohost.semi.domain.service;
 
+import co.kr.necohost.semi.domain.model.entity.Sales;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -30,6 +31,7 @@ public class DiscordBotService {
 
     public void sendOrderNotification(String message) {
         MessageChannel channel = jda.getChannelById(MessageChannel.class, channelId);
+
         if (channel != null) {
             channel.sendMessage(message).queue();
         } else {
