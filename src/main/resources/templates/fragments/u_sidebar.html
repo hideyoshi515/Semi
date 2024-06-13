@@ -5,21 +5,21 @@
         <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
             <div class="sb-sidenav-menu">
                 <div class="nav">
-                <a class="fs-6 sb-sidenav-menu-heading text-light text-decoration-none" href="/">ホーム</a>
-                    <div class="fs-6 sb-sidenav-menu-heading text-light">注文</div>
-                    <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts"
+                <a class="fs-6 sb-sidenav-menu-heading nav-link text-decoration-none" href="/"><i class="bi bi-house-fill me-1"></i>ホーム</a>
+                    <a class="fs-6 sb-sidenav-menu-heading nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts"
                        aria-expanded="false" aria-controls="collapseLayouts">
-                        <div class="sb-nav-link-icon"><i class="fas fa-table-list"></i></div>
-                        メニュー
+                        <i class="bi bi-newspaper me-1"></i>
+                        注文
                         <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                     </a>
                     <div class="collapse show" id="collapseLayouts" aria-labelledby="headingOne"
                          data-bs-parent="#sidenavAccordion">
-                        <nav class="sb-sidenav-menu-nested nav" th:each="category : ${categories}">
-                            <a class="nav-link" th:href="|/order/menu?category=${category.id}|"
-                               th:text="${category.name}"></a>
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link" href="/order/kiosk">キオスク</a>
+                            <a class="nav-link" href="/order">端末注文</a>
                         </nav>
                     </div>
+                <a class="fs-6 sb-sidenav-menu-heading nav-link text-decoration-none" href="/admin"><i class="bi bi-file-person me-1"></i>管理者専用</a>
                 </div>
             </div>
         </nav>

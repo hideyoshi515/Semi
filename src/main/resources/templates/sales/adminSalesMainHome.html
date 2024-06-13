@@ -30,13 +30,13 @@
             <thead>
             <tr>
                 <th>時間</th>
-                <th>매출</th>
+                <th>売上</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="entry : ${hourlySales}">
                 <td th:text="${entry.key} + 'から 1時間'"></td>
-                <td th:text="${entry.value} + '円'"></td>
+                <td th:text="${#numbers.formatInteger(entry.value,1,'COMMA')} + '円'"></td>
             </tr>
             </tbody>
         </table>
