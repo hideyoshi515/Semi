@@ -1,63 +1,82 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      >
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-  <title>POSOLDESK 売上管理プログラム</title>
-  <link rel="stylesheet" href="/css/adminSalesCss.css"> <!-- adminSalesCss.css 파일 경로로 수정 -->
+    <title>POSOLDESK 売上管理プログラム</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/metroStyle.css">
+    <meta charset="UTF-8">
+    <script>
+        function formatGrowthRate() {
+            const growthRateElement = document.getElementById('growthRate');
+            if (growthRateElement) {
+                const growthRate = parseFloat(growthRateElement.innerText);
+                growthRateElement.innerText = growthRate.toFixed(2);
+            }
+        }
 
-  <meta charset="UTF-8">
-  <script>
-    function formatGrowthRate() {
-      const growthRateElement = document.getElementById('growthRate');
-      if (growthRateElement) {
-        const growthRate = parseFloat(growthRateElement.innerText);
-        growthRateElement.innerText = growthRate.toFixed(2);
-      }
-    }
+        function redirectToWeeklySales() {
+            const year = document.getElementById('year').value;
+            const month = document.getElementById('month').value;
+            const day = document.getElementById('day').value;
+            if (year && month && day) {
+                const url = '/totalWeeklySalesByDayInput?year=' + year + '&month=' + month + '&day=' + day;
+                window.location.href = url;
+            } else {
+                alert('年度、月、日をすべて入力してください。');
+            }
+        }
 
-    function redirectToWeeklySales() {
-      const year = document.getElementById('year').value;
-      const month = document.getElementById('month').value;
-      const day = document.getElementById('day').value;
-      if (year && month && day) {
-        const url = '/totalWeeklySalesByDayInput?year=' + year + '&month=' + month + '&day=' + day;
-        window.location.href = url;
-      } else {
-        alert('年度、月、日をすべて入力してください。');
-      }
-    }
+        window.onload = formatGrowthRate;
+    </script>
 
-    window.onload = formatGrowthRate;
-  </script>
 </head>
 <body>
 <div layout:fragment="content">
-  <div class="navbar">
-    <a href="#main">ホーム</a>
-    <a href="#menu" onclick="location.href='/adminSalesMainMenu'">メニュー</a>
-  </div>
-  <h1><img style="width: 38px;height: 38px;" src="/img/storeownerpage/dailyrevenueicon.png">日商/週間売上</h1>
-  <form action="/totalSalesByDayInput" method="get">
-    <h3><label for="year">年度を入力:</label>
-    <input style="font-size:1.17em;" type="number" id="year" name="year" th:value="${year}">
-    <label for="month">月を入力:</label>
-    <input style="font-size:1.17em;" type="number" id="month" name="month" th:value="${month}">
-    <label for="day">日を入力:</label>
-    <input style="font-size:1.17em;" type="number" id="day" name="day" th:value="${day}"></h3>
+    <div class="navbar">
+        <a href="#main">ホーム</a>
+        <a href="#menu" onclick="location.href='/adminSalesMainMenu'">メニュー</a>
+    </div>
+    <h1 style="color: white;"><img style="width: 38px;height: 38px;" src="/img/storeownerpage/dailyrevenueicon.png">日商/週間売上
+    </h1>
+    <form action="/totalSalesByDayInput" method="get">
+        <h3>
+            <label for="year">年度:</label>
+            <input style="font-size:1.17em;" type="number" id="year" name="year" th:value="${year}" min="2000"
+                   max="2099">
+            <label for="month">月:</label>
+            <input style="font-size:1.17em;" type="number" id="month" name="month" th:value="${month}" min="1" max="12">
+            <label for="day">日:</label>
+            <input style="font-size:1.17em;" type="number" id="day" name="day" th:value="${day}" min="1" max="31">
+        </h3>
 
-    <button class="button"  type="submit">日商閲覧</button>
-  </form>
+        <div th:if="${year != null && month != null && day != null}" class="result-container">
+            <h3><span th:text="${year}"></span>年
+                <span th:text="${month}"></span>月
+                <span th:text="${day}"></span>日の売上は
+                <span th:text="${totalSales}"></span>円です。
+            </h3>
+        </div>
 
-  <div th:if="${year != null && month != null && day != null}">
-    <h3><span th:text="${year}"></span>年
-      <span th:text="${month}"></span>月
-      <span th:text="${day}"></span>日の売上は
-    </h3>
-    <h3><span th:text="${totalSales}"></span>円です。</h3>
-  </div>
 
-  <button class="button"  type="button" onclick="redirectToWeeklySales()">その日が属している一週間の総売上高</button>
-  <button class="button"  type="button" onclick="location.href='/adminSalesMenu'">管理者画面に復帰</button>
+        <div class="button-container" style="justify-content: space-around">
+
+            <button class="button" type="submit">日商閲覧</button>
+
+
+            <button class="button" type="button" onclick="redirectToWeeklySales()"><p style="font-size:11pt">
+                その日が属している一週間の総売上高 </p></button>
+            <button class="button" type="button" onclick="location.href='/adminSalesMainMenu'"><p>管理者画面に復帰</p>
+            </button>
+
+
+        </div>
+
+
+    </form>
+
+
+
+
 </div>
 </body>
 </html>
