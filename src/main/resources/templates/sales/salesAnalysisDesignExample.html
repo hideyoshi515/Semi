@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Sales Report</title>
+    <link rel="stylesheet" href="/css/metroStyle.css"><!-- Provided CSS file link -->
+    <style>
+        .menu-report {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            margin: auto;
+            margin-top: 20px;
+        }
+        .menu-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .menu-header img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-right: 20px;
+        }
+        .menu-details {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .menu-stats, .menu-info {
+            width: 48%;
+        }
+        .stat-box {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .stat-box h3 {
+            margin: 0;
+            color: #333;
+        }
+        .stat-box p {
+            margin: 5px 0;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="#">Home</a>
+    <a href="#">Menu</a>
+    <a href="#">Reports</a>
+    <a href="#">Settings</a>
+</div>
+
+<div class="menu-report">
+    <div class="menu-header">
+        <img src="menu-image.jpg" alt="Menu Image">
+        <div>
+            <h1>Americano</h1>
+            <p>Classic espresso with hot water</p>
+        </div>
+    </div>
+
+    <div class="menu-details">
+        <div class="menu-stats">
+            <div class="stat-box">
+                <h3>Current Sales</h3>
+                <p>Sales: $12,000</p>
+                <p>Share: 30%</p>
+            </div>
+            <div class="stat-box">
+                <h3>Recent Sales</h3>
+                <p>Today vs Yesterday: +10%</p>
+                <p>This Week vs Last Week: +5%</p>
+                <p>This Month vs Last Month: +7%</p>
+            </div>
+            <div class="stat-box">
+                <h3>Current Units Sold</h3>
+                <p>Units: 300</p>
+                <p>Share: 25%</p>
+            </div>
+            <div class="stat-box">
+                <h3>Recent Units Sold</h3>
+                <p>Today vs Yesterday: +8%</p>
+                <p>This Week vs Last Week: +4%</p>
+                <p>This Month vs Last Month: +6%</p>
+            </div>
+        </div>
+
+        <div class="menu-info">
+            <div class="stat-box">
+                <h3>Price</h3>
+                <p>$4.00</p>
+            </div>
+            <div class="stat-box">
+                <h3>Cost</h3>
+                <p>$1.50</p>
+            </div>
+            <div class="stat-box">
+                <h3>Stock</h3>
+                <p>150 units</p>
+            </div>
+            <div class="stat-box">
+                <h3>Best Selling Day</h3>
+                <p>Saturday</p>
+            </div>
+            <div class="stat-box">
+                <h3>Best Selling Month</h3>
+                <p>December</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

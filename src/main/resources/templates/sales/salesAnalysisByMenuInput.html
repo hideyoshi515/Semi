@@ -1,10 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POSOLDESK 売上管理プログラム</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/metroStyle.css"> <!-- metroStyle.css 파일 경로로 수정 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+<th:block layout:fragment="content">
+    <div class="navbar">
+        <a href="/adminSalesMainHome">ホーム</a>
+        <a href="/adminSalesMainMenu">メニュー</a>
+    </div>
+    <h1 style="color: white;"><img style="width: 38px;height: 38px;" src="/img/storeownerpage/salereport.png">メニュー別売上販売の現状</h1>
 
+아이디<div th:text="${menu.id}"></div>
+<H2><div th:text="${menu.name}+'メニューの販売データ分析'"></div></H2>
+메뉴의 카테고리<div th:text="${menu.category}"></div>
+메뉴의 현재 재고<div th:text="${menu.stock}"></div>
+메뉴의 가격 <div th:text="${menu.price}"></div>
+메뉴의 원가 <div th:text="${menu.cost}"></div>
+메뉴의 이익률 <div th:text="(${menu.price }-${menu.cost})/${menu.price}"></div>
+메뉴의 이미지
+<img id="menu-detail-image" th:if="${menu.image} != null" th:src="${menu.image}" style="width: 16%; height: auto;"> </div>
+메뉴의 설명<div th:text="${menu.description}"></div>
+
+현재까지 매출액/ 점유율
+최근 매출액 (오늘/어제 대비 증감률, 일주일/전주 대비 증감률, 한달/전월 대비 증감률 )
+현재까지 판매량/ 점유율
+최근 판매량(오늘/어제 대비 증감률, 일주일/전주 대비 증감률, 한달/전월 대비 증감률 )
+
+
+
+
+
+</th:block>
 </body>
 </html>

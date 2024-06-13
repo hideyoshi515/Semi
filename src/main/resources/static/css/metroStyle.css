@@ -2,6 +2,10 @@ body {
     background: linear-gradient(to right, #4CA1AF, #C4E0E5); /* Aqua to Light Blue */
 }
 
+h1 {
+    color: white;
+}
+
 .navbar {
     background-color: whitesmoke; /* Light Slate Gray */
     padding: 10px;
@@ -22,12 +26,72 @@ body {
 }
 
 .navbar a:hover {
+    cursor: pointer;
     background-color: #ADD8E6; /* Light Blue */
     color: white;
     transform: scale(1.05); /* Increase size on hover */
 }
 
-.container {
+.content {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.table-container, .chart-wrapper {
+    width: 50%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+    background-color: white; /* Set background color to white */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    font-size: 1.1rem;
+    table-layout: fixed; /* Fix the table layout */
+}
+
+.table-container.limited-width table {
+    table-layout: fixed;
+}
+
+.table-container.limited-width th:nth-child(1), .table-container.limited-width td:nth-child(1) {
+    width: 25%; /* 첫번째 칼럼 */
+}
+
+.table-container.limited-width th:nth-child(2), .table-container.limited-width td:nth-child(2),
+.table-container.limited-width th:nth-child(3), .table-container.limited-width td:nth-child(3) {
+    width: 37.5%; /* 두번째와 세번째 칼럼 */
+}
+
+.table-container th, .table-container td {
+    border: 1px solid #ddd;
+    padding: 12px;
+}
+
+.table-container th {
+    background-color: #673AB7; /* Change column header background color */
+    color: white; /* Ensure text color is readable */
+}
+
+.chart-wrapper {
+    height: 600px; /* Increase chart height */
+    padding: 20px;
+}
+
+.chart-container {
+    width: 100%;
+    height: 100%;
+}
+
+.button-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -35,12 +99,12 @@ body {
 }
 
 .button {
-    width: 22%; /* Adjusted width for 4 buttons per row with margins */
+    width: 23%;
     margin: 1%;
     padding: 20px;
     text-align: center;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s, border 0.3s; /* Add transform and border transition */
+    transition: background-color 0.3s, box-shadow 0.3s; /* Add box-shadow transition */
     color: white;
     font-size: 1.2rem; /* Increase font size */
     display: flex;
@@ -52,9 +116,8 @@ body {
 }
 
 .button:hover {
-    transform: scale(1.05); /* Slightly increase the size */
-    border: 2px solid white; /* Add white border */
-    transition: transform 0.3s, border 0.3s; /* Add smooth transition for border */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
+    transition: box-shadow 0.3s; /* Smooth transition for shadow */
 }
 
 .button p {
@@ -69,19 +132,103 @@ body {
     margin-bottom: 10px;
 }
 
-.button:nth-child(1) { background-color: #4CAF50; } /* Green */
-.button:nth-child(2) { background-color: #2196F3; } /* Blue */
-.button:nth-child(3) { background-color: #FF5722; } /* Orange */
-.button:nth-child(4) { background-color: #FFC107; } /* Amber */
-.button:nth-child(5) { background-color: #9C27B0; } /* Purple */
-.button:nth-child(6) { background-color: #3F51B5; } /* Indigo */
-.button:nth-child(7) { background-color: #00BCD4; } /* Cyan */
-.button:nth-child(8) { background-color: #E91E63; } /* Pink */
-.button:nth-child(9) { background-color: #FF9800; } /* Deep Orange */
-.button:nth-child(10) { background-color: #8BC34A; } /* Light Green */
-.button:nth-child(11) { background-color: #673AB7; } /* Deep Purple */
-.button:nth-child(12) { background-color: #03A9F4; } /* Light Blue */
-.button:nth-child(13) { background-color: #CDDC39; } /* Lime */
-.button:nth-child(14) { background-color: #FFEB3B; } /* Yellow */
-.button:nth-child(15) { background-color: #795548; } /* Brown */
-.button:nth-child(16) { background-color: #607D8B; } /* Blue Grey */
+.result-container {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+    background-color: white; /* Set background color to white */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    flex-direction: column;
+    text-align: center;
+}
+
+.result-container h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.button:nth-child(1) {
+    background-color: #4CAF50;
+    color: black;
+}
+
+.button:nth-child(2) {
+    background-color: #2196F3;
+    color: white;
+}
+
+.button:nth-child(3) {
+    background-color: #FF5722;
+    color: white;
+}
+
+.button:nth-child(4) {
+    background-color: #FFC107;
+    color: black;
+}
+
+.button:nth-child(5) {
+    background-color: #9C27B0;
+    color: white;
+}
+
+.button:nth-child(6) {
+    background-color: #3F51B5;
+    color: white;
+}
+
+.button:nth-child(7) {
+    background-color: #00BCD4;
+    color: black;
+}
+
+.button:nth-child(8) {
+    background-color: #E91E63;
+    color: white;
+}
+
+.button:nth-child(9) {
+    background-color: #FF9800;
+    color: black;
+}
+
+.button:nth-child(10) {
+    background-color: #8BC34A;
+    color: black;
+}
+
+.button:nth-child(11) {
+    background-color: #673AB7;
+    color: white;
+}
+
+.button:nth-child(12) {
+    background-color: #03A9F4;
+    color: black;
+}
+
+.button:nth-child(13) {
+    background-color: #CDDC39;
+    color: black;
+}
+
+.button:nth-child(14) {
+    background-color: #FFEB3B;
+    color: black;
+}
+
+.button:nth-child(15) {
+    background-color: #795548;
+    color: white;
+}
+
+.button:nth-child(16) {
+    background-color: #607D8B;
+    color: white;
+}
