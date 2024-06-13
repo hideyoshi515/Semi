@@ -38,6 +38,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("net.dv8tion:JDA:5.0.0-beta.3")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
 }
 
 tasks.withType<Test> {
