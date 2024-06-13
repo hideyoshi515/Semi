@@ -3,19 +3,150 @@
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{layout/default_layout}">
->
+<head>
+    <style>
+        .order-ui-body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .order-ui-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .order-ui-div {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-ui-order-category, .order-ui-order-menu {
+            display: block;
+            margin: 5px 0;
+            font-size: 18px;
+        }
+
+        .order-ui-order-category {
+            font-style: italic;
+            color: #2B5797;
+        }
+
+        .order-ui-order-menu {
+            font-weight: bold;
+            color: #0078D7;
+        }
+
+        .order-ui-span {
+            padding: 5px 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-ui-button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #0078D7;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+
+        .order-ui-button:hover {
+            background-color: #005A9E;
+        }
+
+        .order-ui-button:disabled, .order-ui-button[disabled] {
+            background-color: #A0A0A0;
+            cursor: not-allowed;
+        }
+
+        .order-ui-button:focus {
+            outline: none;
+        }
+
+        .order-ui-order-div {
+            flex: 1;
+            padding: 0 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .order-ui-order-div {
+
+        }
+
+        .order-ui-order-div span {
+            display: inline;
+        }
+
+        .order-ui-info {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body class="order-ui-body">
 <th:block layout:fragment="content">
-    <div th:each="order : ${orderList}">
-    <span id="orderCategory" th:text="${categoryName[orderStat.index]}"
-          th:value="${categoryName[orderStat.index]}"></span>
-        <span id="orderMenu" th:text="${menuName[orderStat.index]}" th:value="${menuName[orderStat.index]}"></span>
-        <span th:if="${menuStock[orderStat.index]} <= 0">매진</span>
-        <button th:if="${menuStock[orderStat.index]} <= 0"
-                th:onclick="|location.href='orderDenial?orderID=${order.id}'|">주문 취소
-        </button>
-        <button th:if="${menuStock[orderStat.index]} > 0"
-                th:onclick="|location.href='orderDetail?orderID=${order.id}'|">상세 확인
-        </button>
+    <div class="order-ui-container">
+        <div th:each="order : ${orderList}" class="order-ui-div">
+            <div class="order-ui-order-div">
+                <span id="orderMenu" class="order-ui-order-menu" th:text="${menuName[orderStat.index]}"
+                      th:value="${menuName[orderStat.index]}"></span>
+                <span id="orderCategory" class="order-ui-order-category" th:text="${categoryName[orderStat.index]}"
+                      th:value="${categoryName[orderStat.index]}"></span>
+            </div>
+            <div class="order-ui-order-div">
+                <div class="order-ui-info">
+                    <span>남은 수량: </span>
+                    <span id="orderStock" th:text="${menuStock[orderStat.index]}"
+                          th:value="${menuStock[orderStat.index]}"></span>
+                </div>
+                <br>
+                <div class="order-ui-info">
+                    <span>주문 수량: </span>
+                    <span id="orderQuantity" th:text="${order.quantity}"
+                          th:value="${order.quantity}"></span>
+                </div>
+            </div>
+            <div class="order-ui-order-div">
+                <div class="order-ui-info">
+                    <span>단가: </span>
+                    <span id="orderPrice" th:text="${order.price}" th:value="${order.price}"></span>
+                </div>
+                <br>
+                <div class="order-ui-info">
+                    <span>총 가격: </span>
+                    <span id="orderTotalPrice" th:text="${order.quantity * order.price}"
+                          th:value="${order.quantity * order.price}"></span>
+                </div>
+            </div>
+            <div class="order-ui-order-div">
+                <button th:if="${menuStock[orderStat.index]} - ${order.quantity}<= 0" class="order-ui-button" disabled>매진</button>
+                <br th:if="${menuStock[orderStat.index]} - ${order.quantity}<= 0">
+                <button th:if="${menuStock[orderStat.index]} - ${order.quantity} > 0" class="order-ui-button"
+                        th:onclick="|location.href='orderApproval?orderID=${order.id}&orderQuantity=${menuStock[orderStat.index] - order.quantity}&menuID=${order.menu}'|">주문 승인
+                </button>
+                <br th:if="${menuStock[orderStat.index]} - ${order.quantity} > 0">
+                <button class="order-ui-button"
+                        th:onclick="|location.href='orderDenial?orderID=${order.id}'|">주문 취소
+                </button>
+            </div>
+        </div>
     </div>
 </th:block>
+</body>
 </html>

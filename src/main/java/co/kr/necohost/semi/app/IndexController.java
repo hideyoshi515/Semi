@@ -1,32 +1,39 @@
 package co.kr.necohost.semi.app;
 
-import co.kr.necohost.semi.domain.service.CategoryService;
+import co.kr.necohost.semi.domain.repository.MenuRepository;
 import co.kr.necohost.semi.domain.service.SalesService;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Objects;
 
 @Controller
 public class IndexController {
 
-    SalesService salesService;
-    CategoryService categoryService;
+    private final SalesService salesService;
+    private final MenuRepository menuRepository;
 
-    public IndexController(SalesService salesService, CategoryService categoryService) {
-        this.categoryService = categoryService;
+    public IndexController(SalesService salesService, MenuRepository menuRepository) {
         this.salesService = salesService;
+        this.menuRepository = menuRepository;
     }
 
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     public String getIndex(Model model, @RequestParam(name = "lang", required = false) String lang, HttpSession session) {
         model.addAttribute("session", session);
-        model.addAttribute("categories", categoryService.getAllCategories());
-        return "user/home.html";
+        return "redirect:/";
+    }
+
+    @RequestMapping("/menu/getName")
+    @ResponseBody
+    @Cacheable("getName")
+    public String getName(@RequestParam Map<String, Object> params) {
+        String name = menuRepository.findById(Long.valueOf(params.get("id").toString())).orElse(null).getName();
+        return name;
     }
 
     @RequestMapping(value = "/admin", method = RequestMethod.GET)

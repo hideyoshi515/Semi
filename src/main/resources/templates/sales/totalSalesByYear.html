@@ -4,10 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POSOLDESK 売上管理プログラム</title><!-- adminSalesCss.css 파일 경로로 수정 -->
-
-    <link rel="stylesheet" href="/css/adminSalesCss.css">
-
+    <title>POSOLDESK 売上管理プログラム</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/metroStyle.css"> <!-- metroStyle.css 파일 경로로 수정 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -17,11 +16,11 @@
         <a onclick="location.href='/adminSalesMainHome'">ホーム</a>
         <a onclick="location.href='/adminSalesMainMenu'">メニュー</a>
     </div>
-    <h1><img style="width: 38px;height: 38px;" src="/img/storeownerpage/yearlyrevenueicon2.png">年度別総売上高</h1>
+    <h1 style="color: white;"><img style="width: 38px; height: 38px;" src="/img/storeownerpage/yearlyrevenueicon2.png">年度別総売上高</h1>
 
-    <div class="content">
-        <div class="table-container">
-            <table>
+    <div class="content" style="display: flex; justify-content: space-around">
+        <div class="table-container" style="width: 50%; justify-content: space-around">
+            <table style="justify-content: center">
                 <thead>
                 <tr>
                     <th>年</th>
@@ -33,17 +32,25 @@
             </table>
         </div>
 
-        <div class="chart-wrapper">
+        <div class="chart-wrapper" style="width: 50%;">
             <div class="chart-container">
                 <canvas id="monthlySalesChart"></canvas>
             </div>
         </div>
     </div>
-    <div>
-        <button class="button" id="prevPageBtn">前の5年間</button>
-        <button class="button" id="nextPageBtn">次の5年間</button>
-        <button class="button" onclick="location.href='/totalSalesByYearAndMonthInput'">年度と月を入力して総売上高を検索</button>
-        <button class="button" onclick="location.href='/adminSalesMainHome'">管理者メイン画面に復帰</button>
+    <div class="button-container">
+        <div class="button" id="prevPageBtn" style="background-color: #4CAF50;">
+            <p>前の5年間</p>
+        </div>
+        <div class="button" id="nextPageBtn" style="background-color: #2196F3;">
+            <p>次の5年間</p>
+        </div>
+        <div class="button" onclick="location.href='/totalSalesByYearAndMonthInput'" style="background-color: #FF5722;">
+            <p style="font-size:11pt">年度と月を入力して総売上高を検索</p>
+        </div>
+        <div class="button" onclick="location.href='/adminSalesMainHome'" style="background-color: #FFC107;">
+            <p>管理者メイン画面に復帰</p>
+        </div>
     </div>
 
     <!-- ThymeleafをJavaScriptに伝達 -->
@@ -133,14 +140,14 @@
             }
         });
 
-        document.getElementById('prevPageBtn').addEventListener('click', function() {
+        document.getElementById('prevPageBtn').addEventListener('click', function () {
             if (currentPage > 0) {
                 currentPage--;
                 renderTableAndChart(currentPage);
             }
         });
 
-        document.getElementById('nextPageBtn').addEventListener('click', function() {
+        document.getElementById('nextPageBtn').addEventListener('click', function () {
             if ((currentPage + 1) * itemsPerPage < Object.keys(yearlySalesData).length) {
                 currentPage++;
                 renderTableAndChart(currentPage);

@@ -62,8 +62,8 @@
         data: {
             labels: labels, // 시간 데이터를 배열로 전달
             datasets: [{
-                label: '今日の売上高',
-                data: data, // 매출 데이터를 배열로 전달
+                label: '今日の累積売上高',
+                data: data, // 누적 매출 데이터를 배열로 전달
                 borderColor: 'rgba(75, 192, 192, 1)',
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 fill: true
@@ -76,13 +76,18 @@
                     title: {
                         display: true,
                         text: '時間'
+                    },
+                    ticks: {
+                        autoSkip: false,
+                        maxRotation: 0,
+                        minRotation: 0
                     }
                 },
                 y: {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: '売上高 (円)'
+                        text: '累積売上高 (円)'
                     }
                 }
             }
