@@ -43,7 +43,7 @@ public class MenuController {
 
     // 메뉴 리스트를 가져와서 보여줌
     @RequestMapping(value = "/menuList", method = RequestMethod.GET)
-    public String getMenuList(Model model, @RequestParam Map<String, String> params) {
+    public String getMenuList(Model model, @RequestParam Map<String, String> params, @ModelAttribute("successMessage") String successMessage, @ModelAttribute("errorMessage") String errorMessage) {
         List<Menu> menus;
         List<Category> categories = categoryService.getAllCategories();
         if (params.get("category") != null) {
@@ -64,6 +64,11 @@ public class MenuController {
         model.addAttribute("salesCount", salesCount);
         model.addAttribute("menus", menus);
         model.addAttribute("categories", categories);
+        System.out.println(successMessage);
+        System.out.println(errorMessage);
+        model.addAttribute("successMessage", successMessage);
+        model.addAttribute("errorMessage", errorMessage);
+
         return "/menu/menuList.html";
     }
 
@@ -149,6 +154,14 @@ public class MenuController {
     public ResponseEntity<?> updateStockAndOrder(@RequestBody Map<String, Object> payload) {
         long id = ((Number) payload.get("id")).longValue();
         menuService.updateStockAndOrder(id);
+        return ResponseEntity.ok().build();
+    }
+
+    // 발주량 0으로 초기화
+    @RequestMapping(value = "/cancelUpdateStockAndOrder", method = RequestMethod.POST)
+    public ResponseEntity<?> cancelUpdateStockAndOrder(@RequestBody Map<String, Object> payload) {
+        long id = ((Number) payload.get("id")).longValue();
+        menuService.cancelUpdateStockAndOrder(id);
         return ResponseEntity.ok().build();
     }
 

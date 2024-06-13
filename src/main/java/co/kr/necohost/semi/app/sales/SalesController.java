@@ -83,7 +83,109 @@ public class SalesController {
 //        return "/sales/adminSalesMainHome.html";
 //    }
 
-    //6월 12일 저녁 코드 다시 짜는중 .
+    //6월 12일 저녁 코드 다시 짜는중 . => 누적 매출 안나와서 다시 해본다.
+//    @RequestMapping(value = "/adminSalesMainHome", method = RequestMethod.GET)
+//    public String getAdminSalesMainHome(Model model) {
+//        LocalDateTime now = LocalDateTime.now();
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        String formattedNow = now.format(formatter);
+//        model.addAttribute("currentTime", formattedNow);
+//
+//        LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+//        LocalDateTime endOfDay = now.withHour(23).withMinute(59).withSecond(59);
+//
+//        Map<LocalDateTime, Double> hourlySales = salesService.getHourlySalesByDay(startOfDay, endOfDay);
+//
+//        // 포맷된 시간 데이터를 담을 Map 생성
+//        Map<String, Double> formattedHourlySales = new TreeMap<>();
+//        DateTimeFormatter hourFormatter = DateTimeFormatter.ofPattern("HH:mm");
+//        for (Map.Entry<LocalDateTime, Double> entry : hourlySales.entrySet()) {
+//            formattedHourlySales.put(entry.getKey().format(hourFormatter), entry.getValue());
+//        }
+//
+//        double totalSalesToday = salesService.getTotalSalesUntilNow(now);
+//        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
+//        String formattedTotalSalesToday = numberFormat.format(totalSalesToday);
+//        model.addAttribute("totalSalesToday", formattedTotalSalesToday);
+//
+//        model.addAttribute("hourlySales", formattedHourlySales); // 포맷된 시간 데이터 전달
+//        System.out.println("hourlySales 확인 중");
+//        System.out.println(formattedHourlySales);
+//        return "sales/adminSalesMainHome";
+//    }
+
+    //6월 12일 저녁 코드 다시 짜는중 . => 누적 매출 안나와서 다시 해본다.
+//    @RequestMapping(value = "/adminSalesMainHome", method = RequestMethod.GET)
+//    public String getAdminSalesMainHome(Model model) {
+//        LocalDateTime now = LocalDateTime.now();
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        String formattedNow = now.format(formatter);
+//        model.addAttribute("currentTime", formattedNow);
+//
+//        LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+//        LocalDateTime endOfDay = now.withHour(23).withMinute(59).withSecond(59);
+//
+//        Map<LocalDateTime, Double> hourlySales = salesService.getHourlySalesByDay(startOfDay, endOfDay);
+//
+//        // 포맷된 시간 데이터를 담을 Map 생성
+//        Map<String, Double> formattedHourlySales = new TreeMap<>();
+//        DateTimeFormatter hourFormatter = DateTimeFormatter.ofPattern("HH:mm");
+//        double cumulativeSales = 0.0;
+//        for (Map.Entry<LocalDateTime, Double> entry : hourlySales.entrySet()) {
+//            cumulativeSales += entry.getValue();
+//            formattedHourlySales.put(entry.getKey().format(hourFormatter), cumulativeSales);
+//        }
+//
+//        double totalSalesToday = salesService.getTotalSalesUntilNow(now);
+//        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
+//        String formattedTotalSalesToday = numberFormat.format(totalSalesToday);
+//        model.addAttribute("totalSalesToday", formattedTotalSalesToday);
+//
+//        model.addAttribute("hourlySales", formattedHourlySales); // 포맷된 시간 데이터 전달
+//        System.out.println("hourlySales 확인 중");
+//        System.out.println(formattedHourlySales);
+//        return "sales/adminSalesMainHome";
+//    }
+
+    //6월 12일 오후 7시 마지막으로 다시 .
+//    @RequestMapping(value = "/adminSalesMainHome", method = RequestMethod.GET)
+//    public String getAdminSalesMainHome(Model model) {
+//        // 현재 시간을 가져와서 특정 형식으로 포맷
+//        LocalDateTime now = LocalDateTime.now();
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        String formattedNow = now.format(formatter);
+//        model.addAttribute("currentTime", formattedNow);
+//
+//        // 오늘의 시작과 끝 시간을 설정
+//        LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+//        LocalDateTime endOfDay = now.withHour(23).withMinute(59).withSecond(59);
+//
+//        // 서비스에서 시간별 매출 데이터를 가져옴
+//        Map<LocalDateTime, Double> hourlySales = salesService.getHourlySalesByDay(startOfDay, endOfDay);
+//
+//        // 포맷된 시간 데이터를 담을 Map 생성 및 누적 매출 계산
+//        Map<String, Double> formattedHourlySales = new TreeMap<>();
+//        DateTimeFormatter hourFormatter = DateTimeFormatter.ofPattern("HH:mm");
+//        double cumulativeSales = 0.0;
+//        for (Map.Entry<LocalDateTime, Double> entry : hourlySales.entrySet()) {
+//            cumulativeSales += entry.getValue();
+//            formattedHourlySales.put(entry.getKey().format(hourFormatter), cumulativeSales);
+//        }
+//
+//        // 현재까지의 총 매출을 계산하여 포맷
+//        double totalSalesToday = salesService.getTotalSalesUntilNow(now);
+//        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
+//        String formattedTotalSalesToday = numberFormat.format(totalSalesToday);
+//        model.addAttribute("totalSalesToday", formattedTotalSalesToday);
+//
+//        // 포맷된 시간별 누적 매출 데이터를 모델에 추가
+//        model.addAttribute("hourlySales", formattedHourlySales);
+//        System.out.println("hourlySales 확인 중");
+//        System.out.println(formattedHourlySales);
+//        return "sales/adminSalesMainHome";
+//    }
+
+    //ㄹㅇ마지막
     @RequestMapping(value = "/adminSalesMainHome", method = RequestMethod.GET)
     public String getAdminSalesMainHome(Model model) {
         LocalDateTime now = LocalDateTime.now();
@@ -94,13 +196,16 @@ public class SalesController {
         LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
         LocalDateTime endOfDay = now.withHour(23).withMinute(59).withSecond(59);
 
+        // 서비스에서 시간별 매출 데이터를 가져옴
         Map<LocalDateTime, Double> hourlySales = salesService.getHourlySalesByDay(startOfDay, endOfDay);
 
-        // 포맷된 시간 데이터를 담을 Map 생성
+        // 누적 매출 계산 및 포맷된 시간 데이터를 담을 Map 생성
         Map<String, Double> formattedHourlySales = new TreeMap<>();
         DateTimeFormatter hourFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        double cumulativeSales = 0.0;
         for (Map.Entry<LocalDateTime, Double> entry : hourlySales.entrySet()) {
-            formattedHourlySales.put(entry.getKey().format(hourFormatter), entry.getValue());
+            cumulativeSales += entry.getValue();
+            formattedHourlySales.put(entry.getKey().format(hourFormatter), cumulativeSales);
         }
 
         double totalSalesToday = salesService.getTotalSalesUntilNow(now);
@@ -113,6 +218,8 @@ public class SalesController {
         System.out.println(formattedHourlySales);
         return "sales/adminSalesMainHome";
     }
+
+
 
 
 

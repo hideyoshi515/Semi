@@ -325,10 +325,10 @@ public class SalesService {
         List<Sales> salesList = salesRepository.findSalesByDateRangeAndProcess(startOfDay, endOfDay);
         Map<LocalDateTime, Double> hourlySales = new TreeMap<>();
 
-        // 2시간 단위로 그룹화
+        //
         for (Sales sales : salesList) {
             LocalDateTime hour = sales.getDate().withMinute(0).withSecond(0).withNano(0);
-            hour = hour.withHour((hour.getHour())); // 2시간 단위로 그룹화
+            hour = hour.withHour((hour.getHour())); //
             double salesAmount = sales.getPrice() * sales.getQuantity();
             hourlySales.put(hour, hourlySales.getOrDefault(hour, 0.0) + salesAmount);
         }

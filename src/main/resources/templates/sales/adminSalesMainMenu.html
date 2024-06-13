@@ -5,11 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>POSOLDESK 売上管理プログラム</title>
-    <style>
-
-    </style>
-    <link rel="stylesheet" href="/css/adminSalesCss.css"> <!-- adminSalesCss.css 파일 경로로 수정 -->
-
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/metroStyle.css"> <!-- metroStyle.css 파일 경로로 수정 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <th:block layout:fragment="content">
@@ -19,70 +16,94 @@
         <a onclick="location.href='/adminSalesMainMenu'">メニュー</a>
     </div>
     <div class="container">
-        <div class="button" onclick="location.href='/totalSalesByYear'">
-            <img src="/img/storeownerpage/yearlyrevenueicon2.png" alt="年度別総売上高">
-            年度別総売上高
+<!--        첫째 줄 -->
+        <div style="display: flex">
+            <div class="button" onclick="location.href='/totalSalesByYear'">
+                <img src="/img/storeownerpage/yearlyrevenueicon2.png" alt="年度別総売上高">
+                <p>年度別総売上高</p>
+            </div>
+            <div class="button" onclick="location.href='/totalSalesByMonth'">
+                <img src="/img/storeownerpage/monthrevenueicon.png" alt="月々の総売上高">
+                <p>月々の総売上高</p>
+            </div>
+            <div class="button" onclick="location.href='/totalSalesByDayInput'">
+                <img src="/img/storeownerpage/dailyrevenueicon.png" alt="日商/週間売上">
+                <p>日商/週間売上</p>
+            </div>
+            <div class="button" onclick="location.href='/totalSalesbyCategoryAndPeriodInput'">
+                <img src="/img/storeownerpage/classificationrevenueicon.png" alt="カテゴリー別総売上高">
+                <p>カテゴリー別総売上高</p>
+            </div>
         </div>
-        <div class="button" onclick="location.href='/totalSalesByMonth'">
-            <img src="/img/storeownerpage/monthrevenueicon.png" alt="月々の総売上高">
-            月々の総売上高
+        <!--        2째 줄 -->
+        <div style="display: flex">
+            <div class="button" onclick="location.href='/totalSalesbyMenuAndPeriodInput'">
+                <img src="/img/storeownerpage/menurevenueicon.png" alt="メニュー別売上販売の現状">
+                <p>メニュー別総売上</p>
+            </div>
+            <div class="button" onclick="location.href='/menuList'">
+                <img src="/img/storeownerpage/inventoryicon.png" alt="メニュー/在庫管理">
+                <p>メニュー/在庫管理</p>
+            </div>
+            <div class="button">
+                <img src="/img/storeownerpage/staff.png" alt="従業員管理">
+                <p>従業員管理</p>
+            </div>
+            <div class="button">
+                <img src="/img/storeownerpage/membercardicon.png" alt="メンバーシップ管理">
+                <p>メンバーシップ管理</p>
+            </div>
         </div>
-        <div class="button" onclick="location.href='/totalSalesByDayInput'">
-            <img src="/img/storeownerpage/dailyrevenueicon.png" alt="日商/週間売上">
-            日商/週間売上
+        <!--      3째 줄 -->
+
+        <div style="display: flex">
+            <div class="button">
+                <img src="/img/storeownerpage/costicon.png" alt="原価管理">
+                <p>原価管理</p>
+            </div>
+            <div class="button">
+                <img src="/img/storeownerpage/ordericon.png" alt="注文分析">
+                <p>注文分析</p>
+            </div>
+            <div class="button">
+                <img src="/img/storeownerpage/expenditureicon.png" alt="支出管理">
+                <p>支出管理</p>
+            </div>
+            <div class="button">
+                <img src="/img/storeownerpage/salereport.png" alt="レポート生成">
+                <p>レポート生成</p>
+            </div>
+
+
+
         </div>
-        <div class="button" onclick="location.href='/totalSalesbyCategoryAndPeriodInput'">
-            <img src="/img/storeownerpage/classificationrevenueicon.png" alt="カテゴリー別総売上高">
-            カテゴリー別総売上高
+
+        <!--        4째 줄 -->
+
+
+
+        <div style="display: flex">
+
+            <div class="button">
+                <img src="/img/storeownerpage/promotion.png" alt="プロモーション管理">
+                <p>プロモーション管理</p>
+            </div>
+            <div class="button">
+                <img src="/img/storeownerpage/settings.png" alt="設定">
+                <p>設定</p>
+            </div>
+            <div class="button">
+                <img src="/img/storeownerpage/help.png" alt="ヘルプ">
+                <p>ヘルプ</p>
+            </div>
+            <div class="button">
+                <img src="/img/storeownerpage/logout.png" alt="ログアウト/終了">
+                <p>ログアウト/終了</p>
+            </div>
         </div>
-        <div class="button" onclick="location.href='/totalSalesbyMenuAndPeriodInput'">
-            <img src="/img/storeownerpage/menurevenueicon.png" alt="メニュー別売上販売の現状">
-            メニュー別総売上
-        </div>
-        <div class="button" onclick="location.href='/menuList'">
-            <img src="/img/storeownerpage/inventoryicon.png" alt="メニュー/在庫管理">
-            メニュー/在庫管理
-        </div>
-        <div class="button">
-            <img src="/img/storeownerpage/staff.png" alt="従業員管理">
-            従業員管理
-        </div>
-        <div class="button">
-            <img src="/img/storeownerpage/membercardicon.png" alt="メンバーシップ管理">
-            メンバーシップ管理
-        </div>
-        <div class="button">
-            <img src="/img/storeownerpage/costicon.png" alt="原価管理">
-            原価管理
-        </div>
-        <div class="button">
-            <img src="/img/storeownerpage/ordericon.png" alt="注文分析">
-            注文分析
-        </div>
-        <div class="button">
-            <img src="/img/storeownerpage/expenditureicon.png" alt="支出管理">
-            支出管理
-        </div>
-        <div class="button">
-            <img src="/img/storeownerpage/salereport.png" alt="レポート生成">
-            レポート生成
-        </div>
-        <div class="button">
-            <img src="/img/storeownerpage/promotion.png" alt="プロモーション管理">
-            プロモーション管理
-        </div>
-        <div class="button">
-            <img src="/img/storeownerpage/settings.png" alt="設定">
-            設定
-        </div>
-        <div class="button">
-            <img src="/img/storeownerpage/help.png" alt="ヘルプ">
-            ヘルプ
-        </div>
-        <div class="button">
-            <img src="/img/storeownerpage/logout.png" alt="ログアウト/終了">
-            ログアウト/終了
-        </div>
+
+
+
     </div>
     </body>
 </th:block>

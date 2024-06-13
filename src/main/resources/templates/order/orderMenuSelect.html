@@ -37,25 +37,75 @@
             background-color: #f8f9fa !important;
             margin: 0 !important;
             padding: 20px !important;
-        }
-        #menuContainer{
             display: flex;
-            justify-content: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        #wrapper{
+            display: flex;
+            flex: 1;
+            overflow: visible;
+        }
+        #menuContainer {
+            display: flex;
             flex-wrap: wrap;
+        }
+        #sidebarMein{
+            text-align: center;
+        }
+
+        #sidebar {
+            background-color: #343a40;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+            position: sticky;
+            top: 0;
+            width: 200px;
+            transition: top 0.3s ease-in-out;
+        }
+
+        #sidebar .btn-group-vertical {
+            width: 100%;
+            height: 100vh;
+        }
+
+        #sidebar .btn {
+            background-color: #ffcc00; !important;
+            color: white; !important;
+            margin-bottom: 5px; !important;
+            padding: 10px;
+            font-size: 30px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #sidebar .btn:hover {
+            background-color: red;
+        !important;
+        }
+
+        #content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            margin-left: 20px;
 
         }
-        .btn-group{
+
+        .btn-group {
             display: flex;
         }
 
         .btn-group .btn {
-            background-color: #ffcc00  !important;
+            background-color: #ffcc00 !important;
             color: white !important;
             margin-right: 5px !important;
         }
 
         .btn-group .btn:hover {
-            background-color: red  !important;
+            background-color: red !important;
         }
 
         .menuItem {
@@ -147,47 +197,66 @@
         .modal-footer {
             justify-content: space-between !important;
         }
+
+        #buttonContainer{
+            display: ;
+            justify-content: end;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
 <th:block layout:fragment="content">
-    <div class="btn-group mb-3" role="group" aria-label="Category filter">
-        <button type="button" class="btn btn-secondary" onclick="filterMenu('all')">すべて</button>
-        <button type="button" class="btn btn-secondary"
-                th:each="category : ${categories}"
-                th:text="${category.name}"
-                th:onclick="|filterMenu('${category.id}')|">
-        </button>
-    </div>
-    <h2 id="categoryTitle">すべて</h2>
-    <div class="row" id="menuContainer">
-        <div class="mb-3 menuItem" th:each="menu : ${menus}"
-             th:attr="data-category=${menu.category}, data-menu-id=${menu.id}"
-             style="width: 200px">
-            <a th:if="${menu.stock} > 0"
-               th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ₩'}">
-                <div class="card rounded rounded-3" style="width: 180px;">
-                    <div class="card-body text-center">
-                        <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'"
-                             style="width: 8rem; height: auto;">
-                        <h5 class="card-title" th:text="${menu.name}"></h5>
-                        <p class="card-text mb-0"><span
-                                th:text="${#numbers.formatInteger(menu.price, 1, 'COMMA')}+₩"></span></p>
-                    </div>
-                </div>
-            </a>
-            <div class="card rounded rounded-3" style="width: 180px;" th:if="${menu.stock} <= 0">
-                <div class="rounded-3 w-100 h-100" style="background: rgba(0, 0, 0, 0.7); position: absolute;">
-                </div>
-                <div class="card-body text-center">
-                    <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'"
-                         style="width: 8rem; height: auto;">
-                    <h5 class="card-title" th:text="${menu.name}"></h5>
-                    <p class="card-text mb-0" style="color: darkred; font-weight: bold; z-index: 100000;">
-                        売れ切り</p>
+    <div id="wrapper">
+        <div>
+            <div id="sidebarMein">
+                <h2>座席注文</h2>
+            </div>
+            <div id="sidebar">
+                <div class="btn-group-vertical" role="group" aria-label="Category filter">
+                    <button type="button" class="btn btn-secondary" onclick="filterMenu('all')">すべて</button>
+                    <button type="button" class="btn btn-secondary"
+                            th:each="category : ${categories}"
+                            th:text="${category.name}"
+                            th:onclick="|filterMenu('${category.id}')|">
+                    </button>
                 </div>
             </div>
         </div>
+
+        <div id="content">
+            <h2 id="categoryTitle">すべて</h2>
+            <div class="row" id="menuContainer">
+                <div class="mb-3 menuItem" th:each="menu : ${menus}"
+                     th:attr="data-category=${menu.category}, data-menu-id=${menu.id}"
+                     style="width: 200px">
+                    <a th:if="${menu.stock} > 0"
+                       th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ₩'}">
+                        <div class="card rounded rounded-3" style="width: 180px;">
+                            <div class="card-body text-center">
+                                <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'"
+                                     style="width: 8rem; height: auto;">
+                                <h5 class="card-title" th:text="${menu.name}"></h5>
+                                <p class="card-text mb-0"><span
+                                        th:text="${#numbers.formatInteger(menu.price, 1, 'COMMA')}+₩"></span></p>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="card rounded rounded-3" style="width: 180px;" th:if="${menu.stock} <= 0">
+                        <div class="rounded-3 w-100 h-100" style="background: rgba(0, 0, 0, 0.7); position: absolute;">
+                        </div>
+                        <div class="card-body text-center">
+                            <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'"
+                                 style="width: 8rem; height: auto;">
+                            <h5 class="card-title" th:text="${menu.name}"></h5>
+                            <p class="card-text mb-0" style="color: darkred; font-weight: bold; z-index: 100000;">
+                                売れ切り</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div> daskdaskk</div>
     </div>
 
 
@@ -228,16 +297,18 @@
             </div>
         </div>
     </div>
+    <div id="buttonContainer">
+        <form method="post" action="orderPayment" id="orderForm" onsubmit="return checkoutForm()">
+            <input type="hidden" name="orderData" id="orderData">
+            <button type="submit" class="btn btn-success" id="paymentBtn">お支払い</button>
+        </form>
 
-    <form method="post" action="orderPayment" id="orderForm" onsubmit="return checkoutForm()">
-        <input type="hidden" name="orderData" id="orderData">
-        <button type="submit" class="btn btn-success">お支払い</button>
-    </form>
-
-    <!-- Cart Modal -->
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cartModal">
-        カーゴ
-    </button>
+        <!-- Cart Modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cartModal" id="paymentCartBtn">
+            カーゴ
+        </button>
+    </div>
+<!-- cart Modal 위에랑 이어짐 버튼 이동때문에 div로 감쌌음-->
     <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -475,6 +546,7 @@
         $().ready(function () {
             loadCart();
         })
+
         function filterMenu(category) {
             const menuItems = document.querySelectorAll('#menuContainer .menuItem');
             const title = document.getElementById('categoryTitle');

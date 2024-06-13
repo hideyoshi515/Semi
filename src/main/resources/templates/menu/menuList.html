@@ -55,10 +55,10 @@
                              style="color: #ff363b; font-weight: bold;"
                              th:text="在庫切れ"></div>
                         <div th:if="${menu.stock > 0}">
-                            <div th:if="${menu.stock < sale.value * 0.5}" class="user-select-none stock-status"
+                            <div th:if="${menu.stock < sale.value}" class="user-select-none stock-status"
                                  style="color: #ff363b"
                                  th:text="在庫不足"></div>
-                            <div th:if="${menu.stock >= sale.value * 0.5}" class="user-select-none stock-status"
+                            <div th:if="${menu.stock >= sale.value}" class="user-select-none stock-status"
                                  style="color: #0a53be"
                                  th:text="在庫あり"></div>
                         </div>
@@ -68,8 +68,11 @@
         </div>
     </div>
 
-    <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}"></div>
-    <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
+    <div class="alert-container fixed-bottom-alert">
+        <div th:if="${successMessage} != '' " class="alert alert-success" role="alert"
+             th:text="${successMessage}"></div>
+        <div th:if="${errorMessage} != '' " class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
+    </div>
 
     <!-- Modal -->
     <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel" aria-hidden="true">
@@ -78,7 +81,7 @@
                 <div class="modal-header d-flex justify-content-between align-items-center">
                     <h5 class="modal-title" id="modalTitle"></h5>
                     <div class="btn-group">
-                        <button id="salesManagementButton" class="btn btn-primary d-flex align-items-center">
+                        <button id="salesManagementButton" class="btn btn-primary d-flex align-items-center rounded-2">
                             売上管理
                         </button>
                         <button type="button" class="btn btn-close d-flex align-items-center"
@@ -95,8 +98,8 @@
                     <p id="modalDescription"></p>
                 </div>
                 <div class="modal-footer">
-                    <input type="number" id="order-input" placeholder="수량 입력"
-                           style="display: none; margin-right: 10px;">
+                    <input type="number" id="order-input" placeholder="発注量入力"
+                           style="display: none; margin-right: 10px; width: 10rem">
                     <div id="alert-container"
                          style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1050;"></div>
                     <button type="button" class="btn btn-warning d-flex align-items-center" id="order-button"
@@ -109,6 +112,27 @@
                     <button type="button" class="btn btn-secondary d-flex align-items-center"
                             data-bs-dismiss="modal">キャンセル
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for confirming stock update -->
+    <div class="modal fade" id="stockUpdateModal" tabindex="-1" aria-labelledby="stockUpdateModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="stockUpdateModalLabel">確認</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    発注したメニューを受領しましたか？
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" id="cancelOrderButton">発注取消</button>
+                    <button type="button" class="btn btn-primary" id="confirmReceiveButton">受領確認</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
                 </div>
             </div>
         </div>
@@ -174,19 +198,6 @@
             }
         }
 
-        // function filterMenusByCategory(categoryIdSelected) {
-        //     const menuItems = document.querySelectorAll('.menu-item');
-        //     menuItems.forEach(menuItem => {
-        //         const categoryIdElement = menuItem.querySelector('#category-id');
-        //         const categoryId = categoryIdElement ? categoryIdElement.textContent.trim() : '';
-        //         if (categoryIdSelected === '' || categoryIdSelected === categoryId) {
-        //             menuItem.style.display = 'block';
-        //         } else {
-        //             menuItem.style.display = 'none';
-        //         }
-        //     });
-        // }
-
         let isFilterApplied = false;
 
         function filterMenusByStockStatus() {
@@ -242,7 +253,7 @@
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type} alert-dismissible alert-show`;
             alertDiv.role = 'alert';
-            alertDiv.style.width = '300px';  // 너비 설정
+            alertDiv.style.width = '350px';  // 너비 설정
             alertDiv.style.fontSize = '1.25rem';  // 글자 크기 설정
             alertDiv.innerHTML = `
         ${message}
@@ -256,27 +267,51 @@
                 alertDiv.classList.add('alert-fade');
                 setTimeout(function () {
                     alertDiv.remove();
-                }, 500); // 0.5초 후 요소 제거
-            }, 3000); // 5초 후 자동으로 사라짐
+                }, 3000); // 3초 후 요소 제거
+            }, 3000); // 3초 후 자동으로 사라짐
         }
 
         function updateStockAndOrder() {
-            let ok = confirm('発注したメニューを受領しましたか？')
-            if (ok) {
-                $.ajax({
-                    url: '/updateStockAndOrder',
-                    type: 'POST',
-                    data: JSON.stringify({id: currentMenu}),
-                    contentType: 'application/json; charset=utf-8',
-                    success: function (response) {
-                        alert('在庫が追加されました。');
-                        location.reload(); // 페이지를 새로고침하여 변경사항을 반영합니다.
-                    },
-                    error: function (error) {
-                        alert('エラーが発生しました。');
-                    }
-                });
-            }
+            let myModal = new bootstrap.Modal(document.getElementById('stockUpdateModal'), {});
+            myModal.show();
+
+            document.getElementById('confirmReceiveButton').onclick = function () {
+                if (confirm('本当に受領しましたか？')) {
+                    $.ajax({
+                        url: '/updateStockAndOrder',
+                        type: 'POST',
+                        data: JSON.stringify({id: currentMenu}),
+                        contentType: 'application/json; charset=utf-8',
+                        success: function (response) {
+                            alert('在庫が追加されました。');
+                            location.reload(); // 페이지를 새로고침하여 변경사항을 반영합니다.
+                        },
+                        error: function (error) {
+                            alert('エラーが発生しました。');
+                        }
+                    });
+                    myModal.hide();
+                }
+            };
+
+            document.getElementById('cancelOrderButton').onclick = function () {
+                if (confirm('本当に発注を取り消しますか？')) {
+                    $.ajax({
+                        url: '/cancelUpdateStockAndOrder',
+                        type: 'POST',
+                        data: JSON.stringify({id: currentMenu}),
+                        contentType: 'application/json; charset=utf-8',
+                        success: function (response) {
+                            alert('発注が取り消されました。');
+                            location.reload(); // 페이지를 새로고침하여 변경사항을 반영합니다.
+                        },
+                        error: function (error) {
+                            alert('エラーが発生しました。');
+                        }
+                    });
+                    myModal.hide();
+                }
+            };
         }
 
         function toggleOrderInput() {
@@ -337,7 +372,7 @@
             justify-content: space-between; /* 항목들 사이에 공간을 균등하게 배분 */
         }
 
-        .menu-item:hover{
+        .menu-item:hover {
             border-radius: 10px;
             background-color: #d5d3d3;
         }
@@ -377,6 +412,27 @@
 
         .alert-show {
             opacity: 1;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px; /* 버튼들 간의 간격을 설정 */
+        }
+
+        .fixed-bottom-alert {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .alert {
+            margin: 10px;
         }
     </style>
 </th:block>
