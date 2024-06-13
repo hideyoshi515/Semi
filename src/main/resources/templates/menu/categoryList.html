@@ -4,48 +4,41 @@
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{layout/default_layout}">
 >
+
 <th:block layout:fragment="content">
-    <style>
-        .category-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-
-        .category-id {
-            width: 50px;
-            text-align: right;
-        }
-
-        .category-name {
-            flex-grow: 1;
-            margin: 0 20px;
-        }
-
-        .category-created-at,
-        .category-updated-at {
-            width: 150px;
-            text-align: center;
-            font-size: 0.8rem;
-        }
-
-        .category-actions {
-            width: 250px;
-            text-align: right;
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        .category-actions button {
-            margin-left: 10px;
-        }
-
-
-    </style>
+    <div class="search-container">
+        <input class="search-input form-control rounded-2 ps-1 me-1" type="text" id="search-input" placeholder="カテゴリー名で検索" oninput="filterCategoryByName()">
+        <button class="search-button btn btn-primary d-flex align-items-center me-2" onclick="location.href='/categoryCreate'">
+            カテゴリー登録
+        </button>
+    </div>
+    <div id="category-items" class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="category-item" th:each="category, iterStat : ${categories}">
+            <div class="col">
+                <div class="card border-primary text-center w-100" style="background-color: #dde4fb;">
+                    <div class="card-body">
+                        <h5 class="card-title" style="font-size: 2rem" th:text="|${category.name}|"></h5>
+                        <div class="category-buttons d-flex flex-column align-items-center">
+                            <a th:onclick="|toMenuList(${category.id})|" class="btn btn-secondary">メニューリストへ</a>
+                            <a th:onclick="|updateCategory(${category.id})|"
+                               class="btn btn-primary">カテゴリー名変更</a>
+                            <a th:onclick="|deleteCategory(${category.id})|" class="btn btn-danger">削除</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card border-primary text-center w-100" style="background-color: #dde4fb;">
+                <div class="card-body">
+                    <h5 class="card-title" style="font-size: 2rem">カテゴリー登録</h5>
+                    <div class="category-buttons d-flex flex-column align-items-center">
+                        <a onclick="location.href='/categoryCreate'" class="btn btn-success">登録する</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         function deleteCategory(pk) {
@@ -91,32 +84,55 @@
                 alert('入力間違い又は元カテゴリー名と一致しています。')
             }
         }
-        
+
         function toMenuList(pk) {
-            location.href="/menuList?category=" + pk;
+            location.href = "/menuList?category=" + pk;
         }
 
+        function filterCategoryByName() {
+            const searchInput = document.getElementById('search-input').value.toLowerCase();
+            const categoryItems = document.getElementsByClassName('category-item');
+            for (let i = 0; i < categoryItems.length; i++) {
+                const categoryItem = categoryItems[i];
+                const categoryName = categoryItem.querySelector('.card-title').innerText.toLowerCase();
+                if (categoryName.includes(searchInput)) {
+                    categoryItem.style.display = '';
+                } else {
+                    categoryItem.style.display = 'none';
+                }
+            }
+        }
     </script>
-
-    <div>
-        <div class="category-item" th:each="category : ${categories}">
-            <div class="category-id" th:text="${category.id}"></div>
-            <div class="category-name" th:text="${category.name}"></div>
-            <div class="category-actions d-flex flex-row justify-content-end">
-                <button type="button" class="btn btn-outline-secondary btn-block mr-2" th:onclick="|toMenuList(${category.id})|" style="white-space: nowrap;">メニューリストへ</button>
-                <button type="button" class="btn btn-outline-primary btn-block mr-2" th:onclick="|updateCategory(${category.id})|" style="white-space: nowrap;">カテゴリー名変更</button>
-                <input th:id="|${category.id}_name|" th:value="${category.name}" style="display: none">
-                <button type="button" class="btn btn-outline-danger btn-block" th:onclick="|deleteCategory(${category.id})|" style="white-space: nowrap;">削除</button>
-            </div>
-        </div>
-        <div class="mt-5 text-center">
-            <button class="btn btn-primary btn-block" onclick="location.href='/categoryCreate'">カテゴリー追加</button>
-        </div>
-    </div>
-
-
-
-
 
 </th:block>
 </html>
+<style>
+    .btn {
+        width: 10em;
+        margin-bottom: 0.25em;
+    }
+
+    .btn-danger {
+        width: 5em;
+    }
+
+    #category-items {
+        padding-left: 1em;
+        padding-right: 1em;
+        padding-top: 1em;
+    }
+
+    #search-input {
+        left: 1rem;
+        top: 0.4rem;
+        position: relative;
+    }
+    .search-container {
+        display: flex;
+        justify-content: space-between;
+    }
+    .search-input {
+        flex: 1; /* 너비를 조정하여 화면에 맞추기 */
+        max-width: 18rem; /* 최대 너비 설정 */
+    }
+</style>

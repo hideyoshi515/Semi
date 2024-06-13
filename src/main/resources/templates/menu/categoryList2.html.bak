@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/default_layout}">
+>
+<th:block layout:fragment="content">
+    <style>
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .category-id {
+            width: 50px;
+            text-align: right;
+        }
+
+        .category-name {
+            flex-grow: 1;
+            margin: 0 20px;
+        }
+
+        .category-created-at,
+        .category-updated-at {
+            width: 150px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .category-actions {
+            width: 250px;
+            text-align: right;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .category-actions button {
+            margin-left: 10px;
+        }
+
+
+    </style>
+
+    <script>
+        function deleteCategory(pk) {
+            let ok = confirm("本当にカテゴリーを削除しますか?")
+            if (ok) {
+                $.ajax({
+                    url: '/CategoryDelete',
+                    type: 'POST',
+                    data: {
+                        id: pk
+                    },
+                    success: function (response) {
+                        alert('カテゴリーの削除が成功しました。')
+                        location.href = '/categoryList';
+                    },
+                    error: function () {
+                        alert('カテゴリーの削除が失敗しました。')
+                    }
+                })
+            }
+        }
+
+        function updateCategory(pk) {
+            let currentName = $("#" + pk + "_name").val();
+            let newName = prompt("新しいカテゴリー名を入力してください。", currentName)
+            if (newName != null && newName !== "" && newName !== currentName) {
+                $.ajax({
+                    url: '/categoryUpdate',
+                    type: 'POST',
+                    data: {
+                        id: pk,
+                        name: newName
+                    },
+                    success: function (response) {
+                        alert('カテゴリー名の変更が成功しました。')
+                        location.href = '/categoryList';
+                    },
+                    error: function () {
+                        alert('カテゴリー名の変更が失敗しました。')
+                    }
+                })
+            } else {
+                alert('入力間違い又は元カテゴリー名と一致しています。')
+            }
+        }
+        
+        function toMenuList(pk) {
+            location.href="/menuList?category=" + pk;
+        }
+
+    </script>
+
+    <div>
+        <div class="category-item" th:each="category : ${categories}">
+            <div class="category-id" th:text="${category.id}"></div>
+            <div class="category-name" th:text="${category.name}"></div>
+            <div class="category-actions d-flex flex-row justify-content-end">
+                <button type="button" class="btn btn-outline-secondary btn-block mr-2" th:onclick="|toMenuList(${category.id})|" style="white-space: nowrap;">メニューリストへ</button>
+                <button type="button" class="btn btn-outline-primary btn-block mr-2" th:onclick="|updateCategory(${category.id})|" style="white-space: nowrap;">カテゴリー名変更</button>
+                <input th:id="|${category.id}_name|" th:value="${category.name}" style="display: none">
+                <button type="button" class="btn btn-outline-danger btn-block" th:onclick="|deleteCategory(${category.id})|" style="white-space: nowrap;">削除</button>
+            </div>
+        </div>
+        <div class="mt-5 text-center">
+            <button class="btn btn-primary btn-block" onclick="location.href='/categoryCreate'">カテゴリー追加</button>
+        </div>
+    </div>
+
+
+
+
+
+</th:block>
+</html>
