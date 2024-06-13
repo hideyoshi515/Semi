@@ -10,52 +10,52 @@ import java.util.List;
 
 @Service
 public class OrderService {
-    private final OrderRepository orderRepository;
-    private MenuRepository menuRepository;
-    private final DiscordBotService discordBotService;
+	private final OrderRepository orderRepository;
+	private MenuRepository menuRepository;
+	private final DiscordBotService discordBotService;
 
-    public OrderService(OrderRepository orderRepository, MenuRepository menuRepository, DiscordBotService discordBotService) {
-        this.orderRepository = orderRepository;
-        this.menuRepository = menuRepository;
-        this.discordBotService = discordBotService;
-    }
+	public OrderService(OrderRepository orderRepository, MenuRepository menuRepository, DiscordBotService discordBotService) {
+		this.orderRepository = orderRepository;
+		this.menuRepository = menuRepository;
+		this.discordBotService = discordBotService;
+	}
 
-    public List<Sales> findByProcess(int process) {
-        return orderRepository.findByProcess(process);
-    }
+	public List<Sales> findByProcess(int process) {
+		return orderRepository.findByProcess(process);
+	}
 
-    public List<Object[]> findSalesByProcess(int process) {
-        return orderRepository.findSalesByProcess(process);
-    }
+	public List<Object[]> findSalesByProcess(int process) {
+		return orderRepository.findSalesByProcess(process);
+	}
 
-    public List<Object[]> findSalesByProcessAndDevice(int process) {
-        return orderRepository.findSalesByProcessAndDevice(process);
-    }
+	public List<Object[]> findSalesByProcessAndDevice(int process) {
+		return orderRepository.findSalesByProcessAndDevice(process);
+	}
 
-    public Sales findById(int id) {
-        return orderRepository.findById(id);
-    }
+	public List<Object[]> findByIdAndShowDeviceName(long orderId) {
+		return orderRepository.findByIdAndShowDeviceName(orderId);
+	}
 
-    public List<Object[]> findSalesById(long orderId) {
-        return orderRepository.findSalesById(orderId);
-    }
+	public List<Object[]> findSalesById(long orderId) {
+		return orderRepository.findSalesById(orderId);
+	}
 
-    public void updateDenialByProcess(long orderId) {
-        orderRepository.updateDenialByProcess(orderId);
-    }
+	public void updateDenialByProcess(long orderId) {
+		orderRepository.updateDenialByProcess(orderId);
+	}
 
-    public void updateOrderApproval(long orderId, int orderQuantity, long menuId) {
-        orderRepository.updateSalesProcess(orderId);
-        orderRepository.updateMenuStock(menuId, orderQuantity);
-    }
+	public void updateOrderApproval(long orderId, int orderQuantity, long menuId) {
+		orderRepository.updateSalesProcess(orderId);
+		orderRepository.updateMenuStock(menuId, orderQuantity);
+	}
 
-    @Transactional
-    public void approveOrder(long orderId, String message) {
-        Sales order = orderRepository.findById(orderId);
+	@Transactional
+	public void approveOrder(long orderId, String message) {
+		List<Object[]> order = orderRepository.findByIdAndShowDeviceName(orderId);
 
-        if (order != null) {
-            System.out.println("주문승인");
-            discordBotService.sendOrderNotification(message);
-        }
-    }
+		if (order != null) {
+			System.out.println("주문승인");
+			discordBotService.sendOrderNotification(message);
+		}
+	}
 }
