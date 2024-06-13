@@ -20,6 +20,7 @@ public class OrderService {
         this.discordBotService = discordBotService;
     }
 
+
     public List<Sales> findByProcess(int process) {
         return orderRepository.findByProcess(process);
     }
@@ -30,6 +31,10 @@ public class OrderService {
 
     public List<Object[]> findSalesByProcessAndDevice(int process) {
         return orderRepository.findSalesByProcessAndDevice(process);
+    }
+
+    public List<Object[]> findByIdAndShowDeviceName(long orderId) {
+        return orderRepository.findByIdAndShowDeviceName(orderId);
     }
 
     public Sales findById(int id) {
