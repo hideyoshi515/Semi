@@ -22,7 +22,7 @@ public interface OrderRepository extends JpaRepository<Sales, Integer> {
     @Query("SELECT DISTINCT s.orderNum FROM Sales s WHERE s.process = :process AND DATE(s.date) = :inputdate")
     List<Integer> findDistinctOrderNumByDateAndProcess(@Param("process") int process, @Param("inputdate") LocalDate inputdate);
 
-    @Query("SELECT s FROM Sales s WHERE DATE(s.date) = :inputdate AND s.orderNum = :ordernum")
+    @Query("SELECT s FROM Sales s WHERE DATE(s.date) = :inputdate AND s.orderNum = :ordernum ORDER BY s.id ASC")
     List<Sales> findSalesByOrderNumAndDate(@Param("ordernum") int ordernum, @Param("inputdate") LocalDate inputdate);
 
     @Query("SELECT DISTINCT date_format(s.date, '%Y-%m-%d') FROM Sales s WHERE s.process = :process")

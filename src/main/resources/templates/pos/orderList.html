@@ -91,68 +91,6 @@
         </footer>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="quantityModal" tabindex="-1" aria-labelledby="quantityModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title user-select-none" id="quantityModalLabel">数量調整</h5>
-                    <button type="button" class="btn-close user-select-none" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="text" id="modal-quantity-input" class="form-control mb-2 text-center fs-4" readonly>
-                    <div class="numeric-keypad">
-                        <button type="button" class="btn btn-light border border-1 user-select-none"
-                                th:each="number : ${#numbers.sequence(1, 9)}"
-                                th:onclick="|appendNumberModal(${number})|"
-                                th:text="${number}"></button>
-                        <button type="button" class="btn btn-light border border-1 user-select-none"
-                                onclick="clearNumberModal()">削除
-                        </button>
-                        <button type="button" class="btn btn-light border border-1 user-select-none"
-                                onclick="appendNumberModal(0)">0
-                        </button>
-                        <button type="button" class="btn btn-light border border-1 user-select-none"
-                                onclick="deleteNumberModal()">←
-                        </button>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary user-select-none" data-bs-dismiss="modal">閉じる
-                    </button>
-                    <button type="button" class="btn btn-primary user-select-none" onclick="saveQuantity()">調整
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- 결제 확인 모달 -->
-    <div class="modal fade" id="confirmPaymentModal" tabindex="-1" aria-labelledby="confirmPaymentModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title user-select-none" id="confirmPaymentModalLabel">確認</h5>
-                    <button type="button" class="btn-close user-select-none" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                </div>
-                <div class="modal-body user-select-none">
-                    本当に決済しますか？
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary user-select-none" data-bs-dismiss="modal">
-                        キャンセル
-                    </button>
-                    <button type="button" class="btn btn-primary user-select-none" onclick="processPayment()">確認
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
         let orderList = [];
 
@@ -168,7 +106,6 @@
 
                     orderNums.forEach(function (orderNum) {
                         var itemButton = document.createElement('button');
-                        console.log("orderNum:" + orderNum);
                         itemButton.className = 'btn btn-outline-primary w-100 mb-2 user-select-none';
                         itemButton.textContent = '注文番号 : ' + orderNum; // 버튼에 표시할 텍스트
                         itemButton.setAttribute('onclick', `getOrders(${orderNum}, '` + date + `')`); // 버튼 클릭 시 실행할 함수
@@ -190,12 +127,55 @@
                     clearNumber();
                     orders.forEach(function (order) {
                         getName(order.menu).then(function (name) {
-                            console.log(name);
-                            addItem(name, order.price, order.menu, order.quantity);
-                            console.log(name, order.price, order.menu, order.quantity);
+                            addItem(name, order.price, order.menu, order.quantity, order.process, order.id, date);
                         }).catch(function (error) {
                             console.error("Error fetching name:", error);
                         });
+                    });
+                }
+            };
+            xhr.send();
+        }
+
+        function confirm(pk, menuId, quantity, date){
+
+            var xhr = new XMLHttpRequest();
+            console.log(pk,menuId,quantity,date);
+            xhr.open("POST", "/pos/orderList/confirm?pk=" + pk + "&menuId="+menuId+"&quantity="+quantity, true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const btn = document.getElementById('btn_'+pk);
+                    btn.classList.remove("btn-primary");
+                    btn.classList.add("btn-secondary");
+                    btn.textContent = '承認済み';
+                    btn.setAttribute('disabled', '');
+                    // const index = orderList.findIndex(order => order.pk === pk);
+                    // deleteItem(index);
+                    updateOrderDates();
+                    getOrderNums(date);
+                }
+            };
+            xhr.send();
+        }
+
+        function updateOrderDates() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/pos/orderList/getOrderDates", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var dates = JSON.parse(xhr.responseText);
+                    var menuCategoriesDiv = document.querySelector('.menu-categories');
+                    menuCategoriesDiv.innerHTML = ''; // 기존 내용 삭제
+
+                    dates.forEach(function(date) {
+                        var button = document.createElement('button');
+                        button.className = 'btn btn-primary w-100 mb-2 user-select-none';
+                        button.textContent = date;
+                        button.setAttribute('data-date', date);
+                        button.setAttribute('onclick', 'handleDateClick(this)');
+                        menuCategoriesDiv.appendChild(button);
                     });
                 }
             };
@@ -227,8 +207,8 @@
             getOrderNums(date);
         }
 
-        function addItem(item, price, itemId, quantity) {
-            orderList.push({item, price, itemId: itemId, quantity: quantity});
+        function addItem(item, price, itemId, quantity, process, pk, date) {
+            orderList.push({item, price, itemId: itemId, quantity: quantity, process, pk, date});
             updateOrderList();
             updateTotalAmount();
         }
@@ -271,18 +251,20 @@
                 const buttonGroup = document.createElement('div');
                 buttonGroup.className = 'col-3 user-select-none d-flex justify-content-end';
 
-                const quantityButton = document.createElement('button');
-                quantityButton.className = 'btn btn-secondary btn-sm me-2 user-select-none';
-                quantityButton.textContent = '個数';
-                quantityButton.setAttribute('onclick', `showQuantityModal(${index}, ${order.stock})`);
-
                 const deleteButton = document.createElement('button');
-                deleteButton.className = 'btn btn-danger btn-sm user-select-none';
-                deleteButton.textContent = '削除';
-                deleteButton.setAttribute('onclick', `deleteItem(${index})`);
 
-                buttonGroup.appendChild(quantityButton);
+                if (order.process != 0) {
+                    deleteButton.className = 'btn btn-secondary btn-sm user-select-none';
+                    deleteButton.textContent = '承認済み';
+                    deleteButton.setAttribute('disabled', '');
+                } else {
+                    deleteButton.className = 'btn btn-primary btn-sm user-select-none';
+                    deleteButton.id = 'btn_'+order.pk;
+                    deleteButton.textContent = '承認確認';
+                    deleteButton.setAttribute('onclick', `confirm(${order.pk}, ${order.itemId}, ${order.quantity}, '${order.date}')`);
+                }
                 buttonGroup.appendChild(deleteButton);
+
 
                 orderItem.appendChild(itemName);
                 orderItem.appendChild(itemPrice);
@@ -292,54 +274,6 @@
 
                 orderListDiv.appendChild(orderItem);
             });
-        }
-
-        let modalJustOpen = false;
-
-        function showQuantityModal(index, stock) {
-            currentIndex = index;
-            maxStock = stock;
-            document.getElementById('modal-quantity-input').value = orderList[index].quantity;
-            var quantityModal = new bootstrap.Modal(document.getElementById('quantityModal'));
-            quantityModal.show();
-            modalJustOpen = true;
-        }
-
-        function saveQuantity() {
-            const newQuantity = document.getElementById('modal-quantity-input').value;
-            if (newQuantity !== null && !isNaN(newQuantity) && newQuantity > 0) {
-                orderList[currentIndex].quantity = parseInt(newQuantity, 10);
-                updateOrderList();
-                updateTotalAmount();
-            } else {
-                deleteItem(currentIndex);
-            }
-            var quantityModal = bootstrap.Modal.getInstance(document.getElementById('quantityModal'));
-            quantityModal.hide();
-        }
-
-        function appendNumberModal(number) {
-            const quantityInput = document.getElementById('modal-quantity-input');
-            if (modalJustOpen) {
-                quantityInput.value = number;
-                modalJustOpen = false;
-            } else {
-                const newQuantity = parseInt(quantityInput.value + number, 10);
-                if (newQuantity <= maxStock) {
-                    quantityInput.value = newQuantity;
-                } else {
-                    quantityInput.value = maxStock;
-                }
-            }
-        }
-
-        function clearNumberModal() {
-            document.getElementById('modal-quantity-input').value = '0';
-        }
-
-        function deleteNumberModal() {
-            const quantityInput = document.getElementById('modal-quantity-input');
-            quantityInput.value = quantityInput.value.slice(0, -1) || '0';
         }
 
         function updateTotalAmount() {
@@ -364,34 +298,6 @@
         function showPaymentConfirmation() {
             var confirmPaymentModal = new bootstrap.Modal(document.getElementById('confirmPaymentModal'));
             confirmPaymentModal.show();
-        }
-
-        function processPayment() {
-            var confirmPaymentModal = bootstrap.Modal.getInstance(document.getElementById('confirmPaymentModal'));
-            confirmPaymentModal.hide();
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/pos/order", true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-
-            const orderData = orderList.map(order => ({
-                id: order.itemId,
-                quantity: order.quantity,
-            }));
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        showToast('注文が成功しました。', 'success');
-                        // POS 내용을 초기화
-                        orderList = [];
-                        updateOrderList();
-                        updateTotalAmount();
-                    } else {
-                        showToast('通信エラーが発生しました。', 'error');
-                    }
-                }
-            };
-            xhr.send(JSON.stringify(orderData));
         }
 
         function showToast(message, type) {

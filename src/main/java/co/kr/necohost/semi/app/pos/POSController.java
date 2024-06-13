@@ -7,6 +7,7 @@ import co.kr.necohost.semi.domain.repository.OrderNumRepository;
 import co.kr.necohost.semi.domain.repository.OrderRepository;
 import co.kr.necohost.semi.domain.service.CategoryService;
 import co.kr.necohost.semi.domain.service.MenuService;
+import co.kr.necohost.semi.domain.service.OrderService;
 import co.kr.necohost.semi.domain.service.SalesService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -15,10 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,14 +30,16 @@ public class POSController {
     private final MenuRepository menuRepository;
     private final OrderNumRepository orderNumRepository;
     private final OrderRepository orderRepository;
+    private final OrderService orderService;
 
-    public POSController(MenuService menuService, CategoryService categoryService, SalesService salesService, MenuRepository menuRepository, OrderNumRepository orderNumRepository, OrderRepository orderService) {
+    public POSController(MenuService menuService, CategoryService categoryService, SalesService salesService, MenuRepository menuRepository, OrderNumRepository orderNumRepository, OrderRepository orderRepository, OrderService orderService) {
         this.menuService = menuService;
         this.categoryService = categoryService;
         this.salesService = salesService;
         this.menuRepository = menuRepository;
         this.orderNumRepository = orderNumRepository;
-        this.orderRepository = orderService;
+        this.orderRepository = orderRepository;
+        this.orderService = orderService;
     }
 
     @RequestMapping(value = "/pos", method = RequestMethod.GET)
@@ -64,16 +64,26 @@ public class POSController {
         int orderNum = Integer.parseInt(params.get("orderNum").toString());
         LocalDate inputDate = params.get("date") == null ? LocalDate.now() : LocalDate.parse(params.get("date").toString());
         List<Sales> orders = orderRepository.findSalesByOrderNumAndDate(orderNum, inputDate);
-        orders.forEach(sales -> System.out.println(sales.toString()));
         return orders;
     }
 
     @RequestMapping(value = "/pos/orderList", method = RequestMethod.GET)
-    public String getPOSorderList(Model model, @RequestParam(name = "lang", required = false) String lang, HttpSession session) {
+    public String getPOSOrderList(Model model, @RequestParam(name = "lang", required = false) String lang, HttpSession session) {
         List<String> orderDate = orderRepository.findDistinctDateByProcess(0);
         model.addAttribute("session", session);
         model.addAttribute("orderDate", orderDate);
         return "pos/orderList.html";
+    }
+
+    @RequestMapping(value = "/pos/orderList/confirm",method = RequestMethod.POST)
+    @ResponseBody
+    public String confirmOrder(@RequestParam Map<String, Object> params) {
+        int pk = params.get("pk") == null ? 0 : Integer.parseInt(params.get("pk").toString());
+        int menuId = params.get("menuId") == null ? 0 : Integer.parseInt(params.get("menuId").toString());
+        int orderQuantity = params.get("quantity") == null ? 0 : Integer.parseInt(params.get("quantity").toString());
+        orderRepository.updateSalesProcess(pk);
+        orderRepository.updateMenuStock(menuId, orderQuantity);
+        return "success";
     }
 
     @RequestMapping(value = "/pos/getMenu", method = RequestMethod.GET)
@@ -81,6 +91,13 @@ public class POSController {
     public List<Menu> getMenusByCategory(@RequestParam Map<String, Object> params, HttpSession session){
         List<Menu> menus = menuService.getMenuByCategory(Integer.parseInt(params.get("category").toString()));
         return menus;
+    }
+
+    @RequestMapping(value = "/pos/orderList/getOrderDates", method = RequestMethod.GET)
+    @ResponseBody
+    public List<String> getOrderDates() {
+        List<String> dates = orderRepository.findDistinctDateByProcess(0);
+        return dates;
     }
 
     @RequestMapping(value = "/pos/order", method = RequestMethod.POST)
