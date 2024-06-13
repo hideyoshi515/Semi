@@ -3,6 +3,8 @@ package co.kr.necohost.semi.domain.service;
 import co.kr.necohost.semi.domain.model.dto.MenuRequest;
 import co.kr.necohost.semi.domain.model.entity.Menu;
 import co.kr.necohost.semi.domain.repository.MenuRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -99,4 +101,6 @@ public class MenuService {
         menu.setStockorder(0);
         menuRepository.save(menu);
     }
+
+
 }

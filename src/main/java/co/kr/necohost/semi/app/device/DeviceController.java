@@ -304,15 +304,18 @@ public class DeviceController {
     }
 
     @RequestMapping(value = "/order/kiosk", method = RequestMethod.GET)
-    public String getKiosk(@ModelAttribute DeviceRequest deviceRequest, @RequestParam Map<String, Object> params, HttpSession session, Model model) {
+    public String getKiosk() {
+        return "/order/orderKiosk.html";
+    }
+
+    @RequestMapping(value = "/order/kiosk/menu", method = RequestMethod.GET)
+    public String getKioskMenu(@ModelAttribute DeviceRequest deviceRequest, @RequestParam Map<String, Object> params, HttpSession session, Model model) {
         model.addAttribute("deviceRequest", deviceRequest);
-        Map<Long, List<Menu>> categorizedMenus = menuService.getCategorizedMenus();
-        model.addAttribute("categorizedMenus", categorizedMenus);
         List<Menu> menus = menuService.getAllMenus();
         List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("menus", menus);
         model.addAttribute("categories", categories);
-        return "/order/orderKiosk.html";
+        return "/order/orderKioskMenu.html";
     }
 
     @RequestMapping(value = "/order/kiosk/pay", method = RequestMethod.GET)
