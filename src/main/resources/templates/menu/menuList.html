@@ -55,10 +55,10 @@
                              style="color: #ff363b; font-weight: bold;"
                              th:text="在庫切れ"></div>
                         <div th:if="${menu.stock > 0}">
-                            <div th:if="${menu.stock < sale.value * 0.5}" class="user-select-none stock-status"
+                            <div th:if="${menu.stock < sale.value}" class="user-select-none stock-status"
                                  style="color: #ff363b"
                                  th:text="在庫不足"></div>
-                            <div th:if="${menu.stock >= sale.value * 0.5}" class="user-select-none stock-status"
+                            <div th:if="${menu.stock >= sale.value}" class="user-select-none stock-status"
                                  style="color: #0a53be"
                                  th:text="在庫あり"></div>
                         </div>
