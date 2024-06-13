@@ -8,9 +8,9 @@
 <th:block layout:fragment="content">
     <div class="search-container">
         <input class="search-input form-control rounded-2 ps-1 me-1" type="text" id="search-input" placeholder="カテゴリー名で検索" oninput="filterCategoryByName()">
-        <button class="search-button btn btn-primary d-flex align-items-center me-2" onclick="location.href='/categoryCreate'">
-            カテゴリー登録
-        </button>
+<!--        <button class="search-button btn btn-primary d-flex align-items-center me-2" onclick="location.href='/categoryCreate'">-->
+<!--            カテゴリー登録-->
+<!--        </button>-->
     </div>
     <div id="category-items" class="row row-cols-1 row-cols-md-3 g-4">
         <div class="category-item" th:each="category, iterStat : ${categories}">
