@@ -157,6 +157,14 @@ public class MenuController {
         return ResponseEntity.ok().build();
     }
 
+    // 발주량 0으로 초기화
+    @RequestMapping(value = "/cancelUpdateStockAndOrder", method = RequestMethod.POST)
+    public ResponseEntity<?> cancelUpdateStockAndOrder(@RequestBody Map<String, Object> payload) {
+        long id = ((Number) payload.get("id")).longValue();
+        menuService.cancelUpdateStockAndOrder(id);
+        return ResponseEntity.ok().build();
+    }
+
     // 카테고리 관리 페이지를 반환
     @RequestMapping(value = "/categoryList", method = RequestMethod.GET)
     public String getCategoryList(Model model) {
