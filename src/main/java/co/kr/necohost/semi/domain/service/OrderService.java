@@ -33,7 +33,7 @@ public class OrderService {
     }
 
     public Sales findById(int id) {
-        return orderRepository.findById(id);
+        return orderRepository.findById(id).orElse(null);
     }
 
     public List<Object[]> findSalesById(long orderId) {
@@ -51,7 +51,7 @@ public class OrderService {
 
     @Transactional
     public void approveOrder(long orderId, String message) {
-        Sales order = orderRepository.findById(orderId);
+        Sales order = orderRepository.findById((int) orderId).orElse(null);
 
         if (order != null) {
             System.out.println("주문승인");
