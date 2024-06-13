@@ -349,7 +349,7 @@ public class DeviceController {
             sales.setDevice(2);
             sales.setDeviceNum(1);
             sales.setOrderNum(orderNum.getOrderNum());
-            sales.setProcess(1);
+            sales.setProcess(0);
             salesService.save(sales);
             menu.setStock(menu.getStock() - quantity);
             menuRepository.save(menu);
