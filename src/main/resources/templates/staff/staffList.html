@@ -7,7 +7,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff List</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <th:block layout:fragment="content">
@@ -22,6 +21,7 @@
                         <div class="col"><strong>Username</strong></div>
                         <div class="col"><strong>Phone</strong></div>
                         <div class="col"><strong>Position</strong></div>
+                        <div class="col"><strong>Actions</strong></div>
                     </div>
                 </div>
                 <div class="table-body">
@@ -31,11 +31,33 @@
                         <div class="col" th:text="${staff.username}"></div>
                         <div class="col" th:text="${staff.phone}"></div>
                         <div class="col" th:text="${staff.position.position_Name}"></div>
+                        <div class="col">
+                            <button class="btn btn-danger" th:attr="data-id=${staff.id}" onclick="deleteStaff(this)">해고</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </th:block>
+<script>
+    function deleteStaff(button) {
+        const staffId = $(button).attr("data-id");
+
+        if (confirm("정말로 삭제하시겠습니까?")) {
+            $.ajax({
+                url: '/deleteStaff/' + staffId,
+                type: 'DELETE',
+                success: function(result) {
+                    alert("삭제되었습니다.");
+                    location.reload(); // 페이지 새로고침
+                },
+                error: function(error) {
+                    alert("삭제 중 오류가 발생했습니다.");
+                }
+            });
+        }
+    }
+</script>
 </body>
 </html>
