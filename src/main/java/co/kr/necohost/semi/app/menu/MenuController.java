@@ -64,8 +64,6 @@ public class MenuController {
         model.addAttribute("salesCount", salesCount);
         model.addAttribute("menus", menus);
         model.addAttribute("categories", categories);
-        System.out.println(successMessage);
-        System.out.println(errorMessage);
         model.addAttribute("successMessage", successMessage);
         model.addAttribute("errorMessage", errorMessage);
 
