@@ -49,6 +49,7 @@ public class POSController {
 		this.discordBotService = discordBotService;
 	}
 
+	// POS 페이지のGETリクエストを処理するメソッド
 	@RequestMapping(value = "/pos", method = RequestMethod.GET)
 	public String getPOS(Model model, @RequestParam(name = "lang", required = false) String lang, HttpSession session) {
 		List<Category> categories = categoryService.getAllCategories();
@@ -59,6 +60,7 @@ public class POSController {
 		return "pos/index.html";
 	}
 
+	// 特定の日付の注文番号リストを取得するメソッド
 	@RequestMapping(value = "/pos/orderList/getOrderNum", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Integer> getOrderNumByDate(@RequestParam Map<String, Object> params) {
@@ -67,6 +69,7 @@ public class POSController {
 		return orderNums;
 	}
 
+	// 特定の注文番号の注文リストを取得するメソッド
 	@RequestMapping(value = "/pos/orderList/getOrder", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Sales> getOrders(@RequestParam Map<String, Object> params) {
@@ -76,6 +79,7 @@ public class POSController {
 		return orders;
 	}
 
+	// POS注文リストページのGETリクエストを処理するメソッド
 	@RequestMapping(value = "/pos/orderList", method = RequestMethod.GET)
 	public String getPOSOrderList(Model model, @RequestParam(name = "lang", required = false) String lang, HttpSession session) {
 		List<String> orderDate = orderRepository.findDistinctDateByProcess(0);
@@ -84,6 +88,7 @@ public class POSController {
 		return "pos/orderList.html";
 	}
 
+	// 注文を確認するメソッド
 	@RequestMapping(value = "/pos/orderList/confirm", method = RequestMethod.POST)
 	@ResponseBody
 	public String confirmOrder(@RequestParam Map<String, Object> params) {
@@ -125,6 +130,7 @@ public class POSController {
 		return "success";
 	}
 
+	// 特定のカテゴリのメニューリストを取得するメソッド
 	@RequestMapping(value = "/pos/getMenu", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Menu> getMenusByCategory(@RequestParam Map<String, Object> params, HttpSession session) {
@@ -132,6 +138,7 @@ public class POSController {
 		return menus;
 	}
 
+	// 注文日リストを取得するメソッド
 	@RequestMapping(value = "/pos/orderList/getOrderDates", method = RequestMethod.GET)
 	@ResponseBody
 	public List<String> getOrderDates() {
@@ -139,6 +146,7 @@ public class POSController {
 		return dates;
 	}
 
+	// POS注文を処理するメソッド
 	@RequestMapping(value = "/pos/order", method = RequestMethod.POST)
 	@ResponseBody
 	public String postPOSOrder(@RequestBody List<POSOrder> orderItems, HttpSession session) throws IOException {
@@ -165,13 +173,14 @@ public class POSController {
 			menuRepository.save(menu);
 		}
 
-		// WebSocket을 통해 클라이언트에 알림 전송
+		// WebSocketを通じてクライアントに通知を送信
 		String message = "새로운 주문이 들어왔습니다";
 		orderWebSocketHandler.sendMessageToAll(message);
 
 		return "注文が成功しました";
 	}
 
+	// クーポンを作成するメソッド
 	@RequestMapping(value = "/pos/makeCoupon", method = RequestMethod.POST)
 	@ResponseBody
 	public String makeCoupon() {
@@ -179,16 +188,16 @@ public class POSController {
 		Random random = new Random();
 
 		for (int i = 0; i < 16; i++) {
-			couponCode.append(random.nextInt(10)); // 0-9 사이의 숫자를 추가
+			couponCode.append(random.nextInt(10)); // 0-9 사이の数字を追加
 			if ((i + 1) % 4 == 0 && i != 15) {
-				couponCode.append('-'); // 4자리마다 '-' 추가
+				couponCode.append('-'); // 4桁ごとに '-' を追加
 			}
 		}
 
 		String coupon = couponCode.toString();
 
 		couponService.saveCoupon(coupon);
-		discordBotService.sendOrderNotification("쿠폰이 발급되었습니다 : " + coupon);
+		discordBotService.sendOrderNotification("クーポンが発行されました: " + coupon);
 
 		return coupon;
 	}

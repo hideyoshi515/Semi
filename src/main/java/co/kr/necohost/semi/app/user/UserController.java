@@ -17,12 +17,14 @@ public class UserController {
         this.accountRepository = accountRepository;
     }
 
+    // ホームページのリクエストを処理するメソッド
     @RequestMapping("/")
     public String index(Model model, HttpSession session) {
         model.addAttribute("session", session);
         return "user/home.html";
     }
 
+    // ユーザーの会員チェックを行うメソッド
     @ResponseBody
     @RequestMapping("/user/memberCheck")
     public Account getMemberCheck(@RequestParam Map<String, Object> params) {
