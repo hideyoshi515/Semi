@@ -30,56 +30,50 @@
     </div>
 
     <script>
-        document.getElementById('clockInForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
+        $(document).ready(function() {
+            $('#clockInForm').on('submit', function(event) {
+                event.preventDefault();
 
-            const username = document.getElementById('clockInUsername').value;
+                const username = $('#clockInUsername').val();
+                const requestData = {
+                    username: username
+                };
 
-            const requestData = {
-                username: username
-            };
-
-            try {
-                const response = await fetch('/timecard/clockin', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
+                $.ajax({
+                    url: '/timeCardIn',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(requestData),
+                    success: function(response) {
+                        $('#message').html(`<div class="alert alert-success">${response}</div>`);
                     },
-                    body: JSON.stringify(requestData)
+                    error: function(xhr, status, error) {
+                        $('#message').html(`<div class="alert alert-danger">Error: ${xhr.responseText}</div>`);
+                    }
                 });
+            });
 
-                const result = await response.text();
+            $('#clockOutForm').on('submit', function(event) {
+                event.preventDefault();
 
-                document.getElementById('message').innerHTML = `<div class="alert alert-success">${result}</div>`;
-            } catch (error) {
-                document.getElementById('message').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
-            }
-        });
+                const username = $('#clockOutUsername').val();
+                const requestData = {
+                    username: username
+                };
 
-        document.getElementById('clockOutForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-
-            const username = document.getElementById('clockOutUsername').value;
-
-            const requestData = {
-                username: username
-            };
-
-            try {
-                const response = await fetch('/timecard/clockout', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
+                $.ajax({
+                    url: '/timeCardOut',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(requestData),
+                    success: function(response) {
+                        $('#message').html(`<div class="alert alert-success">${response}</div>`);
                     },
-                    body: JSON.stringify(requestData)
+                    error: function(xhr, status, error) {
+                        $('#message').html(`<div class="alert alert-danger">Error: ${xhr.responseText}</div>`);
+                    }
                 });
-
-                const result = await response.text();
-
-                document.getElementById('message').innerHTML = `<div class="alert alert-success">${result}</div>`;
-            } catch (error) {
-                document.getElementById('message').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
-            }
+            });
         });
     </script>
 </th:block>
