@@ -419,11 +419,27 @@ public class SalesService {
 				.mapToInt(Sales::getQuantity)
 				.sum();
 
-		Map<String, Double> result = new HashMap<>();
-		result.put("totalSalesAmount", totalSalesAmount);
-		result.put("totalQuantity", (double) totalQuantity);
-		return result;
-	}
+        Map<String, Double> result = new HashMap<>();
+        result.put("totalSalesAmount", totalSalesAmount);
+        result.put("totalQuantity", Double.valueOf(totalQuantity));
+        return result;
+    }
+
+    //추가 중 6월 14일 4시 9분
+    public double calculateTotalCostByProcess(int process) {
+        List<Sales> salesList = findByProcess(process).stream()
+                .filter(s -> s.getProcess() == 1)
+                .collect(Collectors.toList());
+
+        double totalCost = 0.0;
+
+        for (Sales sale : salesList) {
+            Menu menu = menuRepository.findById(sale.getMenu()).orElseThrow(() -> new RuntimeException("Menu not found"));
+            totalCost += sale.getQuantity() * menu.getCost();
+        }
+
+        return totalCost;
+    }
 
 	//
 	public Map<String, Object> calculateMenuSalesData(Long menuId) {
