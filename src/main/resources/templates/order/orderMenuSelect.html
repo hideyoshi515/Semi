@@ -38,7 +38,7 @@
         <div id="sidebarMein"></div>
         <div id="sidebar">
             <div class="btn-group-vertical" role="group" aria-label="Category filter">
-                <a type="button" class="rounded-0 border border-1 btn scrollNav btn-success"
+                <a type="button" class="rounded-0 border border-1 btn scrollNav btn-warning"
                    th:each="category : ${categories}"
                    th:text="${category.name}"
                    th:href="|#section${categoryStat.count}|"
@@ -57,7 +57,7 @@
             </div>
         </div>
         <div id="content">
-            <div class="section mb-5" th:id="|section${sectionNumStat.count}|" th:each="sectionNum : ${#numbers.sequence(1,categoryCount)}">
+            <div class="section pb-5 mb-5" th:id="|section${sectionNumStat.count}|" th:each="sectionNum : ${#numbers.sequence(1,categoryCount)}">
                 <h2 id="categoryTitle" th:text="${category.name}" th:if="${categoryStat.count == sectionNumStat.count}" th:each="category : ${categories}"></h2>
                 <div class="row" id="menuContainer">
                     <div class="mb-3 menuItem" th:each="menu : ${menusList[sectionNumStat.index]}"
@@ -445,9 +445,9 @@
 
                 navLinks.forEach(a => {
                     a.classList.add("btn-light");
-                    a.classList.remove("btn-success");
+                    a.classList.remove("btn-warning");
                     if (a.getAttribute("href").includes(current)) {
-                        a.classList.add("btn-success");
+                        a.classList.add("btn-warning");
                         a.classList.remove("btn-light");
                     }
                 });
