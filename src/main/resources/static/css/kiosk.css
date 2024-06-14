@@ -1,0 +1,142 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f7f7f7;
+}
+
+.container {
+    width: 768px !important;
+    margin: auto;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.headTitle {
+    width: 100% !important;
+    background-color: #ffcc00;
+    text-align: center;
+    padding: 10px 0;
+}
+
+.headTitle img {
+    height: 50px;
+}
+
+.menu-section {
+    padding: 20px;
+    min-height: 1110px;
+}
+
+.menu-category {
+    margin-bottom: 20px;
+}
+
+.menu-category h2 {
+    margin-bottom: 10px;
+    border-bottom: 2px solid #ffcc00;
+    padding-bottom: 5px;
+}
+
+.menu-item {
+    width: 30%;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.menu-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.menu-item p {
+    margin: 10px 0 0;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f2f2f2;
+    padding: 10px 20px;
+}
+
+.btn-group-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.btn-group-container {
+    overflow-x: hidden;
+    white-space: nowrap;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.btn-group {
+    display: flex;
+}
+
+.btn-group .btn {
+    margin: 0px;
+    white-space: nowrap;
+}
+
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100vh - 5rem);
+}
+
+.fade-effect {
+    animation: fadeInOut 2s infinite;
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+}
+
+#menuContainer::-webkit-scrollbar {
+    width: 10px;
+}
+
+#menuContainer::-webkit-scrollbar-track {
+    background-color: #f2f2f2;
+}
+
+#menuContainer::-webkit-scrollbar-thumb {
+    background-color: #ffcc00;
+}
+
+#menuContainer::-webkit-scrollbar-track,
+#menuContainer::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+}
+
+.numeric-keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.numeric-keypad button {
+    font-size: 1.5rem;
+    padding: 5px 15px;
+    text-align: center;
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.membershipInput {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
