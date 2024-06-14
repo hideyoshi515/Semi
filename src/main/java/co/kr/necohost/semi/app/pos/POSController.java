@@ -5,21 +5,19 @@ import co.kr.necohost.semi.domain.model.entity.*;
 import co.kr.necohost.semi.domain.repository.MenuRepository;
 import co.kr.necohost.semi.domain.repository.OrderNumRepository;
 import co.kr.necohost.semi.domain.repository.OrderRepository;
-import co.kr.necohost.semi.domain.service.CategoryService;
-import co.kr.necohost.semi.domain.service.MenuService;
-import co.kr.necohost.semi.domain.service.OrderService;
-import co.kr.necohost.semi.domain.service.SalesService;
+import co.kr.necohost.semi.domain.service.*;
+import co.kr.necohost.semi.websocket.OrderWebSocketHandler;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
 public class POSController {
@@ -31,8 +29,9 @@ public class POSController {
     private final OrderNumRepository orderNumRepository;
     private final OrderRepository orderRepository;
     private final OrderService orderService;
+    private final OrderWebSocketHandler orderWebSocketHandler;
 
-    public POSController(MenuService menuService, CategoryService categoryService, SalesService salesService, MenuRepository menuRepository, OrderNumRepository orderNumRepository, OrderRepository orderRepository, OrderService orderService) {
+    public POSController(MenuService menuService, CategoryService categoryService, SalesService salesService, MenuRepository menuRepository, OrderNumRepository orderNumRepository, OrderRepository orderRepository, OrderService orderService, OrderWebSocketHandler orderWebSocketHandler) {
         this.menuService = menuService;
         this.categoryService = categoryService;
         this.salesService = salesService;
@@ -40,6 +39,7 @@ public class POSController {
         this.orderNumRepository = orderNumRepository;
         this.orderRepository = orderRepository;
         this.orderService = orderService;
+        this.orderWebSocketHandler = orderWebSocketHandler;
     }
 
     @RequestMapping(value = "/pos", method = RequestMethod.GET)
@@ -102,7 +102,7 @@ public class POSController {
 
     @RequestMapping(value = "/pos/order", method = RequestMethod.POST)
     @ResponseBody
-    public String postPOSOrder(@RequestBody List<POSOrder> orderItems, HttpSession session){
+    public String postPOSOrder(@RequestBody List<POSOrder> orderItems, HttpSession session) throws IOException {
         LocalDateTime localDate = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDateTime = localDate.format(formatter);
@@ -125,6 +125,11 @@ public class POSController {
             menu.setStock(menu.getStock() - quantity);
             menuRepository.save(menu);
         }
+
+        // WebSocket을 통해 클라이언트에 알림 전송
+        String message = "새로운 주문이 들어왔습니다";
+        orderWebSocketHandler.sendMessageToAll(message);
+
         return "注文が成功しました";
     }
 }

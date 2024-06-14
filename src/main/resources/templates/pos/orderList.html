@@ -1,21 +1,12 @@
 <!DOCTYPE html>
-<html
-        xmlns:th="http://www.thymeleaf.org"
-        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{layout/plain_layout}">
->
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/plain_layout}">
 <th:block layout:fragment="content">
     <div class="container">
         <header class="header" style="height:42px !important;">
             <div>
                 POS
             </div>
-            <!--        <div class="settings">-->
-            <!--            <button onclick="printReceipt('receipt')">영수증 출력여부</button>-->
-            <!--            <button onclick="printReceipt('order')">고객주문서 출력여부</button>-->
-            <!--            <button onclick="printReceipt('kitchen')">주방주문서 출력여부</button>-->
-            <!--            <button onclick="toggleMenuPrint()">영수증에 메뉴출력여부</button>-->
-            <!--        </div>-->
         </header>
 
         <main class="main-content">
@@ -93,19 +84,47 @@
 
     <script>
         let orderList = [];
+        let today = new Date();
+
+        let year = today.getFullYear();
+        let month = ('0' + (today.getMonth() + 1)).slice(-2);
+        let day = ('0' + today.getDate()).slice(-2);
+
+        // WebSocket 설정
+        let socket = new WebSocket("ws://localhost:8080/ws/orders");
+
+        socket.onopen = function () {
+            setInterval(() => socket.send(""), 1000);
+        };
+
+        socket.onmessage = function (event) {
+            // 주문 목록 갱신 로직
+            let dateString = year + '-' + month + '-' + day;
+
+            updateOrderDates();
+            getOrderNums(dateString);
+        };
+
+        socket.onerror = function (error) {
+            console.error("WebSocket 오류가 발생했습니다: ", error);
+        };
+
+        socket.onclose = function () {
+            console.log("WebSocket 연결이 닫혔습니다.");
+        };
 
         function getOrderNums(date) {
-            var xhr = new XMLHttpRequest();
+            let xhr = new XMLHttpRequest();
             xhr.open("GET", "/pos/orderList/getOrderNum?date=" + date, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    var orderNums = JSON.parse(xhr.responseText);
-                    var salesItemsDiv = document.getElementById('sales-items');
+                    let orderNums = JSON.parse(xhr.responseText);
+                    let salesItemsDiv = document.getElementById('sales-items');
                     salesItemsDiv.innerHTML = ''; // 기존 내용 삭제
 
                     orderNums.forEach(function (orderNum) {
-                        var itemButton = document.createElement('button');
+                        let itemButton = document.createElement('button');
                         itemButton.className = 'btn btn-outline-primary w-100 mb-2 user-select-none';
                         itemButton.textContent = '注文番号 : ' + orderNum; // 버튼에 표시할 텍스트
                         itemButton.setAttribute('onclick', `getOrders(${orderNum}, '` + date + `')`); // 버튼 클릭 시 실행할 함수
@@ -116,14 +135,13 @@
             xhr.send();
         }
 
-
         function getOrders(orderNum, date) {
-            var xhr = new XMLHttpRequest();
+            let xhr = new XMLHttpRequest();
             xhr.open("GET", "/pos/orderList/getOrder?orderNum=" + orderNum + "&date=" + date, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    var orders = JSON.parse(xhr.responseText);
+                    let orders = JSON.parse(xhr.responseText);
                     clearNumber();
                     orders.forEach(function (order) {
                         getName(order.menu).then(function (name) {
@@ -137,25 +155,23 @@
             xhr.send();
         }
 
-        function confirm(pk, menuId, quantity, date){
-
-            var xhr = new XMLHttpRequest();
-            console.log(pk,menuId,quantity,date);
-            xhr.open("POST", "/pos/orderList/confirm?pk=" + pk + "&menuId="+menuId+"&quantity="+quantity, true);
+        function confirm(pk, menuId, quantity, date) {
+            let xhr = new XMLHttpRequest();
+            console.log(pk, menuId, quantity, date);
+            xhr.open("POST", "/pos/orderList/confirm?pk=" + pk + "&menuId=" + menuId + "&quantity=" + quantity, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    const btn = document.getElementById('btn_'+pk);
+                    const btn = document.getElementById('btn_' + pk);
                     btn.classList.remove("btn-primary");
                     btn.classList.add("btn-secondary");
                     btn.textContent = '承認済み';
                     btn.setAttribute('disabled', '');
                     const index = orderList.findIndex(order => order.pk === pk);
                     orderList[index].process = 1;
-                    // deleteItem(index);
 
                     const allClear = orderList.every(order => order.process !== 0);
-                    if(allClear){
+                    if (allClear) {
                         clearNumber();
                     }
 
@@ -167,17 +183,17 @@
         }
 
         function updateOrderDates() {
-            var xhr = new XMLHttpRequest();
+            let xhr = new XMLHttpRequest();
             xhr.open("GET", "/pos/orderList/getOrderDates", true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    var dates = JSON.parse(xhr.responseText);
-                    var menuCategoriesDiv = document.querySelector('.menu-categories');
+                    let dates = JSON.parse(xhr.responseText);
+                    let menuCategoriesDiv = document.querySelector('.menu-categories');
                     menuCategoriesDiv.innerHTML = ''; // 기존 내용 삭제
 
-                    dates.forEach(function(date) {
-                        var button = document.createElement('button');
+                    dates.forEach(function (date) {
+                        let button = document.createElement('button');
                         button.className = 'btn btn-primary w-100 mb-2 user-select-none';
                         button.textContent = date;
                         button.setAttribute('data-date', date);
@@ -189,10 +205,9 @@
             xhr.send();
         }
 
-
         function getName(menuId) {
             return new Promise(function (resolve, reject) {
-                var xhr = new XMLHttpRequest();
+                let xhr = new XMLHttpRequest();
                 xhr.open("GET", "/menu/getName?id=" + menuId, true);
                 xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 xhr.onreadystatechange = function () {
@@ -207,7 +222,6 @@
                 xhr.send();
             });
         }
-
 
         function handleDateClick(button) {
             var date = button.getAttribute('data-date');
@@ -274,12 +288,11 @@
                     deleteButton.setAttribute('disabled', '');
                 } else {
                     deleteButton.className = 'btn btn-primary btn-sm user-select-none';
-                    deleteButton.id = 'btn_'+order.pk;
+                    deleteButton.id = 'btn_' + order.pk;
                     deleteButton.textContent = '承認確認';
                     deleteButton.setAttribute('onclick', `confirm(${order.pk}, ${order.itemId}, ${order.quantity}, '${order.date}')`);
                 }
                 buttonGroup.appendChild(deleteButton);
-
 
                 orderItem.appendChild(itemName);
                 orderItem.appendChild(itemPrice);
@@ -302,7 +315,6 @@
         }
 
         function appendNumber(number) {
-            // This function can be extended to handle number pad input
             console.log(`Number entered: ${number}`);
         }
 
@@ -311,7 +323,7 @@
         }
 
         function showPaymentConfirmation() {
-            var confirmPaymentModal = new bootstrap.Modal(document.getElementById('confirmPaymentModal'));
+            let confirmPaymentModal = new bootstrap.Modal(document.getElementById('confirmPaymentModal'));
             confirmPaymentModal.show();
         }
 
@@ -325,9 +337,9 @@
             const toastBody = document.createElement('div');
             toastBody.className = 'd-flex';
             toastBody.innerHTML = `
-        <div class="toast-body">${message}</div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-    `;
+            <div class="toast-body">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        `;
 
             toast.appendChild(toastBody);
             document.body.appendChild(toast);
@@ -340,9 +352,8 @@
                 toast.remove();
             }, 3000);
         }
-
-
     </script>
+
     <style>
         .numeric-keypad {
             display: grid;

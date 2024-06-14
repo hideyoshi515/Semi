@@ -8,13 +8,18 @@ import co.kr.necohost.semi.domain.repository.MenuRepository;
 import co.kr.necohost.semi.domain.repository.OrderNumRepository;
 import co.kr.necohost.semi.domain.repository.OrderRepository;
 import co.kr.necohost.semi.domain.service.*;
+import co.kr.necohost.semi.websocket.OrderWebSocketHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -23,350 +28,380 @@ import java.util.Map;
 
 @Controller
 public class DeviceController {
-    private final MenuService menuService;
-    private final DeviceService deviceService;
-    private final SalesService salesService;
-    private final MenuRepository menuRepository;
-    private final AccountService accountService;
-    private final CategoryService categoryService;
-    private final OrderRepository orderRepository;
-    private final OrderNumRepository orderNumRepository;
+	private final MenuService menuService;
+	private final DeviceService deviceService;
+	private final SalesService salesService;
+	private final MenuRepository menuRepository;
+	private final AccountService accountService;
+	private final CategoryService categoryService;
+	private final OrderRepository orderRepository;
+	private final OrderNumRepository orderNumRepository;
+	private final OrderWebSocketHandler orderWebSocketHandler;
 
-    public DeviceController(MenuService menuService, DeviceService deviceService, SalesService salesService, MenuRepository menuRepository, AccountService accountService, CategoryService categoryService, OrderRepository orderRepository, OrderNumRepository orderNumRepository) {
-        this.menuService = menuService;
-        this.deviceService = deviceService;
-        this.salesService = salesService;
-        this.menuRepository = menuRepository;
-        this.accountService = accountService;
-        this.categoryService = categoryService;
-        this.orderRepository = orderRepository;
-        this.orderNumRepository = orderNumRepository;
-    }
+	public DeviceController(MenuService menuService, DeviceService deviceService, SalesService salesService, MenuRepository menuRepository, AccountService accountService, CategoryService categoryService, OrderRepository orderRepository, OrderNumRepository orderNumRepository, OrderWebSocketHandler orderWebSocketHandler) {
+		this.menuService = menuService;
+		this.deviceService = deviceService;
+		this.salesService = salesService;
+		this.menuRepository = menuRepository;
+		this.accountService = accountService;
+		this.categoryService = categoryService;
+		this.orderRepository = orderRepository;
+		this.orderNumRepository = orderNumRepository;
+		this.orderWebSocketHandler = orderWebSocketHandler;
+	}
 
-    private int calculatePoints(long price) {
-        return (int) (price * 0.01);
-    }
+	private int calculatePoints(long price) {
+		return (int) (price * 0.01);
+	}
 
-    private Map<Menu, Integer> getSessionOrders(HttpSession session) {
-        return (Map<Menu, Integer>) session.getAttribute("orders");
-    }
+	private Map<Menu, Integer> getSessionOrders(HttpSession session) {
+		return (Map<Menu, Integer>) session.getAttribute("orders");
+	}
 
-    private long calculateTotalPrice(Map<Menu, Integer> orders) {
-        return orders.entrySet().stream()
-                .mapToLong(entry -> (long) entry.getKey().getPrice() * entry.getValue())
-                .sum();
-    }
+	private long calculateTotalPrice(Map<Menu, Integer> orders) {
+		return orders.entrySet().stream()
+				.mapToLong(entry -> (long) entry.getKey().getPrice() * entry.getValue())
+				.sum();
+	}
 
-    @RequestMapping(value = "/order", method = RequestMethod.GET)
-    public String getOrder(Model model) {
-        model.addAttribute("deviceRequest", new DeviceRequest());
-        List<Device> device = deviceService.findAll();
-        model.addAttribute("devices", device);
-        return "order/orderOption.html";
-    }
+	@RequestMapping(value = "/order", method = RequestMethod.GET)
+	public String getOrder(Model model) {
+		model.addAttribute("deviceRequest", new DeviceRequest());
+		List<Device> device = deviceService.findAll();
+		model.addAttribute("devices", device);
+		return "order/orderOption.html";
+	}
 
-    @RequestMapping(value = "/orderStart", method = RequestMethod.POST)
-    public String postOrder(DeviceRequest deviceRequest, Model model, @RequestParam Map<String, Object> params) {
-        model.addAttribute("deviceRequest", deviceRequest);
-        Map<Long, List<Menu>> categorizedMenus = menuService.getCategorizedMenus();
-        model.addAttribute("categorizedMenus", categorizedMenus);
-        List<Menu> menus = menuService.getAllMenus();
-        List<Category> categories = categoryService.getAllCategories();
-        model.addAttribute("menus", menus);
-        model.addAttribute("categories", categories);
-        return "order/orderMenuSelect.html";
-    }
+	@RequestMapping(value = "/orderStart", method = RequestMethod.POST)
+	public String postOrder(DeviceRequest deviceRequest, Model model, @RequestParam Map<String, Object> params) {
+		model.addAttribute("deviceRequest", deviceRequest);
+		Map<Long, List<Menu>> categorizedMenus = menuService.getCategorizedMenus();
+		model.addAttribute("categorizedMenus", categorizedMenus);
+		List<Menu> menus = menuService.getAllMenus();
+		List<Category> categories = categoryService.getAllCategories();
+		model.addAttribute("menus", menus);
+		model.addAttribute("categories", categories);
+		return "order/orderMenuSelect.html";
+	}
 
-    @RequestMapping(value = "/orderPayment", method = RequestMethod.POST)
-    public String postOrderPayment(HttpSession session, Model model, DeviceRequest deviceRequest) {
-        Map<Menu, Integer> orders = getSessionOrders(session);
-        if (orders == null || orders.isEmpty()) {
-            return "order/orderMenuSelect.html"; // 주문이 없는 경우
-        }
+	@RequestMapping(value = "/orderPayment", method = RequestMethod.POST)
+	public String postOrderPayment(HttpSession session, Model model, DeviceRequest deviceRequest) {
+		Map<Menu, Integer> orders = getSessionOrders(session);
+		if (orders == null || orders.isEmpty()) {
+			return "order/orderMenuSelect.html"; // 주문이 없는 경우
+		}
 
-        long totalPrice = calculateTotalPrice(orders);
-        model.addAttribute("orderedItems", orders);
-        model.addAttribute("totalPrice", totalPrice);
+		long totalPrice = calculateTotalPrice(orders);
+		model.addAttribute("orderedItems", orders);
+		model.addAttribute("totalPrice", totalPrice);
 
-        return "order/orderPaymentSelect.html";
-    }
+		return "order/orderPaymentSelect.html";
+	}
 
-    @RequestMapping(value = "/orderPayment", method = RequestMethod.GET)
-    public String getOrderPayment(Model model, DeviceRequest deviceRequest, HttpSession session) {
-        Map<Menu, Integer> orders = getSessionOrders(session);
-        if (orders == null || orders.isEmpty()) {
-            return "order/orderMenuSelect.html"; // 주문이 없는 경우
-        }
+	@RequestMapping(value = "/orderPayment", method = RequestMethod.GET)
+	public String getOrderPayment(Model model, DeviceRequest deviceRequest, HttpSession session) {
+		Map<Menu, Integer> orders = getSessionOrders(session);
+		if (orders == null || orders.isEmpty()) {
+			return "order/orderMenuSelect.html"; // 주문이 없는 경우
+		}
 
-        long totalPrice = calculateTotalPrice(orders);
-        model.addAttribute("orderedItems", orders);
-        model.addAttribute("totalPrice", totalPrice);
+		long totalPrice = calculateTotalPrice(orders);
+		model.addAttribute("orderedItems", orders);
+		model.addAttribute("totalPrice", totalPrice);
 
-        return "order/orderPaymentSelect.html";
-    }
+		return "order/orderPaymentSelect.html";
+	}
 
-    @RequestMapping(value = "/orderPaymentSelect", method = RequestMethod.POST)
-    public String OrderPaymentSelect(HttpSession session, Model model, @RequestParam String paymentMethod, AccountRequest accountRequest) {
-        Map<Menu, Integer> orders = getSessionOrders(session);
-        if (orders == null) {
-            System.out.println("오류오류오류");
-        }
+	@RequestMapping(value = "/orderPaymentSelect", method = RequestMethod.POST)
+	public String OrderPaymentSelect(HttpSession session, Model model, @RequestParam String paymentMethod, AccountRequest accountRequest) {
+		Map<Menu, Integer> orders = getSessionOrders(session);
+		if (orders == null) {
+			System.out.println("오류오류오류");
+		}
 
-        DeviceRequest deviceRequest = createDefaultDeviceRequest(orders);
+		DeviceRequest deviceRequest = createDefaultDeviceRequest(orders);
 
-        System.out.println("DeviceRequest: " + deviceRequest);
+		System.out.println("DeviceRequest: " + deviceRequest);
 
-        long totalPrice = processOrder(orders, deviceRequest, paymentMethod, accountRequest);
+		long totalPrice = processOrder(orders, deviceRequest, paymentMethod, accountRequest);
 
-        model.addAttribute("orderedItems", orders);
-        model.addAttribute("totalPrice", totalPrice);
+		model.addAttribute("orderedItems", orders);
+		model.addAttribute("totalPrice", totalPrice);
 
-        return switch (paymentMethod) {
-            case "CASH", "CARD", "PAY" -> "order/orderPayment.html";
-            default -> {
-                model.addAttribute("error", "유효하지 않은 결제방법입니다.");
-                yield "order/orderPaymentSelect.html";
-            }
-        };
-    }
+		// WebSocket을 통해 새로운 주문 알림 전송
+		String message = "New order created: " + deviceRequest.getOrderNum();
+		for (WebSocketSession webSocketSession : orderWebSocketHandler.getSessions()) {
+			try {
+				webSocketSession.sendMessage(new TextMessage(message));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
-    private DeviceRequest createDefaultDeviceRequest(Map<Menu, Integer> orders) {
-        DeviceRequest deviceRequest = new DeviceRequest();
+		return switch (paymentMethod) {
+			case "CASH", "CARD", "PAY" -> "order/orderPayment.html";
+			default -> {
+				model.addAttribute("error", "유효하지 않은 결제방법입니다.");
+				yield "order/orderPaymentSelect.html";
+			}
+		};
+	}
 
-        Map<Long, Integer> quantities = new HashMap<>();
-        for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
-            quantities.put(entry.getKey().getId(), entry.getValue());
-        }
-        deviceRequest.setQuantities(quantities);
-        deviceRequest.setPhoneNum("defaultPhone");
-        deviceRequest.setPass("defaultPass");
+	private DeviceRequest createDefaultDeviceRequest(Map<Menu, Integer> orders) {
+		DeviceRequest deviceRequest = new DeviceRequest();
 
-        return deviceRequest;
-    }
+		Map<Long, Integer> quantities = new HashMap<>();
+		for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
+			quantities.put(entry.getKey().getId(), entry.getValue());
+		}
+		deviceRequest.setQuantities(quantities);
+		deviceRequest.setPhoneNum("defaultPhone");
+		deviceRequest.setPass("defaultPass");
 
-    private long processOrder(Map<Menu, Integer> orders, DeviceRequest deviceRequest, String paymentMethod, AccountRequest accountRequest) {
-        long totalPrice = 0;
-        String phone = deviceRequest.getPhoneNum();
-        String pass = deviceRequest.getPass();
+		return deviceRequest;
+	}
 
-        OrderNum orderNum = orderNumRepository.save(new OrderNum());
+	private long processOrder(Map<Menu, Integer> orders, DeviceRequest deviceRequest, String paymentMethod, AccountRequest accountRequest) {
+		long totalPrice = 0;
+		String phone = deviceRequest.getPhoneNum();
+		String pass = deviceRequest.getPass();
 
-        for (Map.Entry<Long, Integer> entry : deviceRequest.getQuantities().entrySet()) {
-            Long menuId = entry.getKey();
-            Integer quantity = entry.getValue();
-            Menu menu = menuService.getMenuById(menuId);
-            Account account = accountService.getAccountByPhone(phone);
+		OrderNum orderNum = orderNumRepository.save(new OrderNum());
 
-            if (quantity != null && quantity > 0 && quantity <= menu.getStock()) {
-                totalPrice += (long) menu.getPrice() * quantity;
-                LocalDateTime localDate = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                String formattedDateTime = localDate.format(formatter);
+		for (Map.Entry<Long, Integer> entry : deviceRequest.getQuantities().entrySet()) {
+			Long menuId = entry.getKey();
+			Integer quantity = entry.getValue();
+			Menu menu = menuService.getMenuById(menuId);
+			Account account = accountService.getAccountByPhone(phone);
 
-                SalesRequest salesRequest = new SalesRequest();
-                salesRequest.setCategory(menu.getCategory());
-                salesRequest.setDate(LocalDateTime.parse(formattedDateTime, formatter));
-                salesRequest.setMenu(menu.getId());
-                salesRequest.setQuantity(quantity);
-                salesRequest.setDevice(1);
-                salesRequest.setDeviceNum(0);
-                salesRequest.setOrderNum(deviceRequest.getOrderNum());
-                salesRequest.setProcess(paymentMethod.equals("CASH") ? 0 : 1);
-                salesRequest.setOrderNum(orderNum.getOrderNum());
+			if (quantity != null && quantity > 0 && quantity <= menu.getStock()) {
+				totalPrice += (long) menu.getPrice() * quantity;
+				LocalDateTime localDate = LocalDateTime.now();
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+				String formattedDateTime = localDate.format(formatter);
 
-                try {
-                    salesService.save2(salesRequest);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    System.out.println("Error Saving sales request" + e.getMessage());
-                }
+				SalesRequest salesRequest = new SalesRequest();
+				salesRequest.setCategory(menu.getCategory());
+				salesRequest.setDate(LocalDateTime.parse(formattedDateTime, formatter));
+				salesRequest.setMenu(menu.getId());
+				salesRequest.setQuantity(quantity);
+				salesRequest.setDevice(1);
+				salesRequest.setDeviceNum(0);
+				salesRequest.setOrderNum(deviceRequest.getOrderNum());
+				salesRequest.setProcess(paymentMethod.equals("CASH") ? 0 : 1);
+				salesRequest.setOrderNum(orderNum.getOrderNum());
 
-                menu.setStock(menu.getStock() - quantity);
-                menuService.saveMenu(menu);
-            }
-        }
-        return totalPrice;
-    }
+				try {
+					salesService.save2(salesRequest);
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.out.println("Error Saving sales request" + e.getMessage());
+				}
 
-    @ResponseBody
-    @RequestMapping(value = "/order/cart", method = RequestMethod.GET)
-    public Map<Menu, Integer> getOrderCart(HttpSession session, Model model) {
-        return getSessionOrders(session);
-    }
+				menu.setStock(menu.getStock() - quantity);
+				menuService.saveMenu(menu);
+			}
+		}
+		return totalPrice;
+	}
 
-    @PostMapping("/addToSession")
-    @ResponseBody
-    public String addToSession(@RequestBody Map<String, Object> data, HttpSession session) {
-        String menuId = (String) data.get("menuId");
-        Integer quantity = (Integer) data.get("quantity");
+	@ResponseBody
+	@RequestMapping(value = "/order/cart", method = RequestMethod.GET)
+	public Map<Menu, Integer> getOrderCart(HttpSession session, Model model) {
+		return getSessionOrders(session);
+	}
 
-        Menu menu = menuRepository.findById(Long.valueOf(menuId)).orElse(null);
-        if (menu == null) {
-            return "error: menu not found";
-        }
+	@PostMapping("/addToSession")
+	@ResponseBody
+	public String addToSession(@RequestBody Map<String, Object> data, HttpSession session) {
+		String menuIdStr = (String) data.get("menuId");
+		Integer quantity = (Integer) data.get("quantity");
 
-        Map<Menu, Integer> orders = getSessionOrders(session);
-        if (orders == null) {
-            orders = new HashMap<>();
-        }
+		if (menuIdStr == null || menuIdStr.isEmpty()) {
+			return "error: menuId is null or empty";
+		}
 
-        orders.put(menu, quantity);
+		Long menuId;
+		try {
+			menuId = Long.valueOf(menuIdStr);
+		} catch (NumberFormatException e) {
+			return "error: invalid menuId";
+		}
 
-        session.setAttribute("orders", orders);
+		Menu menu = menuRepository.findById(menuId).orElse(null);
+		if (menu == null) {
+			return "error: menu not found";
+		}
 
-        return "success";
-    }
+		Map<Menu, Integer> orders = getSessionOrders(session);
+		if (orders == null) {
+			orders = new HashMap<>();
+		}
 
-    @GetMapping("/getCartItems")
-    @ResponseBody
-    public Map<String, Object> getCartItems(HttpSession session) {
-        Map<Menu, Integer> orders = getSessionOrders(session);
-        Map<String, Object> response = new HashMap<>();
-        if (orders != null) {
-            for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
-                Map<String, Object> item = new HashMap<>();
-                item.put("name", entry.getKey().getName());
-                item.put("price", entry.getKey().getPrice());
-                item.put("quantity", entry.getValue());
-                item.put("stock", entry.getKey().getStock());
-                response.put(String.valueOf(entry.getKey().getId()), item);
-            }
-        }
-        return response;
-    }
+		orders.put(menu, quantity);
+		session.setAttribute("orders", orders);
 
-    @PostMapping("/updateCartQuantity")
-    @ResponseBody
-    public String updateCartQuantity(@RequestBody Map<String, Object> data, HttpSession session) {
-        Long menuId = ((Number) data.get("menuId")).longValue();
-        Integer quantity = (Integer) data.get("quantity");
+		return "success";
+	}
 
-        Menu menu = menuRepository.findById(menuId).orElse(null);
-        if (menu == null) {
-            return "error: menu not found";
-        }
+	@GetMapping("/getCartItems")
+	@ResponseBody
+	public Map<String, Object> getCartItems(HttpSession session) {
+		Map<Menu, Integer> orders = getSessionOrders(session);
+		Map<String, Object> response = new HashMap<>();
+		if (orders != null) {
+			for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
+				Map<String, Object> item = new HashMap<>();
+				item.put("name", entry.getKey().getName());
+				item.put("price", entry.getKey().getPrice());
+				item.put("quantity", entry.getValue());
+				item.put("stock", entry.getKey().getStock());
+				response.put(String.valueOf(entry.getKey().getId()), item);
+			}
+		}
+		return response;
+	}
 
-        Map<Menu, Integer> orders = getSessionOrders(session);
-        if (orders == null) {
-            orders = new HashMap<>();
-        }
+	@PostMapping("/updateCartQuantity")
+	@ResponseBody
+	public String updateCartQuantity(@RequestBody Map<String, Object> data, HttpSession session) {
+		Long menuId = ((Number) data.get("menuId")).longValue();
+		Integer quantity = (Integer) data.get("quantity");
 
-        if (quantity > 0) {
-            orders.put(menu, quantity);
-        } else {
-            orders.remove(menu);
-        }
+		Menu menu = menuRepository.findById(menuId).orElse(null);
+		if (menu == null) {
+			return "error: menu not found";
+		}
 
-        session.setAttribute("orders", orders);
+		Map<Menu, Integer> orders = getSessionOrders(session);
+		if (orders == null) {
+			orders = new HashMap<>();
+		}
 
-        return "success";
-    }
+		if (quantity > 0) {
+			orders.put(menu, quantity);
+		} else {
+			orders.remove(menu);
+		}
 
-    @PostMapping("deleteCartItem")
-    @ResponseBody
-    public String deleteCartItem(@RequestBody Map<String, Object> data, HttpSession session) {
-        Long menuId = ((Number) data.get("menuId")).longValue();
-        Menu menu = menuRepository.findById(menuId).orElse(null);
-        if (menu == null) {
-            return "error: menu not found";
-        }
-        Map<Menu, Integer> orders = getSessionOrders(session);
-        if (orders == null) {
-            orders = new HashMap<>();
-        }
-        orders.remove(menu);
-        session.setAttribute("orders", orders);
-        return "success";
-    }
+		session.setAttribute("orders", orders);
 
-    @RequestMapping(value = "/order/kiosk", method = RequestMethod.GET)
-    public String getKiosk() {
-        return "/order/orderKiosk.html";
-    }
+		return "success";
+	}
 
-    @RequestMapping(value = "/order/kiosk/menu", method = RequestMethod.GET)
-    public String getKioskMenu(@ModelAttribute DeviceRequest deviceRequest, @RequestParam Map<String, Object> params, HttpSession session, Model model) {
-        model.addAttribute("deviceRequest", deviceRequest);
-        List<Menu> menus = menuService.getAllMenus();
-        List<Category> categories = categoryService.getAllCategories();
-        model.addAttribute("menus", menus);
-        model.addAttribute("categories", categories);
-        return "/order/orderKioskMenu.html";
-    }
+	@PostMapping("deleteCartItem")
+	@ResponseBody
+	public String deleteCartItem(@RequestBody Map<String, Object> data, HttpSession session) {
+		Long menuId = ((Number) data.get("menuId")).longValue();
+		Menu menu = menuRepository.findById(menuId).orElse(null);
+		if (menu == null) {
+			return "error: menu not found";
+		}
+		Map<Menu, Integer> orders = getSessionOrders(session);
+		if (orders == null) {
+			orders = new HashMap<>();
+		}
+		orders.remove(menu);
+		session.setAttribute("orders", orders);
+		return "success";
+	}
 
-    @RequestMapping(value = "/order/kiosk/pay", method = RequestMethod.GET)
-    public String getKioskPayment() {
-        return "redirect:/order/kiosk/menu";
-    }
+	@RequestMapping(value = "/order/kiosk", method = RequestMethod.GET)
+	public String getKiosk() {
+		return "/order/orderKiosk.html";
+	}
 
-    @RequestMapping(value = "/order/kiosk/pay", method = RequestMethod.POST)
-    public String postKioskPayment(Model model, DeviceRequest deviceRequest, HttpSession session) {
-        Map<Menu, Integer> orders = getSessionOrders(session);
-        if (orders == null || orders.isEmpty()) {
-            return "redirect:/order/kiosk/menu"; // 주문이 없는 경우
-        }
+	@RequestMapping(value = "/order/kiosk/menu", method = RequestMethod.GET)
+	public String getKioskMenu(@ModelAttribute DeviceRequest deviceRequest, @RequestParam Map<String, Object> params, HttpSession session, Model model) {
+		model.addAttribute("deviceRequest", deviceRequest);
+		List<Menu> menus = menuService.getAllMenus();
+		List<Category> categories = categoryService.getAllCategories();
+		model.addAttribute("menus", menus);
+		model.addAttribute("categories", categories);
+		return "/order/orderKioskMenu.html";
+	}
 
-        long totalPrice = calculateTotalPrice(orders);
-        model.addAttribute("orderedItems", orders);
-        model.addAttribute("totalPrice", totalPrice);
+	@RequestMapping(value = "/order/kiosk/pay", method = RequestMethod.GET)
+	public String getKioskPayment() {
+		return "redirect:/order/kiosk/menu";
+	}
 
-        return "order/orderKioskPay.html";
-    }
+	@RequestMapping(value = "/order/kiosk/pay", method = RequestMethod.POST)
+	public String postKioskPayment(Model model, DeviceRequest deviceRequest, HttpSession session) {
+		Map<Menu, Integer> orders = getSessionOrders(session);
+		if (orders == null || orders.isEmpty()) {
+			return "redirect:/order/kiosk/menu"; // 주문이 없는 경우
+		}
 
-    @ResponseBody
-    @RequestMapping("/order/totalPrice")
-    public long getTotalPrice(HttpSession session) {
-        Map<Menu, Integer> orders = getSessionOrders(session);
-        if (orders == null || orders.isEmpty()) {
-            return 0;
-        }
+		long totalPrice = calculateTotalPrice(orders);
+		model.addAttribute("orderedItems", orders);
+		model.addAttribute("totalPrice", totalPrice);
 
-        return calculateTotalPrice(orders);
-    }
+		return "order/orderKioskPay.html";
+	}
 
-    @RequestMapping(value = "/order/kiosk/payment", method = RequestMethod.POST)
-    public String postKioskPayment(Model model, HttpSession session, @RequestParam Map<String, Object> params) {
-        Map<Menu, Integer> orders = getSessionOrders(session);
-        if (orders == null || orders.isEmpty()) {
-            return "redirect:/order/kiosk"; // 주문이 없는 경우
-        }
+	@ResponseBody
+	@RequestMapping("/order/totalPrice")
+	public long getTotalPrice(HttpSession session) {
+		Map<Menu, Integer> orders = getSessionOrders(session);
+		if (orders == null || orders.isEmpty()) {
+			return 0;
+		}
 
-        long totalPrice = calculateTotalPrice(orders);
-        LocalDateTime localDate = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedDateTime = localDate.format(formatter);
-        OrderNum orderNum = orderNumRepository.save(new OrderNum());
+		return calculateTotalPrice(orders);
+	}
 
-        for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
-            Menu menu = entry.getKey();
-            int quantity = entry.getValue();
-            SalesRequest sales = new SalesRequest();
-            sales.setDate(LocalDateTime.parse(formattedDateTime, formatter));
-            sales.setCategory(menu.getCategory());
-            sales.setMenu(menu.getId());
-            sales.setPrice(menu.getPrice());
-            sales.setQuantity(quantity);
-            sales.setDevice(2);
-            sales.setDeviceNum(1);
-            sales.setOrderNum(orderNum.getOrderNum());
-            sales.setProcess(0);
-            salesService.save(sales);
-            menu.setStock(menu.getStock() - quantity);
-            menuRepository.save(menu);
-        }
-        orders.clear();
+	@RequestMapping(value = "/order/kiosk/payment", method = RequestMethod.POST)
+	public String postKioskPayment(Model model, HttpSession session, @RequestParam Map<String, Object> params) {
+		Map<Menu, Integer> orders = getSessionOrders(session);
+		if (orders == null || orders.isEmpty()) {
+			return "redirect:/order/kiosk/menu"; // 주문이 없는 경우
+		}
 
-        if (params.get("phone") != null) {
-            String phoneNum = (String) params.get("phone");
-            Account account = accountService.getAccountByPhone(phoneNum);
-            account.setMsPoint((int) (account.getMsPoint() + (totalPrice * 0.01)));
-            accountService.save(account);
-        }
-        return "redirect:/order/kiosk/success";
-    }
+		long totalPrice = calculateTotalPrice(orders);
+		LocalDateTime localDate = LocalDateTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		String formattedDateTime = localDate.format(formatter);
+		OrderNum orderNum = orderNumRepository.save(new OrderNum());
 
-    @RequestMapping(value = "/order/kiosk/success", method = RequestMethod.GET)
-    public String getSuccess() {
-        return "/order/orderKioskSuccess.html";
-    }
+		for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
+			Menu menu = entry.getKey();
+			int quantity = entry.getValue();
+			SalesRequest sales = new SalesRequest();
+			sales.setDate(LocalDateTime.parse(formattedDateTime, formatter));
+			sales.setCategory(menu.getCategory());
+			sales.setMenu(menu.getId());
+			sales.setPrice(menu.getPrice());
+			sales.setQuantity(quantity);
+			sales.setDevice(2);
+			sales.setDeviceNum(1);
+			sales.setOrderNum(orderNum.getOrderNum());
+			sales.setProcess(0);
+			salesService.save(sales);
+			menu.setStock(menu.getStock() - quantity);
+			menuRepository.save(menu);
+		}
+		orders.clear();
+
+		if (params.get("phone") != null) {
+			String phoneNum = (String) params.get("phone");
+			Account account = accountService.getAccountByPhone(phoneNum);
+			account.setMsPoint((int) (account.getMsPoint() + (totalPrice * 0.01)));
+			accountService.save(account);
+		}
+
+		// WebSocket 메시지 전송
+		try {
+			orderWebSocketHandler.sendMessageToAllSessions(new TextMessage("새로운 주문이 들어왔습니다."));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return "redirect:/order/kiosk/success";
+	}
+
+	@RequestMapping(value = "/order/kiosk/success", method = RequestMethod.GET)
+	public String getSuccess() {
+		return "/order/orderKioskSuccess.html";
+	}
 }
