@@ -13,48 +13,48 @@ import java.util.Map;
 
 @Service
 public class AccountService {
-    AccountRepository accountRepository;
+	AccountRepository accountRepository;
 
-    public AccountService(AccountRepository accountRepository) {
-        this.accountRepository = accountRepository;
-    }
+	public AccountService(AccountRepository accountRepository) {
+		this.accountRepository = accountRepository;
+	}
 
-    public boolean isExit(AccountRequest accountRequest) {
-        Account check = accountRepository.findByEmail(accountRequest.getEmail()).orElse(null);
-        return check != null;
-    }
+	public boolean isExit(AccountRequest accountRequest) {
+		Account check = accountRepository.findByEmail(accountRequest.getEmail()).orElse(null);
+		return check != null;
+	}
 
-    public boolean isPhoneExit(AccountRequest accountRequest) {
-        Account check = accountRepository.findByPhone(accountRequest.getPhone()).orElse(null);
-        return check != null;
-    }
+	public boolean isPhoneExit(AccountRequest accountRequest) {
+		Account check = accountRepository.findByPhone(accountRequest.getPhone()).orElse(null);
+		return check != null;
+	}
 
-    public Map<String, String> validateHandling(Errors errors) {
-        Map<String, String> errorMap = new HashMap<String, String>();
+	public Map<String, String> validateHandling(Errors errors) {
+		Map<String, String> errorMap = new HashMap<String, String>();
 
-        for (FieldError fieldError : errors.getFieldErrors()) {
-            String validKeyName = String.format("valid_%s", fieldError.getField());
-            errorMap.put(validKeyName, fieldError.getDefaultMessage());
-        }
+		for (FieldError fieldError : errors.getFieldErrors()) {
+			String validKeyName = String.format("valid_%s", fieldError.getField());
+			errorMap.put(validKeyName, fieldError.getDefaultMessage());
+		}
 
-        return errorMap;
-    }
+		return errorMap;
+	}
 
-    @Transactional
-    public void save(AccountRequest accountRequest) {
-        accountRepository.save(accountRequest.toEntity());
-    }
+	@Transactional
+	public void save(AccountRequest accountRequest) {
+		accountRepository.save(accountRequest.toEntity());
+	}
 
-    @Transactional
-    public void save(Account account){
-        accountRepository.save(account);
-    }
+	@Transactional
+	public void save(Account account) {
+		accountRepository.save(account);
+	}
 
+	public Account getAccountByid(long id) {
+		return accountRepository.findById(id).orElse(null);
+	}
 
-    public Account getAccountByid(long id) {
-        return accountRepository.findById(id).orElse(null);
-    }
-    public  Account getAccountByPhone(String phone) {
-        return accountRepository.findByPhone(phone).orElse(null);
-    }
+	public Account getAccountByPhone(String phone) {
+		return accountRepository.findByPhone(phone).orElse(null);
+	}
 }

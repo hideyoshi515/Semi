@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface TimeCardRepository extends JpaRepository<TimeCard, Long> {
-    Optional<TimeCard> findTopByStaffOrderByStartDesc(Staff staff);
+	Optional<TimeCard> findTopByStaffOrderByStartDesc(Staff staff);
 }

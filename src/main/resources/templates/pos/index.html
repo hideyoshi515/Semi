@@ -87,6 +87,9 @@
                 <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos/orderList">注文リスト</a>
             </section>
             <section class="sales-menu" style="width: 314px;">
+                <button class="btn btn-outline-primary w-100 mb-2 user-select-none selbtn"
+                        th:onclick="|makeCoupon()|"
+                        th:text="'쿠폰 발급'"></button>
             </section>
         </footer>
     </div>
@@ -170,24 +173,24 @@
             clickedButton.classList.remove('btn-outline-primary');
             clickedButton.classList.add('btn-primary');
             // AJAX 요청을 통해 서버로 데이터 전송
-            var xhr = new XMLHttpRequest();
+            let xhr = new XMLHttpRequest();
             xhr.open("GET", "/pos/getMenu?category=" + category, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     menu = JSON.parse(xhr.responseText);
-                    var salesItemsDiv = document.getElementById('sales-items');
+                    let salesItemsDiv = document.getElementById('sales-items');
                     salesItemsDiv.innerHTML = '';
                     menu.forEach(function (menuItem) {
                         let price = menuItem.price.toLocaleString();
                         if (menuItem.stock > 0) {
-                            var itemButton = document.createElement('button');
+                            let itemButton = document.createElement('button');
                             itemButton.className = 'btn btn-outline-primary w-100 mb-2 user-select-none';
                             itemButton.textContent = menuItem.name + ' - ' + price + ' ₩';
                             itemButton.setAttribute('onclick', `addItem('${menuItem.name}', ${menuItem.price}, ${menuItem.id}, ${menuItem.stock})`);
                             salesItemsDiv.appendChild(itemButton);
                         } else {
-                            var itemButton = document.createElement('button');
+                            let itemButton = document.createElement('button');
                             itemButton.className = 'btn btn-outline-primary w-100 mb-2 user-select-none';
                             itemButton.textContent = menuItem.name + ' - 売切り';
                             itemButton.setAttribute('disabled', true);
@@ -283,7 +286,7 @@
             currentIndex = index;
             maxStock = stock;
             document.getElementById('modal-quantity-input').value = orderList[index].quantity;
-            var quantityModal = new bootstrap.Modal(document.getElementById('quantityModal'));
+            let quantityModal = new bootstrap.Modal(document.getElementById('quantityModal'));
             quantityModal.show();
             modalJustOpen = true;
         }
@@ -297,7 +300,7 @@
             } else {
                 deleteItem(currentIndex);
             }
-            var quantityModal = bootstrap.Modal.getInstance(document.getElementById('quantityModal'));
+            let quantityModal = bootstrap.Modal.getInstance(document.getElementById('quantityModal'));
             quantityModal.hide();
         }
 
@@ -345,14 +348,14 @@
         }
 
         function showPaymentConfirmation() {
-            var confirmPaymentModal = new bootstrap.Modal(document.getElementById('confirmPaymentModal'));
+            let confirmPaymentModal = new bootstrap.Modal(document.getElementById('confirmPaymentModal'));
             confirmPaymentModal.show();
         }
 
         function processPayment() {
-            var confirmPaymentModal = bootstrap.Modal.getInstance(document.getElementById('confirmPaymentModal'));
+            let confirmPaymentModal = bootstrap.Modal.getInstance(document.getElementById('confirmPaymentModal'));
             confirmPaymentModal.hide();
-            var xhr = new XMLHttpRequest();
+            let xhr = new XMLHttpRequest();
             xhr.open("POST", "/pos/order", true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
@@ -403,10 +406,22 @@
             }, 3000);
         }
 
+        function makeCoupon() {
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "/pos/makeCoupon", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
-
-
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    let couponCode = xhr.responseText;
+                    alert("쿠폰이 발급되었습니다: " + couponCode);
+                    location.href = "/pos";
+                }
+            };
+            xhr.send();
+        }
     </script>
+
     <style>
         .numeric-keypad {
             display: grid;
