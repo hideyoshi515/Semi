@@ -20,4 +20,12 @@ public class CouponService {
 
 		couponRepository.save(coupon);
 	}
+
+	public Coupon findByCouponNum(String couponNum) {
+		return couponRepository.findByCouponNum(couponNum);
+	}
+
+	public void save(Coupon coupon) {
+		couponRepository.save(coupon);
+	}
 }

@@ -7,7 +7,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KIOSK</title>
-
     <link rel="stylesheet" href="/css/kiosk.css">
 </head>
 <body>
@@ -17,7 +16,7 @@
             KIOSK
         </div>
 
-        <div class="menu-section"  style="min-height: 1168px">
+        <div class="menu-section" style="min-height: 1168px">
             <div class="menu-category">
                 <h2 id="categoryTitle">お支払い</h2>
                 <div class="row align-top ms-2" id="menuContainer"
@@ -47,6 +46,7 @@
                 <div class="fs-2 ms-1" th:text="|合計 : ${#numbers.formatInteger(totalPrice,1,'COMMA')} ₩|"></div>
             </div>
             <div class="d-flex">
+                <button type="button" class="btn btn-lg btn-warning" onclick="showCouponModal()">クーポン</button>
                 <a href="/order/kiosk/menu" class="btn btn-lg btn-warning me-3">戻る</a>
                 <button id="payBtn" onclick="payStart()" type="button" class="btn btn-lg btn-warning"
                         data-toggle="modal" data-target="#membershipModal">支払い
@@ -70,7 +70,7 @@
                     <button type="button" class="btn btn-secondary" id="skipMembership">いいえ</button>
                     <button type="button" onclick="msYes()" class="btn btn-primary" data-toggle="modal"
                             data-target="#phoneNumberModal"
-                    data-dismiss="modal">はい
+                            data-dismiss="modal">はい
                     </button>
                 </div>
             </div>
@@ -111,7 +111,8 @@
                             style="width: 300px;">照会
                     </button>
                     <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#paymentModal"
-                            data-dismiss="modal" id="saveMembership" disabled style="width: 300px;" onclick="msNext()">貯める
+                            data-dismiss="modal" id="saveMembership" disabled style="width: 300px;" onclick="msNext()">
+                        貯める
                     </button>
 
                 </div>
@@ -134,18 +135,43 @@
                     <h5 class="modal-title" id="paymentModalLabel">お支払方法</h5>
                 </div>
                 <div class="modal-body d-flex justify-content-center flex-row">
-                    <button type="button" class="btn btn-success btn-lg mx-2 fs-4" style="width: 145px; height: 72.5px;" onclick="payEnd()"><i class="bi bi-credit-card me-1"></i>カード</button>
-                    <button type="button" class="btn btn-warning btn-lg mx-2 fs-4" style="width: 145px; height: 72.5px;" onclick="payEnd()"><i class="bi bi-cash me-1"></i>現金</button>
+                    <button type="button" class="btn btn-success btn-lg mx-2 fs-4" style="width: 145px; height: 72.5px;"
+                            onclick="payEnd()"><i class="bi bi-credit-card me-1"></i>カード
+                    </button>
+                    <button type="button" class="btn btn-warning btn-lg mx-2 fs-4" style="width: 145px; height: 72.5px;"
+                            onclick="payEnd()"><i class="bi bi-cash me-1"></i>現金
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 쿠폰 입력 모달 -->
+    <div class="modal fade" id="couponModal" tabindex="-1" role="dialog" aria-labelledby="couponModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="couponModalLabel">クーポン適用</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-0" style="width: 300px;">
+                        <label class="fs-5" for="couponNumber">クーポン番号:</label>
+                        <input type="text" class="form-control" id="couponNumber" maxlength="19" required>
+                    </div>
+                    <button type="button" class="btn btn-warning mt-3" onclick="applyCoupon()" style="width: 300px;">
+                        適用
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-
-
         let account;
-            $(document).ready(function () {
+
+        $(document).ready(function () {
             $('#skipMembership').click(function () {
                 $('#membershipModal').modal('hide');
                 $('#paymentModal').modal('show');
@@ -205,7 +231,7 @@
             const phone = phoneNumberInput.value.replaceAll("-", "");
 
             // AJAX 요청을 통해 서버로 데이터 전송
-            var xhr = new XMLHttpRequest();
+            let xhr = new XMLHttpRequest();
             xhr.open("POST", "/user/memberCheck?phoneNum=" + phone, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
@@ -235,23 +261,79 @@
             const maskedChars = '*'.repeat(name.length - 2);
             return firstChar + maskedChars + lastChar;
         }
+
         function payEnd() {
-            var form = document.createElement("form");
+            let form = document.createElement("form");
             form.method = "POST";
             form.action = "/order/kiosk/payment";
 
+            // 주문 항목 데이터를 폼에 추가 (예시)
+            let orderedItemsInput = document.createElement("input");
+            orderedItemsInput.type = "hidden";
+            orderedItemsInput.name = "orderedItems";
+            orderedItemsInput.value = JSON.stringify([
+                // 예시: 주문 항목 리스트
+                // { "name": "Americano", "price": 3000, "quantity": 1 }
+            ]);
+            form.appendChild(orderedItemsInput);
+
+            // 쿠폰 번호를 폼에 추가
+            let couponNum = document.getElementById('couponNumber').value;
+            if (couponNum) {
+                let couponInput = document.createElement("input");
+                couponInput.type = "hidden";
+                couponInput.name = "couponNum";
+                couponInput.value = couponNum;
+                form.appendChild(couponInput);
+            }
+
+            // 회원 정보가 있을 경우 폼에 추가
             if (account) {
-                var input = document.createElement("input");
-                input.type = "hidden";
-                input.name = "phone";
-                input.value = account.phone;
-                form.appendChild(input);
+                let phoneInput = document.createElement("input");
+                phoneInput.type = "hidden";
+                phoneInput.name = "phone";
+                phoneInput.value = account.phone;
+                form.appendChild(phoneInput);
             }
 
             document.body.appendChild(form);
             form.submit();
         }
 
+        function showCouponModal() {
+            $('#couponModal').modal('show');
+        }
+
+        function applyCoupon() {
+            const couponNumber = document.getElementById('couponNumber').value;
+
+            // AJAX 요청을 통해 서버로 쿠폰 번호 전송
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "/pos/applyCoupon", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.valid) {
+                        // 쿠폰 유효성만 확인하고 할인 적용
+                        applyDiscount();
+                        alert('クーポンが適用されました。');
+                    } else {
+                        alert('無効なクーポン番号です。');
+                    }
+                    $('#couponModal').modal('hide');
+                }
+            };
+            xhr.send(JSON.stringify({ couponNum: couponNumber }));
+        }
+
+        function applyDiscount() {
+            // 현재 총 금액에서 10% 할인 적용
+            let totalPriceElement = document.querySelector('.order-summary .fs-2');
+            let totalPrice = parseInt(totalPriceElement.textContent.replace(/[^\d]/g, ''), 10);
+            let discountedPrice = totalPrice * 0.9;
+            totalPriceElement.textContent = `合計 : ${discountedPrice.toLocaleString()} ₩`;
+        }
     </script>
 </th:block>
 </body>
