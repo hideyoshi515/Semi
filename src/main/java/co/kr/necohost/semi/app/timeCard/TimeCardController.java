@@ -43,8 +43,7 @@ public class TimeCardController {
     @RequestMapping(value = "/timeCardIn", method = RequestMethod.POST)
     public ResponseEntity<String> postTimeCardIn(@RequestBody StaffRequest request) {
         try {
-            timeCardService.clockIn(request);
-            Optional<TimeCard> timeCard = timeCardService.getTimeCardByUserName(request);
+            Optional<TimeCard> timeCard = timeCardService.clockIn(request);
             discordBotService.sendOrderNotification(request.getUsername() + "이/가 " + timeCard.get().getStart() + "에 출근했습니다.");
             return ResponseEntity.ok("Clock in attempted.");
         } catch (IllegalArgumentException e) {
@@ -55,8 +54,7 @@ public class TimeCardController {
     @RequestMapping(value = "/timeCardOut", method = RequestMethod.POST)
     public ResponseEntity<String> postTimeCardOut(@RequestBody StaffRequest request) {
         try {
-            timeCardService.clockOut(request);
-            Optional<TimeCard> timeCard = timeCardService.getTimeCardByUserName(request);
+            Optional<TimeCard> timeCard = timeCardService.clockOut(request);
             discordBotService.sendOrderNotification(request.getUsername() + "이/가 " + timeCard.get().getEnd() + "에 퇴근했습니다.");
             return ResponseEntity.ok("Clock out attempted.");
         } catch (IllegalArgumentException e) {

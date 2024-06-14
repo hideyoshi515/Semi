@@ -27,13 +27,13 @@ public class TimeCardService {
 		return timeCardRepository.findAll();
 	}
 
-	public Optional<TimeCard> getTimeCardByUserName(StaffRequest request){
-		Staff staff = staffRepository.findByUsername(request.getUsername())
-				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
-        return timeCardRepository.findTopByStaffOrderByStartDesc(staff);
-	}
+//	public Optional<TimeCard> getTimeCardByUserName(StaffRequest request){
+//		Staff staff = staffRepository.findByUsername(request.getUsername())
+//				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
+//        return timeCardRepository.findTopByStaffOrderByStartDesc(staff);
+//	}
 
-	public void clockIn(StaffRequest request) {
+	public Optional<TimeCard> clockIn(StaffRequest request) {
 		Staff staff = staffRepository.findByUsername(request.getUsername())
 				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
 
@@ -43,7 +43,7 @@ public class TimeCardService {
 		if (recentTimeCard.isPresent() && recentTimeCard.get().getStart().toLocalDate().isEqual(now.toLocalDate())) {
 			// 중복 출근
 			System.out.println("Already clocked in today.");
-			return;
+			return recentTimeCard;
 		}
 
 		// 새로운 타임카드 생성
@@ -52,9 +52,11 @@ public class TimeCardService {
 		timeCard.setStart(now);
 		timeCardRepository.save(timeCard);
 		System.out.println("Clock in recorded.");
+
+		return recentTimeCard;
 	}
 
-	public void clockOut(StaffRequest request) {
+	public Optional<TimeCard> clockOut(StaffRequest request) {
 		Staff staff = staffRepository.findByUsername(request.getUsername())
 				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
 
@@ -74,5 +76,7 @@ public class TimeCardService {
 			// 현재 시각의 날짜와 다르다면 오류 발생
 			System.out.println("Cannot clock out without clocking in today.");
 		}
+
+		return recentTimeCard;
 	}
 }
