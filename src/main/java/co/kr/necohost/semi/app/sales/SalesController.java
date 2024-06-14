@@ -430,15 +430,46 @@ public class SalesController {
 
         // process가 1인 판매량과 판매액 총합 계산
         Map<String, Double> totalSalesAndQuantityByProcess = salesService.getTotalSalesAndQuantityByProcess(1);
-        DecimalFormat salesFormatter = new DecimalFormat("#,###");
-        String formattedTotalSalesAmountProcess1 = salesFormatter.format(totalSalesAndQuantityByProcess.get("totalSalesAmount"));
-        model.addAttribute("totalQuantityProcess1", totalSalesAndQuantityByProcess.get("totalQuantity").intValue());
-        model.addAttribute("totalSalesAmountProcess1", formattedTotalSalesAmountProcess1);
+        double totalSalesAmountProcess1 = totalSalesAndQuantityByProcess.get("totalSalesAmount");
+        double totalQuantityProcess1 = totalSalesAndQuantityByProcess.get("totalQuantity");
+
+        model.addAttribute("totalQuantityProcess1", (int) totalQuantityProcess1);
+        model.addAttribute("totalSalesAmountProcess1", totalSalesAmountProcess1);
+
+        // 점유율 계산
+        double totalSalesAmount = (double) salesData.get("totalSalesAmount");
+        double totalQuantity = (double) salesData.get("totalQuantity");
+
+        double salesPercentage = 0;
+        if (totalSalesAmountProcess1 != 0) {
+            salesPercentage = (totalSalesAmount / totalSalesAmountProcess1) * 100;
+        }
+
+        double quantityPercentage = 0;
+        if (totalQuantityProcess1 != 0) {
+            quantityPercentage = (totalQuantity / totalQuantityProcess1) * 100;
+        }
+
+        DecimalFormat df = new DecimalFormat("#.##");
+        model.addAttribute("salesPercentage", df.format(salesPercentage));
+        model.addAttribute("quantityPercentage", df.format(quantityPercentage));
+        model.addAttribute("totalQuantity", (long) totalQuantity); // 소수점 이하 절사
+        model.addAttribute("totalSalesAmount", (long) totalSalesAmount); // 소수점 이하 절사
+
+        // process가 1인 판매의 총 원가 계산
+        double totalCostByProcess = salesService.calculateTotalCostByProcess(1);
+        model.addAttribute("totalCostByProcess", totalCostByProcess);
+
+        // 원가 점유율 계산
+        Menu menu = (Menu) salesData.get("menu");
+        double costPercentage = 0;
+        if (totalCostByProcess != 0) {
+            costPercentage = (totalQuantity * menu.getCost() / totalCostByProcess) * 100;
+        }
+        model.addAttribute("costPercentage", df.format(costPercentage));
 
         return "sales/salesAnalysisByMenuInput";
     }
-
-
 
 
 

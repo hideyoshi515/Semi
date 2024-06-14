@@ -384,7 +384,7 @@ public class SalesService {
     }
 
 
-    // 날짜 범위에 따른 카테고리별 매출액 도출 위한 쿼리 6월 12일 오후 5시 5분
+    // 날짜 범위에 따른 카테고리별 매출액 도출 위한 쿼리
     public Map<String, Double> getSalesByCategoryInRange(LocalDateTime startDate, LocalDateTime endDate) {
         List<Sales> salesList = salesRepository.findSalesByDateRangeWithProcess(startDate, endDate);
         List<Category> categoryList = categoryRepository.findAll();
@@ -400,7 +400,7 @@ public class SalesService {
                 ));
     }
 
-    // 날짜 범위에 따른 카테고리별 판매량 도출 위한 쿼리  6월 12일 오후 5시 5분
+    // 날짜 범위에 따른 카테고리별 판매량 도출 위한 쿼리
     public Map<String, Integer> getQuantityByCategoryInRange(LocalDateTime startDate, LocalDateTime endDate) {
         List<Sales> salesList = salesRepository.findSalesByDateRangeWithProcess(startDate, endDate);
         List<Category> categoryList = categoryRepository.findAll();
@@ -416,7 +416,7 @@ public class SalesService {
                 ));
     }
 
-    //6월 14일 작업 : 파라미터로 받아온 id로 sales data 읽기
+    //파라미터로 받아온 id로 sales data 읽기
     public List<Sales> findSalesByMenuId(Long menuId) {
         return salesRepository.findByMenu(menuId);
     }
@@ -445,63 +445,61 @@ public class SalesService {
         double totalSalesAmount = salesList.stream()
                 .mapToDouble(s -> s.getPrice() * s.getQuantity())
                 .sum();
-        int totalQuantity = salesList.stream()
-                .mapToInt(Sales::getQuantity)
+        double totalQuantity = salesList.stream()
+                .mapToDouble(Sales::getQuantity)
                 .sum();
 
         Map<String, Double> result = new HashMap<>();
         result.put("totalSalesAmount", totalSalesAmount);
-        result.put("totalQuantity", (double) totalQuantity);
+        result.put("totalQuantity", totalQuantity);
         return result;
     }
+    //추가 중 6월 14일 4시 9분
+    public double calculateTotalCostByProcess(int process) {
+        List<Sales> salesList = findByProcess(process).stream()
+                .filter(s -> s.getProcess() == 1)
+                .collect(Collectors.toList());
 
+        double totalCost = 0.0;
+
+        for (Sales sale : salesList) {
+            Menu menu = menuRepository.findById(sale.getMenu()).orElseThrow(() -> new RuntimeException("Menu not found"));
+            totalCost += sale.getQuantity() * menu.getCost();
+        }
+
+        return totalCost;
+    }
 
     //
     public Map<String, Object> calculateMenuSalesData(Long menuId) {
         Menu menu = menuRepository.findById(menuId).orElseThrow(() -> new RuntimeException("Menu not found"));
         List<Sales> salesList = salesRepository.findByMenu(menuId);
 
-
-        int totalQuantity = 0;
+        double totalQuantity = 0.0;
         double totalSalesAmount = 0.0;
 
-        //총매출, 총판매량 계산
+        // 총매출, 총판매량 계산
         for (Sales sale : salesList) {
             totalQuantity += sale.getQuantity();
             totalSalesAmount += sale.getPrice() * sale.getQuantity();
         }
 
-        DecimalFormat salesFormatter = new DecimalFormat("#,###");
-        String formattedTotalSalesAmount = salesFormatter.format(totalSalesAmount);
-        //이익률 계산
+        //계산
         double profitRate = 100.0 * (menu.getPrice() - menu.getCost()) / menu.getPrice();
         DecimalFormat profitFormatter = new DecimalFormat("#0.0");
         String formattedProfitRate = profitFormatter.format(profitRate);
-        //점유율 계산
-
-
 
         Map<String, Object> result = new HashMap<>();
         result.put("menu", menu);
         result.put("salesListall", salesList);
         result.put("totalQuantity", totalQuantity);
-        result.put("totalSalesAmount", formattedTotalSalesAmount);
+        result.put("totalSalesAmount", totalSalesAmount);
         result.put("profitRate", formattedProfitRate);
 
         System.out.println(result);
 
         return result;
     }
-
-
-
-
-
-
-
-
-
-
 
 
 
