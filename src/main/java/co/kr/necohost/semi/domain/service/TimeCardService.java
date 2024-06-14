@@ -1,5 +1,6 @@
 package co.kr.necohost.semi.domain.service;
 
+import co.kr.necohost.semi.domain.model.dto.StaffRequest;
 import co.kr.necohost.semi.domain.model.entity.Staff;
 import co.kr.necohost.semi.domain.model.entity.TimeCard;
 import co.kr.necohost.semi.domain.repository.StaffRepository;
@@ -13,45 +14,48 @@ import java.util.Optional;
 @Service
 public class TimeCardService {
 
-    @Autowired
-    private StaffRepository staffRepository;
+    private final StaffRepository staffRepository;
 
-    @Autowired
-    private TimeCardRepository timecardRepository;
+    private final TimeCardRepository timeCardRepository;
 
-    public void clockIn(Long staffId) {
-        Staff staff = staffRepository.findById(staffId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid staff ID"));
+    public TimeCardService(StaffRepository staffRepository, TimeCardRepository timecardRepository) {
+        this.staffRepository = staffRepository;
+        this.timeCardRepository = timecardRepository;
+    }
 
-        Optional<TimeCard> recentTimecard = timecardRepository.findTopByStaffOrderByStartDesc(staff);
+    public void clockIn(StaffRequest request) {
+        Staff staff = staffRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid username"));
+
+        Optional<TimeCard> recentTimeCard = timeCardRepository.findTopByStaffOrderByStartDesc(staff);
         LocalDateTime now = LocalDateTime.now();
 
-        if (recentTimecard.isPresent() && recentTimecard.get().getStart().toLocalDate().isEqual(now.toLocalDate())) {
+        if (recentTimeCard.isPresent() && recentTimeCard.get().getStart().toLocalDate().isEqual(now.toLocalDate())) {
             // 중복 출근
             System.out.println("Already clocked in today.");
             return;
         }
 
         // 새로운 타임카드 생성
-        TimeCard timecard = new TimeCard();
-        timecard.setStaff(staff);
-        timecard.setStart(now);
-        timecardRepository.save(timecard);
+        TimeCard timeCard = new TimeCard();
+        timeCard.setStaff(staff);
+        timeCard.setStart(now);
+        timeCardRepository.save(timeCard);
         System.out.println("Clock in recorded.");
     }
 
-    public void clockOut(Long staffId) {
-        Staff staff = staffRepository.findById(staffId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid staff ID"));
+    public void clockOut(StaffRequest request) {
+        Staff staff = staffRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid username"));
 
-        Optional<TimeCard> recentTimecard = timecardRepository.findTopByStaffOrderByStartDesc(staff);
+        Optional<TimeCard> recentTimeCard = timeCardRepository.findTopByStaffOrderByStartDesc(staff);
         LocalDateTime now = LocalDateTime.now();
 
-        if (recentTimecard.isPresent() && recentTimecard.get().getStart().toLocalDate().isEqual(now.toLocalDate())) {
-            TimeCard timecard = recentTimecard.get();
-            if (timecard.getEnd() == null) {
-                timecard.setEnd(now);
-                timecardRepository.save(timecard);
+        if (recentTimeCard.isPresent() && recentTimeCard.get().getStart().toLocalDate().isEqual(now.toLocalDate())) {
+            TimeCard timeCard = recentTimeCard.get();
+            if (timeCard.getEnd() == null) {
+                timeCard.setEnd(now);
+                timeCardRepository.save(timeCard);
                 System.out.println("Clock out recorded.");
             } else {
                 System.out.println("Already clocked out today.");

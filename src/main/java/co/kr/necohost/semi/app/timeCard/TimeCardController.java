@@ -1,28 +1,46 @@
 package co.kr.necohost.semi.app.timeCard;
 
+import co.kr.necohost.semi.domain.model.dto.StaffRequest;
 import co.kr.necohost.semi.domain.service.TimeCardService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/timeCard")
+@Controller
 public class TimeCardController {
-    @Autowired
-    private TimeCardService timeCardService;
+    private final TimeCardService timeCardService;
 
-    @PostMapping("/clockin/{staffId}")
-    public ResponseEntity<String> clockIn(@PathVariable Long staffId) {
-        timeCardService.clockIn(staffId);
-        return ResponseEntity.ok("Clock in attempted.");
+    public TimeCardController(TimeCardService timeCardService) {
+        this.timeCardService = timeCardService;
     }
 
-    @PostMapping("/clockout/{staffId}")
-    public ResponseEntity<String> clockOut(@PathVariable Long staffId) {
-        timeCardService.clockOut(staffId);
-        return ResponseEntity.ok("Clock out attempted.");
+    @RequestMapping(value = "/timeCardInput", method = RequestMethod.GET)
+    public String timeCardInput(Model model) {
+        StaffRequest staffRequest = new StaffRequest();
+        model.addAttribute("staffRequest", staffRequest);
+        return "timeCard/timeCardInput.html";
+    }
+
+    @RequestMapping(value = "/timeCardIn", method = RequestMethod.POST)
+    public ResponseEntity<String> clockIn(@RequestBody StaffRequest request) {
+        try {
+            timeCardService.clockIn(request);
+            return ResponseEntity.ok("Clock in attempted.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/timeCardOut", method = RequestMethod.POST)
+    public ResponseEntity<String> clockOut(@RequestBody StaffRequest request) {
+        try {
+            timeCardService.clockOut(request);
+            return ResponseEntity.ok("Clock out attempted.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 }

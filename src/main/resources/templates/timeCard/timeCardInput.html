@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/default_layout}">
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="container mt-5">
+        <h2>Clock In and Clock Out</h2>
+        <form id="clockInForm" class="mb-3">
+            <div class="mb-3">
+                <label for="clockInUsername" class="form-label">Clock In Username</label>
+                <input type="text" class="form-control" id="clockInUsername" placeholder="Enter your username" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Clock In</button>
+        </form>
+        <form id="clockOutForm">
+            <div class="mb-3">
+                <label for="clockOutUsername" class="form-label">Clock Out Username</label>
+                <input type="text" class="form-control" id="clockOutUsername" placeholder="Enter your username" required>
+            </div>
+            <button type="submit" class="btn btn-secondary">Clock Out</button>
+        </form>
+        <div id="message" class="mt-3"></div>
+    </div>
+
+    <script>
+        document.getElementById('clockInForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('clockInUsername').value;
+
+            const requestData = {
+                username: username
+            };
+
+            try {
+                const response = await fetch('/timecard/clockin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                const result = await response.text();
+
+                document.getElementById('message').innerHTML = `<div class="alert alert-success">${result}</div>`;
+            } catch (error) {
+                document.getElementById('message').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            }
+        });
+
+        document.getElementById('clockOutForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('clockOutUsername').value;
+
+            const requestData = {
+                username: username
+            };
+
+            try {
+                const response = await fetch('/timecard/clockout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                const result = await response.text();
+
+                document.getElementById('message').innerHTML = `<div class="alert alert-success">${result}</div>`;
+            } catch (error) {
+                document.getElementById('message').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            }
+        });
+    </script>
+</th:block>
+</body>
+</html>
