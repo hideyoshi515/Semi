@@ -91,6 +91,9 @@ public interface SalesRepository extends JpaRepository<Sales, Long> {
     @Query("SELECT s FROM Sales s WHERE s.date BETWEEN :startDate AND :endDate AND s.process = 1")
     List<Sales> findSalesByDateRangeWithProcess(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
+    //이 메서드는 데이터베이스에서 지정된 menuId와 일치하는 메뉴 ID를 가지며 process 값이 1인 Sales 엔티티 목록을 검색
+    @Query("SELECT s FROM Sales s WHERE s.menu = :menuId AND s.process = 1")
+    List<Sales> findByMenu(@Param("menuId") Long menuId);
 
 
 

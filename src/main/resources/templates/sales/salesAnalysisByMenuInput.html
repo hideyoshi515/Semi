@@ -8,6 +8,20 @@
     <link rel="stylesheet" href="/css/metroStyle.css"> <!-- metroStyle.css 파일 경로로 수정 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
 <body>
 <th:block layout:fragment="content">
     <div class="navbar">
@@ -15,6 +29,43 @@
         <a href="/adminSalesMainMenu">メニュー</a>
     </div>
     <h1 style="color: white;"><img style="width: 38px;height: 38px;" src="/img/storeownerpage/salereport.png">メニュー別売上販売の現状</h1>
+    <img id="menu-detail-image" th:if="${menu.image} != null" th:src="${menu.image}" style="width: 16%; height: auto;"> </div>
+
+    <div>
+        <h3>총 판매량: <span th:text="${totalQuantity}"></span>個</h3>
+        <h3>총 판매액: <span th:text="${totalSalesAmount}"></span>円</h3>
+        <h3>총 원가: <span th:text="${totalQuantity}*${menu.cost}"></span>円</h3>
+        <h3>메뉴의 가격 <span th:text="${menu.price}"></span>円</h3>
+        <h3>메뉴의 원가 <span th:text="${menu.cost}"></span>円</h3>
+        <h3>이익률: <span th:text="${profitRate}"></span>%</h3>
+
+        <h3>모든 메뉴의 총 판매량: <span th:text="${totalQuantityProcess1}"></span></h3>
+        <h3>모든 메뉴의 총 판매액: <span th:text="${totalSalesAmountProcess1}"></span></h3>
+        <h3>더 붙일려고 하는거</h3>
+        <h3>오늘 판매량 / 점유율</h3>
+        <h3>오늘 판매액 / 점유율</h3>
+        <h3>금주 판매량 / 점유율</h3>
+        <h3>금주 판매액 / 점유율</h3>
+        <h3>금월 판매량 / 점유율</h3>
+        <h3>금월 판매액 / 점유율</h3>
+        <h3>금년 판매량 / 점유율</h3>
+        <h3>금년 판매액 / 점유율</h3>
+        <h3>특히 잘 팔리는 요일 3개</h3>
+        <h3>특히 잘 팔리는 월 3개</h3>
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
 
 아이디<div th:text="${menu.id}"></div>
 <H2><div th:text="${menu.name}+'メニューの販売データ分析'"></div></H2>
@@ -24,13 +75,46 @@
 메뉴의 원가 <div th:text="${menu.cost}"></div>
 메뉴의 이익률 <div th:text="(${menu.price }-${menu.cost})/${menu.price}"></div>
 메뉴의 이미지
-<img id="menu-detail-image" th:if="${menu.image} != null" th:src="${menu.image}" style="width: 16%; height: auto;"> </div>
+
 메뉴의 설명<div th:text="${menu.description}"></div>
 
 현재까지 매출액/ 점유율
 최근 매출액 (오늘/어제 대비 증감률, 일주일/전주 대비 증감률, 한달/전월 대비 증감률 )
 현재까지 판매량/ 점유율
 최근 판매량(오늘/어제 대비 증감률, 일주일/전주 대비 증감률, 한달/전월 대비 증감률 )
+
+    <table>
+        <thead>
+        <tr>
+            <th scope="col">id</th>
+            <th scope="col">date</th>
+            <th scope="col">category</th>
+            <th scope="col">menu</th>
+            <th scope="col">price</th>
+            <th scope="col">quantity</th>
+            <th scope="col">device</th>
+            <th scope="col">deviceNum</th>
+            <th scope="col">odrderNum</th>
+            <th scope="col">process</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="sale : ${salesListall}">
+            <td th:text="${sale.id}"></td>
+            <td th:text="${sale.date}"></td>
+            <td th:text="${sale.category}"></td>
+            <td th:text="${sale.menu}"></td>
+            <td th:text="${sale.price}"></td>
+            <td th:text="${sale.quantity}"></td>
+            <td th:text="${sale.device}"></td>
+            <td th:text="${sale.deviceNum}"></td>
+            <td th:text="${sale.orderNum}"></td>
+            <td th:text="${sale.process}"></td>
+
+        </tr>
+        </tbody>
+    </table>
 
 
 
