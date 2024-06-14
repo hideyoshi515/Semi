@@ -420,8 +420,9 @@ public class SalesController {
 //    }
 
 
-    @RequestMapping(value="salesAnalysisByMenuInput", method= RequestMethod.GET)
+    @RequestMapping(value = "salesAnalysisByMenuInput", method = RequestMethod.GET)
     public String getSalesAnalysisByMenuInput(@RequestParam Map<String, Object> params, Model model) {
+        // 메뉴 ID를 파싱
         Long menuId = Long.parseLong(params.get("menuId").toString());
 
         // 서비스 계층에서 데이터 처리
@@ -440,15 +441,8 @@ public class SalesController {
         double totalSalesAmount = (double) salesData.get("totalSalesAmount");
         double totalQuantity = (double) salesData.get("totalQuantity");
 
-        double salesPercentage = 0;
-        if (totalSalesAmountProcess1 != 0) {
-            salesPercentage = (totalSalesAmount / totalSalesAmountProcess1) * 100;
-        }
-
-        double quantityPercentage = 0;
-        if (totalQuantityProcess1 != 0) {
-            quantityPercentage = (totalQuantity / totalQuantityProcess1) * 100;
-        }
+        double salesPercentage = calculatePercentage(totalSalesAmount, totalSalesAmountProcess1);
+        double quantityPercentage = calculatePercentage(totalQuantity, totalQuantityProcess1);
 
         DecimalFormat df = new DecimalFormat("#.##");
         model.addAttribute("salesPercentage", df.format(salesPercentage));
@@ -462,14 +456,22 @@ public class SalesController {
 
         // 원가 점유율 계산
         Menu menu = (Menu) salesData.get("menu");
-        double costPercentage = 0;
-        if (totalCostByProcess != 0) {
-            costPercentage = (totalQuantity * menu.getCost() / totalCostByProcess) * 100;
-        }
+        double costPercentage = calculatePercentage(totalQuantity * menu.getCost(), totalCostByProcess);
         model.addAttribute("costPercentage", df.format(costPercentage));
 
         return "sales/salesAnalysisByMenuInput";
     }
+
+    /**
+     * 두 값을 기반으로 백분율을 계산합니다.
+     * @param value 부분 값
+     * @param total 전체 값
+     * @return 백분율 값
+     */
+    private double calculatePercentage(double value, double total) {
+        return total != 0 ? (value / total) * 100 : 0;
+    }
+
 
 
 
