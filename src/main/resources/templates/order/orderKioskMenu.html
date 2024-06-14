@@ -112,7 +112,7 @@
         <div class="btn-group-wrapper mb-2" role="group" aria-label="Category filter" >
             <div class="btn-group-container">
                 <div class="btn-group" id="categoryContainer">
-                    <button type="button" class="btn btn-lg btn-secondary" onclick="filterMenu('all')">すべて</button>
+<!--                    <button type="button" class="btn btn-lg btn-secondary" onclick="filterMenu('all')">すべて</button>-->
                     <button type="button" class="btn btn-lg btn-secondary" th:each="category : ${categories}"
                             th:text="${category.name}" th:id="|c_${category.id}_btn|"
                             th:onclick="|filterMenu(${category.id})|"></button>
@@ -128,16 +128,18 @@
                     <div class="row align-top ms-3" id="menuContainer">
                         <div class="menu-item mb-2 me-2" th:each="menu : ${menus}"
                              th:attr="data-category=${menu.category}"
-                             style="width: 200px; height: 220px;">
+                             style="width: 200px; min-height: 220px;" th:id="|div_${menuStat.index}|">
                             <a th:if="${menu.stock} > 0"
                                th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ₩'}">
                                 <div class="card rounded rounded-3" style="width: 180px;">
-                                    <div class="card-body text-center">
-                                        <img th:src="${menu.image}"
+                                    <div class="card-body text-center pt-0">
+                                        <div style="height: 135px">
+                                        <img th:src="|/${menu.image}|"
                                              onerror="this.onerror=null; this.src='/img/americano.png'"
-                                             style="width: 8rem; height: auto;">
-                                        <h5 class="card-title" th:text="${menu.name}"></h5>
-                                        <p class="card-text mb-0"><span
+                                             style="width: 8rem; height: auto; margin-top: -15px !important;">
+                                        </div>
+                                        <h5 class="card-title my-0" th:text="${menu.name}"></h5>
+                                        <p class="card-text my-0"><span
                                                 th:text="|${#numbers.formatInteger(menu.price, 1, 'COMMA')} ₩|"></span>
                                         </p>
                                     </div>
@@ -146,10 +148,12 @@
                             <div class="card rounded rounded-3" style="width: 180px;" th:if="${menu.stock} <= 0">
                                 <div class="rounded-3 w-100 h-100"
                                      style="background: rgba(0, 0, 0, 0.7); position: absolute;"></div>
-                                <div class="card-body text-center">
-                                    <img th:src="${menu.image}"
-                                         onerror="this.onerror=null; this.src='/img/americano.png'"
-                                         style="width: 8rem; height: auto;">
+                                <div class="card-body text-center pt-0">
+                                    <div style="height: 135px">
+                                        <img th:src="|/${menu.image}|"
+                                             onerror="this.onerror=null; this.src='/img/americano.png'"
+                                             style="width: 8rem; height: auto; margin-top: -15px !important;">
+                                    </div>
                                     <h5 class="card-title" th:text="${menu.name}"></h5>
                                     <p class="card-text mb-0"
                                        style="color: darkred; font-weight: bold; z-index: 100000;">
@@ -504,8 +508,24 @@
                 });
             });
         }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const menuContainer = document.getElementById("menuContainer");
+            const buttons = Array.from(menuContainer.children);
+
+            buttons.sort((a, b) => {
+                const idA = parseInt(a.id.split('_')[1]);
+                const idB = parseInt(b.id.split('_')[1]);
+                return idB - idA;
+            });
+
+            // 정렬된 버튼들을 다시 컨테이너에 추가
+            buttons.forEach(button => menuContainer.appendChild(button));
+        });
+
+
         // 초기 필터링 설정
-        filterMenu('all');
+        filterMenu('1');
     </script>
 </th:block>
 </body>

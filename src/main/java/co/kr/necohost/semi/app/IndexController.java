@@ -4,6 +4,7 @@ import co.kr.necohost.semi.domain.repository.MenuRepository;
 import co.kr.necohost.semi.domain.service.SalesService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,7 @@ public class IndexController {
         return "redirect:/";
     }
 
-    @RequestMapping("/menu/getName")
+    @RequestMapping(value = "/menu/getName", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Cacheable("getName")
     public String getName(@RequestParam Map<String, Object> params) {

@@ -52,5 +52,5 @@ replay_pid*
 .idea/modules/Semi.main.iml
 .idea/gradle.xml
 
-src/main/resources/static/img
+### src/main/resources/static/img
 out/

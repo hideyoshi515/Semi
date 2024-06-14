@@ -30,7 +30,7 @@
                 <h2 class="user-select-none">日付別</h2>
                 <div class="menu-categories">
                     <div th:each="dates : ${orderDate}">
-                        <button class="btn btn-primary w-100 mb-2 user-select-none"
+                        <button class="btn btn-outline-primary w-100 mb-2 user-select-none selbtn"
                                 th:text="${dates}" th:attr="data-date=${dates}"
                                 onclick="handleDateClick(this)"></button>
                     </div>
@@ -83,7 +83,7 @@
                 </div>
             </div>
             <section class="menu" style="width: 314px;">
-                <a class="btn btn-primary w-100 mb-2 user-select-none" href="/pos">POS</a>
+                <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos">POS</a>
                 <a class="btn btn-primary w-100 mb-2 user-select-none" href="/pos/orderList">注文リスト</a>
             </section>
             <section class="sales-menu" style="width: 314px;">
@@ -211,6 +211,14 @@
 
         function handleDateClick(button) {
             var date = button.getAttribute('data-date');
+            const buttons = document.querySelectorAll('.selbtn');
+            buttons.forEach(button => {
+                button.classList.remove('btn-primary');
+                button.classList.add('btn-outline-primary');
+            });
+            const clickedButton = event.currentTarget;
+            clickedButton.classList.remove('btn-outline-primary');
+            clickedButton.classList.add('btn-primary');
             getOrderNums(date);
         }
 

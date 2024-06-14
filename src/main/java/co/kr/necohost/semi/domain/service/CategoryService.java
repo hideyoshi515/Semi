@@ -6,6 +6,7 @@ import co.kr.necohost.semi.domain.repository.CategoryRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,6 +32,7 @@ public class CategoryService {
         categoryRepository.save(categoryRequest.toEntity());
     }
 
+    @Transactional
     @CacheEvict(value = "categories", allEntries = true)
     public void deleteCategory(int id) {
         categoryRepository.deleteById(id);

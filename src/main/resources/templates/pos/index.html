@@ -30,7 +30,7 @@
                 <h2 class="user-select-none">カテゴリー</h2>
                 <div class="menu-categories">
                     <div th:each="category : ${categories}">
-                        <button class="btn btn-primary w-100 mb-2 user-select-none"
+                        <button class="btn btn-outline-primary w-100 mb-2 user-select-none selbtn"
                                 th:onclick="|getMenu(${category.id})|"
                                 th:text="${category.name}"></button>
                     </div>
@@ -84,7 +84,7 @@
             </div>
             <section class="menu" style="width: 314px;">
                 <a class="btn btn-primary w-100 mb-2 user-select-none" href="/pos">POS</a>
-                <a class="btn btn-primary w-100 mb-2 user-select-none" href="/pos/orderList">注文リスト</a>
+                <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos/orderList">注文リスト</a>
             </section>
             <section class="sales-menu" style="width: 314px;">
             </section>
@@ -161,6 +161,14 @@
         let maxStock = 0;
 
         function getMenu(category) {
+            const buttons = document.querySelectorAll('.selbtn');
+            buttons.forEach(button => {
+                button.classList.remove('btn-primary');
+                button.classList.add('btn-outline-primary');
+            });
+            const clickedButton = event.currentTarget;
+            clickedButton.classList.remove('btn-outline-primary');
+            clickedButton.classList.add('btn-primary');
             // AJAX 요청을 통해 서버로 데이터 전송
             var xhr = new XMLHttpRequest();
             xhr.open("GET", "/pos/getMenu?category=" + category, true);
@@ -394,6 +402,8 @@
                 toast.remove();
             }, 3000);
         }
+
+
 
 
     </script>
