@@ -138,7 +138,9 @@
                                              onerror="this.onerror=null; this.src='/img/americano.png'"
                                              style="width: 8rem; height: auto; margin-top: -15px !important;">
                                         </div>
+                                        <div style="height: 48px;">
                                         <h5 class="card-title my-0" th:text="${menu.name}"></h5>
+                                        </div>
                                         <p class="card-text my-0"><span
                                                 th:text="|${#numbers.formatInteger(menu.price, 1, 'COMMA')} ₩|"></span>
                                         </p>
@@ -154,7 +156,9 @@
                                              onerror="this.onerror=null; this.src='/img/americano.png'"
                                              style="width: 8rem; height: auto; margin-top: -15px !important;">
                                     </div>
-                                    <h5 class="card-title" th:text="${menu.name}"></h5>
+                                    <div style="height: 38px;">
+                                        <h5 class="card-title my-0" th:text="${menu.name}"></h5>
+                                    </div>
                                     <p class="card-text mb-0"
                                        style="color: darkred; font-weight: bold; z-index: 100000;">
                                         売れ切り</p>
