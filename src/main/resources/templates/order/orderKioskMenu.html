@@ -109,7 +109,7 @@
         <div class="headTitle">
             KIOSK
         </div>
-        <div class="btn-group-wrapper mb-2" role="group" aria-label="Category filter" >
+        <div class="btn-group-wrapper mb-2" role="group" aria-label="Category filter">
             <div class="btn-group-container">
                 <div class="btn-group" id="categoryContainer">
                     <button type="button" class="btn btn-lg btn-secondary" onclick="filterMenu('all')">すべて</button>
@@ -243,20 +243,20 @@
 
     <script>
         document.getElementById('menuModal').addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var menuName = button.getAttribute('data-menu-name');
-            var menuId = button.getAttribute('data-menu-id');
-            var menuStock = button.getAttribute('data-menu-stock');
-            var menuImage = button.getAttribute('data-menu-image');
-            var menuDesc = button.getAttribute('data-menu-desc');
-            var menuPrice = button.getAttribute('data-menu-price');
+            let button = event.relatedTarget;
+            let menuName = button.getAttribute('data-menu-name');
+            let menuId = button.getAttribute('data-menu-id');
+            let menuStock = button.getAttribute('data-menu-stock');
+            let menuImage = button.getAttribute('data-menu-image');
+            let menuDesc = button.getAttribute('data-menu-desc');
+            let menuPrice = button.getAttribute('data-menu-price');
 
-            var modalTitle = document.getElementById('menuModalLabel');
-            var quantityInput = document.getElementById('quantityInput');
-            var menuIdInput = document.getElementById('menuIdInput');
-            var modalImage = document.getElementById('modalImage');
-            var modalDesc = document.getElementById('modalDesc');
-            var modalPrice = document.getElementById('modalPrice');
+            let modalTitle = document.getElementById('menuModalLabel');
+            let quantityInput = document.getElementById('quantityInput');
+            let menuIdInput = document.getElementById('menuIdInput');
+            let modalImage = document.getElementById('modalImage');
+            let modalDesc = document.getElementById('modalDesc');
+            let modalPrice = document.getElementById('modalPrice');
 
             modalTitle.textContent = menuName;
             modalDesc.textContent = menuDesc;
@@ -268,8 +268,8 @@
         });
 
         function saveToSession() {
-            var menuId = document.getElementById('menuIdInput').value;
-            var quantity = parseInt(document.getElementById('quantityInput').value);
+            let menuId = document.getElementById('menuIdInput').value;
+            let quantity = parseInt(document.getElementById('quantityInput').value);
 
             if (quantity < 0) {
                 alert("数量は0以上にしてください。");
@@ -277,7 +277,7 @@
             }
 
             // AJAX 요청을 통해 서버로 데이터 전송
-            var xhr = new XMLHttpRequest();
+            let xhr = new XMLHttpRequest();
             xhr.open("POST", "/addToSession", true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
@@ -287,23 +287,23 @@
                 }
             };
 
-            var data = JSON.stringify({"menuId": menuId, "quantity": quantity});
+            let data = JSON.stringify({"menuId": menuId, "quantity": quantity});
             xhr.send(data);
             document.getElementById('cartTotalPrice').innerText = '合計 : ' + getTotalPrice();
         }
 
         document.getElementById('orderForm').addEventListener('submit', function (event) {
-            var orders = sessionStorage.getItem('orders');
-            document.getElementById('orderData').value = orders;
-        }
+                let orders = sessionStorage.getItem('orders');
+                document.getElementById('orderData').value = orders;
+            }
         );
 
-        var currentPage = 1;
-        var itemsPerPage = 12; // 한 페이지에 보여줄 아이템 수
+        let currentPage = 1;
+        let itemsPerPage = 12; // 한 페이지에 보여줄 아이템 수
         function filterMenu(category) {
-            var menuItems = document.querySelectorAll('#menuContainer .menu-item');
-            var title = document.getElementById('categoryTitle');
-            var getTitle = document.getElementById('c_' + category + '_btn');
+            let menuItems = document.querySelectorAll('#menuContainer .menu-item');
+            let title = document.getElementById('categoryTitle');
+            let getTitle = document.getElementById('c_' + category + '_btn');
             if (category === 'all') {
                 title.innerText = "すべて"
             } else {
@@ -321,9 +321,9 @@
         }
 
         function showPage(page) {
-            var items = document.querySelectorAll('#menuContainer .filtered');
-            var totalItems = items.length;
-            var totalPages = Math.ceil(totalItems / itemsPerPage);
+            let items = document.querySelectorAll('#menuContainer .filtered');
+            let totalItems = items.length;
+            let totalPages = Math.ceil(totalItems / itemsPerPage);
             currentPage = page;
 
             items.forEach(function (item, index) {
@@ -350,13 +350,13 @@
         }
 
         function changeQuantity(amount) {
-            var quantityInput = document.getElementById('quantityInput');
-            var currentQuantity = parseInt(quantityInput.value);
-            var newQuantity = currentQuantity + amount;
+            let quantityInput = document.getElementById('quantityInput');
+            let currentQuantity = parseInt(quantityInput.value);
+            let newQuantity = currentQuantity + amount;
             if (newQuantity < 1) {
                 newQuantity = 1;
             }
-            var maxQuantity = parseInt(quantityInput.getAttribute('max'));
+            let maxQuantity = parseInt(quantityInput.getAttribute('max'));
             if (newQuantity > maxQuantity) {
                 newQuantity = maxQuantity;
             }
@@ -365,12 +365,12 @@
 
         function loadCart() {
             // AJAX 요청을 통해 장바구니 데이터를 가져옴
-            var xhr = new XMLHttpRequest();
+            let xhr = new XMLHttpRequest();
             xhr.open("GET", "/getCartItems", true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    var cartItems = JSON.parse(xhr.responseText);
+                    let cartItems = JSON.parse(xhr.responseText);
                     displayCartItems(cartItems);
                 }
             };
@@ -413,9 +413,9 @@
         }
 
         function changeCartQuantity(menuId, stock, amount) {
-            var quantityInput = document.getElementById('quantity-' + menuId);
-            var currentQuantity = parseInt(quantityInput.value);
-            var newQuantity = currentQuantity + amount;
+            let quantityInput = document.getElementById('quantity-' + menuId);
+            let currentQuantity = parseInt(quantityInput.value);
+            let newQuantity = currentQuantity + amount;
 
             if (newQuantity < 1) {
                 newQuantity = 1;
@@ -424,7 +424,7 @@
             }
 
             // AJAX 요청을 통해 서버로 데이터 전송
-            var xhr = new XMLHttpRequest();
+            let xhr = new XMLHttpRequest();
             xhr.open("POST", "/updateCartQuantity", true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
@@ -442,7 +442,7 @@
                 }
             };
 
-            var data = JSON.stringify({"menuId": menuId, "quantity": newQuantity});
+            let data = JSON.stringify({"menuId": menuId, "quantity": newQuantity});
             xhr.send(data);
         }
 
@@ -490,6 +490,7 @@
         document.getElementById('cartModal').addEventListener('show.bs.modal', function () {
             loadCart();
         });
+
         function getTotalPrice() {
             return new Promise((resolve, reject) => {
                 $.ajax({
@@ -504,6 +505,7 @@
                 });
             });
         }
+
         // 초기 필터링 설정
         filterMenu('all');
     </script>
