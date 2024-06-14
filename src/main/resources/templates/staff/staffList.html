@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff List</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="container mt-5">
+        <h2>Staff List</h2>
+        <div class="table-responsive">
+            <div class="table">
+                <div class="table-header">
+                    <div class="row">
+                        <div class="col"><strong>ID</strong></div>
+                        <div class="col"><strong>Name</strong></div>
+                        <div class="col"><strong>Username</strong></div>
+                        <div class="col"><strong>Phone</strong></div>
+                        <div class="col"><strong>Position</strong></div>
+                    </div>
+                </div>
+                <div class="table-body">
+                    <div th:each="staff : ${staffs}" class="row">
+                        <div class="col" th:text="${staff.id}"></div>
+                        <div class="col" th:text="${staff.name}"></div>
+                        <div class="col" th:text="${staff.username}"></div>
+                        <div class="col" th:text="${staff.phone}"></div>
+                        <div class="col" th:text="${staff.position.position_Name}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

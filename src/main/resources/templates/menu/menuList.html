@@ -31,7 +31,7 @@
     <div id="scrollable-content" class="scrollable-container">
         <div id="menu-container" class="mt-3 d-flex flex-wrap ">
             <div th:each="menu : ${menus}" class="menu-item text-center align-content-center"
-                 th:id="${menu.id}" style="width: 19%; height: 30%;" th:onclick="|detail(${menu.id})|">
+                 th:id="${menu.id}" style="width: 24%; height: 30%;" th:onclick="|detail(${menu.id})|">
                 <div class="user-select-none">
                     <img th:src="${menu.image}" style="width: 150px; height: 150px;">
                     <div style="font-size: 20pt; background-color: #f3f5f6" id="menu-name" class="user-select-none"
