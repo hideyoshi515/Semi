@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -373,17 +375,68 @@ public class SalesController {
         return "sales/totalSalesByYearAndCategoryInput";
     }
 
+    //6월 14일 6시 18분 확인중
+//    @RequestMapping(value = "salesAnalysisByMenuInput", method = RequestMethod.GET)
+//    public String getSalesAnalysisByMenuInput(@RequestParam Map<String, Object> params, Model model) {
+//        // 메뉴 ID를 파싱
+//        Long menuId = Long.parseLong(params.get("menuId").toString());
+//
+//        // 서비스 계층에서 데이터 처리
+//        Map<String, Object> salesData = salesService.calculateMenuSalesData(menuId);
+//        model.addAllAttributes(salesData);
+//
+//        // process가 1인 판매량과 판매액 총합 계산
+//        Map<String, Double> totalSalesAndQuantityByProcess = salesService.getTotalSalesAndQuantityByProcess(1);
+//        double totalSalesAmountProcess1 = totalSalesAndQuantityByProcess.get("totalSalesAmount");
+//        double totalQuantityProcess1 = totalSalesAndQuantityByProcess.get("totalQuantity");
+//
+//        model.addAttribute("totalQuantityProcess1", (int) totalQuantityProcess1);
+//        model.addAttribute("totalSalesAmountProcess1", totalSalesAmountProcess1);
+//
+//        // 점유율 계산
+//        double totalSalesAmount = (double) salesData.get("totalSalesAmount");
+//        double totalQuantity = (double) salesData.get("totalQuantity");
+//
+//        double salesPercentage = calculatePercentage(totalSalesAmount, totalSalesAmountProcess1);
+//        double quantityPercentage = calculatePercentage(totalQuantity, totalQuantityProcess1);
+//
+//        DecimalFormat df = new DecimalFormat("#.##");
+//        model.addAttribute("salesPercentage", df.format(salesPercentage));
+//        model.addAttribute("quantityPercentage", df.format(quantityPercentage));
+//        model.addAttribute("totalQuantity", (long) totalQuantity); // 소수점 이하 절사
+//        model.addAttribute("totalSalesAmount", (long) totalSalesAmount); // 소수점 이하 절사
+//
+//        // process가 1인 판매의 총 원가 계산
+//        double totalCostByProcess = salesService.calculateTotalCostByProcess(1);
+//        model.addAttribute("totalCostByProcess", totalCostByProcess);
+//
+//        // 원가 점유율 계산
+//        Menu menu = (Menu) salesData.get("menu");
+//        double costPercentage = calculatePercentage(totalQuantity * menu.getCost(), totalCostByProcess);
+//        model.addAttribute("costPercentage", df.format(costPercentage));
+//
+//        return "sales/salesAnalysisByMenuInput";
+//    }
+//
+//    /**
+//     * 두 값을 기반으로 백분율을 계산합니다.
+//     * @param value 부분 값
+//     * @param total 전체 값
+//     * @return 백분율 값
+//     */
+//    private double calculatePercentage(double value, double total) {
+//        return total != 0 ? (value / total) * 100 : 0;
+//    }
+
+    //6월 14일 6시 18분 확인중
 
     @RequestMapping(value = "salesAnalysisByMenuInput", method = RequestMethod.GET)
     public String getSalesAnalysisByMenuInput(@RequestParam Map<String, Object> params, Model model) {
-        // 메뉴 ID를 파싱
         Long menuId = Long.parseLong(params.get("menuId").toString());
 
-        // 서비스 계층에서 데이터 처리
         Map<String, Object> salesData = salesService.calculateMenuSalesData(menuId);
         model.addAllAttributes(salesData);
 
-        // process가 1인 판매량과 판매액 총합 계산
         Map<String, Double> totalSalesAndQuantityByProcess = salesService.getTotalSalesAndQuantityByProcess(1);
         double totalSalesAmountProcess1 = totalSalesAndQuantityByProcess.get("totalSalesAmount");
         double totalQuantityProcess1 = totalSalesAndQuantityByProcess.get("totalQuantity");
@@ -391,9 +444,8 @@ public class SalesController {
         model.addAttribute("totalQuantityProcess1", (int) totalQuantityProcess1);
         model.addAttribute("totalSalesAmountProcess1", totalSalesAmountProcess1);
 
-        // 점유율 계산
         double totalSalesAmount = (double) salesData.get("totalSalesAmount");
-        double totalQuantity = (double) salesData.get("totalQuantity");
+        int totalQuantity = (int) salesData.get("totalQuantity");
 
         double salesPercentage = calculatePercentage(totalSalesAmount, totalSalesAmountProcess1);
         double quantityPercentage = calculatePercentage(totalQuantity, totalQuantityProcess1);
@@ -401,17 +453,77 @@ public class SalesController {
         DecimalFormat df = new DecimalFormat("#.##");
         model.addAttribute("salesPercentage", df.format(salesPercentage));
         model.addAttribute("quantityPercentage", df.format(quantityPercentage));
-        model.addAttribute("totalQuantity", (long) totalQuantity); // 소수점 이하 절사
-        model.addAttribute("totalSalesAmount", (long) totalSalesAmount); // 소수점 이하 절사
+        model.addAttribute("totalQuantity", totalQuantity);
+        model.addAttribute("totalSalesAmount", (long) totalSalesAmount);
 
-        // process가 1인 판매의 총 원가 계산
         double totalCostByProcess = salesService.calculateTotalCostByProcess(1);
         model.addAttribute("totalCostByProcess", totalCostByProcess);
 
-        // 원가 점유율 계산
         Menu menu = (Menu) salesData.get("menu");
         double costPercentage = calculatePercentage(totalQuantity * menu.getCost(), totalCostByProcess);
         model.addAttribute("costPercentage", df.format(costPercentage));
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfToday = now.toLocalDate().atStartOfDay();
+        LocalDateTime startOfWeek = now.with(DayOfWeek.MONDAY).toLocalDate().atStartOfDay();
+        LocalDateTime startOfMonth = now.withDayOfMonth(1).toLocalDate().atStartOfDay();
+        LocalDateTime startOfQuarter = now.with(now.getMonth().firstMonthOfQuarter()).withDayOfMonth(1).toLocalDate().atStartOfDay();
+
+        int todayQuantity = salesService.getTotalQuantityByDateRange(startOfToday, now, menuId);
+        double todaySalesAmount = salesService.getTotalSalesByDateRange(startOfToday, now, menuId);
+
+        int weekQuantity = salesService.getTotalQuantityByDateRange(startOfWeek, now, menuId);
+        double weekSalesAmount = salesService.getTotalSalesByDateRange(startOfWeek, now, menuId);
+
+        int monthQuantity = salesService.getTotalQuantityByDateRange(startOfMonth, now, menuId);
+        double monthSalesAmount = salesService.getTotalSalesByDateRange(startOfMonth, now, menuId);
+
+        int quarterQuantity = salesService.getTotalQuantityByDateRange(startOfQuarter, now, menuId);
+        double quarterSalesAmount = salesService.getTotalSalesByDateRange(startOfQuarter, now, menuId);
+
+        int totalTodayQuantity = salesService.getTotalQuantityByDateRange(startOfToday, now);
+        double totalTodaySalesAmount = salesService.getTotalSalesByDateRange(startOfToday, now);
+
+        int totalWeekQuantity = salesService.getTotalQuantityByDateRange(startOfWeek, now);
+        double totalWeekSalesAmount = salesService.getTotalSalesByDateRange(startOfWeek, now);
+
+        int totalMonthQuantity = salesService.getTotalQuantityByDateRange(startOfMonth, now);
+        double totalMonthSalesAmount = salesService.getTotalSalesByDateRange(startOfMonth, now);
+
+        int totalQuarterQuantity = salesService.getTotalQuantityByDateRange(startOfQuarter, now);
+        double totalQuarterSalesAmount = salesService.getTotalSalesByDateRange(startOfQuarter, now);
+
+        double todayQuantityPercentage = calculatePercentage(todayQuantity, totalTodayQuantity);
+        double todaySalesPercentage = calculatePercentage(todaySalesAmount, totalTodaySalesAmount);
+
+        double weekQuantityPercentage = calculatePercentage(weekQuantity, totalWeekQuantity);
+        double weekSalesPercentage = calculatePercentage(weekSalesAmount, totalWeekSalesAmount);
+
+        double monthQuantityPercentage = calculatePercentage(monthQuantity, totalMonthQuantity);
+        double monthSalesPercentage = calculatePercentage(monthSalesAmount, totalMonthSalesAmount);
+
+        double quarterQuantityPercentage = calculatePercentage(quarterQuantity, totalQuarterQuantity);
+        double quarterSalesPercentage = calculatePercentage(quarterSalesAmount, totalQuarterSalesAmount);
+
+        model.addAttribute("todayQuantity", todayQuantity);
+        model.addAttribute("todaySalesAmount", todaySalesAmount);
+        model.addAttribute("todayQuantityPercentage", df.format(todayQuantityPercentage));
+        model.addAttribute("todaySalesPercentage", df.format(todaySalesPercentage));
+
+        model.addAttribute("weekQuantity", weekQuantity);
+        model.addAttribute("weekSalesAmount", weekSalesAmount);
+        model.addAttribute("weekQuantityPercentage", df.format(weekQuantityPercentage));
+        model.addAttribute("weekSalesPercentage", df.format(weekSalesPercentage));
+
+        model.addAttribute("monthQuantity", monthQuantity);
+        model.addAttribute("monthSalesAmount", monthSalesAmount);
+        model.addAttribute("monthQuantityPercentage", df.format(monthQuantityPercentage));
+        model.addAttribute("monthSalesPercentage", df.format(monthSalesPercentage));
+
+        model.addAttribute("quarterQuantity", quarterQuantity);
+        model.addAttribute("quarterSalesAmount", quarterSalesAmount);
+        model.addAttribute("quarterQuantityPercentage", df.format(quarterQuantityPercentage));
+        model.addAttribute("quarterSalesPercentage", df.format(quarterSalesPercentage));
 
         return "sales/salesAnalysisByMenuInput";
     }
@@ -425,6 +537,12 @@ public class SalesController {
     private double calculatePercentage(double value, double total) {
         return total != 0 ? (value / total) * 100 : 0;
     }
+
+
+    //6월 14일 6시 18분 확인중
+
+
+
 
 
 

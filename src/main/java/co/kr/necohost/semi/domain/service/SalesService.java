@@ -446,7 +446,6 @@ public class SalesService {
 		Menu menu = menuRepository.findById(menuId).orElseThrow(() -> new RuntimeException("Menu not found"));
 		List<Sales> salesList = salesRepository.findByMenu(menuId);
 
-
 		int totalQuantity = 0;
 		double totalSalesAmount = 0.0;
 
@@ -456,24 +455,55 @@ public class SalesService {
 			totalSalesAmount += sale.getPrice() * sale.getQuantity();
 		}
 
-		DecimalFormat salesFormatter = new DecimalFormat("#,###");
-		String formattedTotalSalesAmount = salesFormatter.format(totalSalesAmount);
 		//이익률 계산
 		double profitRate = 100.0 * (menu.getPrice() - menu.getCost()) / menu.getPrice();
-		DecimalFormat profitFormatter = new DecimalFormat("#0.0");
-		String formattedProfitRate = profitFormatter.format(profitRate);
-		//점유율 계산
-
 
 		Map<String, Object> result = new HashMap<>();
 		result.put("menu", menu);
 		result.put("salesListall", salesList);
 		result.put("totalQuantity", totalQuantity);
-		result.put("totalSalesAmount", formattedTotalSalesAmount);
-		result.put("profitRate", formattedProfitRate);
-
-		System.out.println(result);
+		result.put("totalSalesAmount", totalSalesAmount); // Double 형식으로 유지
+		result.put("profitRate", profitRate);
 
 		return result;
 	}
+
+
+	//6월 18일 마지막으로 확인중
+	public int getTotalQuantityByDateRange(LocalDateTime startDate, LocalDateTime endDate, Long menuId) {
+		List<Sales> salesList = salesRepository.findSalesByDateRangeAndMenu(startDate, endDate, menuId);
+		return salesList.stream()
+				.mapToInt(Sales::getQuantity)
+				.sum();
+	}
+
+	public double getTotalSalesByDateRange(LocalDateTime startDate, LocalDateTime endDate, Long menuId) {
+		List<Sales> salesList = salesRepository.findSalesByDateRangeAndMenu(startDate, endDate, menuId);
+		return salesList.stream()
+				.mapToDouble(s -> s.getPrice() * s.getQuantity())
+				.sum();
+	}
+
+	public int getTotalQuantityByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+		List<Sales> salesList = salesRepository.findSalesByDateRange(startDate, endDate);
+		return salesList.stream()
+				.mapToInt(Sales::getQuantity)
+				.sum();
+	}
+
+	public double getTotalSalesByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+		List<Sales> salesList = salesRepository.findSalesByDateRange(startDate, endDate);
+		return salesList.stream()
+				.mapToDouble(s -> s.getPrice() * s.getQuantity())
+				.sum();
+	}
+
+
+	//6월 18일 마지막으로 확인중
+
+
+
+
+
+
 }

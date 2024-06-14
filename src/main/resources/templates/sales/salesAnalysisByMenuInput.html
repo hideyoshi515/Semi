@@ -30,6 +30,7 @@
     </div>
     <h1 style="color: black;"><img style="width: 38px;height: 38px;" src="/img/storeownerpage/salereport.png">メニュー別売上販売の現状</h1>
     <img id="menu-detail-image" th:if="${menu.image} != null" th:src="${menu.image}" style="width: 16%; height: auto;"> </div>
+    <h3 style="color: black;">メニュー名: <span th:text="${menu.name}"></span></h3>
 
     <div>
         <h3 style="color: black;">누적 판매량: <span th:text="${totalQuantity}"></span>個//점유율<span th:text="${quantityPercentage}"></span>%</h3>
