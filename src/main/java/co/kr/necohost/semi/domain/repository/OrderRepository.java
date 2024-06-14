@@ -46,6 +46,6 @@ public interface OrderRepository extends JpaRepository<Sales, Integer> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE Menu m SET m.stock = :orderQuantity WHERE m.id = :menuId")
+    @Query("UPDATE Menu m SET m.stock = (m.stock - :orderQuantity) WHERE m.id = :menuId")
     void updateMenuStock(@Param("menuId") long menuId, @Param("orderQuantity") int quantity);
 }
