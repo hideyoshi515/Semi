@@ -10,7 +10,9 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class POSOrder{
-    private long id;
-    private int quantity;
+public class POSOrder {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long id;
+	private int quantity;
 }

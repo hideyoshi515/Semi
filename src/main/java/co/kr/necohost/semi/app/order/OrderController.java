@@ -86,7 +86,7 @@ public class OrderController {
 
 		String formattedPrice = numberFormat.format(sales.getPrice() * sales.getQuantity());
 
-		String message = "```주문 번호 " + sales.getOrderNum() + "이/가 승인되었습니다.\n" +
+		String message = "주문 번호 " + sales.getOrderNum() + "이/가 승인되었습니다.\n" +
 				"===================================\n" +
 				"            주문번호 " + sales.getOrderNum() + "\n" +
 				"===================================\n";
@@ -103,7 +103,7 @@ public class OrderController {
 				"-----------------------------------\n" +
 				"주문 시간 " + sales.getDate() + "\n" +
 				"총 가격 " + formattedPrice + "원\n" +
-				"===================================```";
+				"===================================";
 
 		orderService.approveOrder(orderID, message);
 		orderService.updateOrderApproval(orderID, orderQuantity, menuID);

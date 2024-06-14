@@ -32,26 +32,18 @@
     <img id="menu-detail-image" th:if="${menu.image} != null" th:src="${menu.image}" style="width: 16%; height: auto;"> </div>
 
     <div>
-        <h3>총 판매량: <span th:text="${totalQuantity}"></span>個</h3>
-        <h3>총 판매액: <span th:text="${totalSalesAmount}"></span>円</h3>
-        <h3>총 원가: <span th:text="${totalQuantity}*${menu.cost}"></span>円</h3>
+        <h3>누적 판매량: <span th:text="${totalQuantity}"></span>個//점유율<span th:text="${quantityPercentage}"></span>%</h3>
+        <h3>누적 판매액: <span th:text="${totalSalesAmount}"></span>円//점유율 <span th:text="${salesPercentage}"></span>%</h3></h3>
+        <h3>누적 원가: <span th:text="${totalQuantity}*${menu.cost}"></span>円// 원가 점유율 <span th:text="${costPercentage}"></span>%</h3>
         <h3>메뉴의 가격 <span th:text="${menu.price}"></span>円</h3>
         <h3>메뉴의 원가 <span th:text="${menu.cost}"></span>円</h3>
         <h3>이익률: <span th:text="${profitRate}"></span>%</h3>
 
-        <h3>모든 메뉴의 총 판매량: <span th:text="${totalQuantityProcess1}"></span></h3>
-        <h3>모든 메뉴의 총 판매액: <span th:text="${totalSalesAmountProcess1}"></span></h3>
-        <h3>더 붙일려고 하는거</h3>
-        <h3>오늘 판매량 / 점유율</h3>
-        <h3>오늘 판매액 / 점유율</h3>
-        <h3>금주 판매량 / 점유율</h3>
-        <h3>금주 판매액 / 점유율</h3>
-        <h3>금월 판매량 / 점유율</h3>
-        <h3>금월 판매액 / 점유율</h3>
-        <h3>금년 판매량 / 점유율</h3>
-        <h3>금년 판매액 / 점유율</h3>
-        <h3>특히 잘 팔리는 요일 3개</h3>
-        <h3>특히 잘 팔리는 월 3개</h3>
+        <h3>모든 메뉴의 총 판매량: <span th:text="${totalQuantityProcess1}"></span>곧 지울거</h3>
+        <h3>모든 메뉴의 총 판매액: <span th:text="${totalSalesAmountProcess1}"></span>곧 지울거</h3>
+        <h3>최종 판매완료된 모든 메뉴의 총 원가: <span th:text="${totalCostByProcess}"></span>곧 지울거</h3>
+<!--        테스트중 -->
+
 
     </div>
 
@@ -67,21 +59,21 @@
 
 
 
-아이디<div th:text="${menu.id}"></div>
-<H2><div th:text="${menu.name}+'メニューの販売データ分析'"></div></H2>
-메뉴의 카테고리<div th:text="${menu.category}"></div>
-메뉴의 현재 재고<div th:text="${menu.stock}"></div>
-메뉴의 가격 <div th:text="${menu.price}"></div>
-메뉴의 원가 <div th:text="${menu.cost}"></div>
-메뉴의 이익률 <div th:text="(${menu.price }-${menu.cost})/${menu.price}"></div>
-메뉴의 이미지
+    아이디<div th:text="${menu.id}"></div>
+    <H2><div th:text="${menu.name}+'メニューの販売データ分析'"></div></H2>
+    메뉴의 카테고리<div th:text="${menu.category}"></div>
+    메뉴의 현재 재고<div th:text="${menu.stock}"></div>
+    메뉴의 가격 <div th:text="${menu.price}"></div>
+    메뉴의 원가 <div th:text="${menu.cost}"></div>
+    메뉴의 이익률 <div th:text="(${menu.price }-${menu.cost})/${menu.price}"></div>
+    메뉴의 이미지
 
-메뉴의 설명<div th:text="${menu.description}"></div>
+    메뉴의 설명<div th:text="${menu.description}"></div>
 
-현재까지 매출액/ 점유율
-최근 매출액 (오늘/어제 대비 증감률, 일주일/전주 대비 증감률, 한달/전월 대비 증감률 )
-현재까지 판매량/ 점유율
-최근 판매량(오늘/어제 대비 증감률, 일주일/전주 대비 증감률, 한달/전월 대비 증감률 )
+    현재까지 매출액/ 점유율
+    최근 매출액 (오늘/어제 대비 증감률, 일주일/전주 대비 증감률, 한달/전월 대비 증감률 )
+    현재까지 판매량/ 점유율
+    최근 판매량(오늘/어제 대비 증감률, 일주일/전주 대비 증감률, 한달/전월 대비 증감률 )
 
     <table>
         <thead>

@@ -12,29 +12,29 @@ import java.util.List;
 
 @Service
 public class CategoryService {
-    CategoryRepository categoryRepository;
+	CategoryRepository categoryRepository;
 
-    public CategoryService(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
-    }
+	public CategoryService(CategoryRepository categoryRepository) {
+		this.categoryRepository = categoryRepository;
+	}
 
-    public Category findById(int id) {
-        return categoryRepository.findById(id).get();
-    }
+	public Category findById(int id) {
+		return categoryRepository.findById(id).get();
+	}
 
-    @Cacheable(value = "categories")
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
-    }
+	@Cacheable(value = "categories")
+	public List<Category> getAllCategories() {
+		return categoryRepository.findAll();
+	}
 
-    @CacheEvict(value = "categories", allEntries = true)
-    public void saveCategory(CategoryRequest categoryRequest) {
-        categoryRepository.save(categoryRequest.toEntity());
-    }
+	@CacheEvict(value = "categories", allEntries = true)
+	public void saveCategory(CategoryRequest categoryRequest) {
+		categoryRepository.save(categoryRequest.toEntity());
+	}
 
-    @Transactional
-    @CacheEvict(value = "categories", allEntries = true)
-    public void deleteCategory(int id) {
-        categoryRepository.deleteById(id);
-    }
+	@Transactional
+	@CacheEvict(value = "categories", allEntries = true)
+	public void deleteCategory(int id) {
+		categoryRepository.deleteById(id);
+	}
 }

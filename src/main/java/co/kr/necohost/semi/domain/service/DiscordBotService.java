@@ -11,31 +11,31 @@ import javax.annotation.PostConstruct;
 
 @Service
 public class DiscordBotService {
-    @Value("${discord.bot.token}")
-    private String botToken;
+	@Value("${discord.bot.token}")
+	private String botToken;
 
-    @Value("${discord.channel.id}")
-    private String channelId;
+	@Value("${discord.channel.id}")
+	private String channelId;
 
-    private JDA jda;
+	private JDA jda;
 
-    @PostConstruct
-    public void init() {
-        try {
-            jda = JDABuilder.createDefault(botToken).build();
-            jda.awaitReady();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+	@PostConstruct
+	public void init() {
+		try {
+			jda = JDABuilder.createDefault(botToken).build();
+			jda.awaitReady();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-    public void sendOrderNotification(String message) {
-        MessageChannel channel = jda.getChannelById(MessageChannel.class, channelId);
+	public void sendOrderNotification(String message) {
+		MessageChannel channel = jda.getChannelById(MessageChannel.class, channelId);
 
-        if (channel != null) {
-            channel.sendMessage(message).queue();
-        } else {
-            System.out.println("채널을 찾을 수 없습니다: " + channelId);
-        }
-    }
+		if (channel != null) {
+			channel.sendMessage("```" + message + "```").queue();
+		} else {
+			System.out.println("채널을 찾을 수 없습니다: " + channelId);
+		}
+	}
 }
