@@ -5,10 +5,10 @@ import co.kr.necohost.semi.domain.model.entity.Staff;
 import co.kr.necohost.semi.domain.model.entity.TimeCard;
 import co.kr.necohost.semi.domain.repository.StaffRepository;
 import co.kr.necohost.semi.domain.repository.TimeCardRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,6 +21,16 @@ public class TimeCardService {
 	public TimeCardService(StaffRepository staffRepository, TimeCardRepository timecardRepository) {
 		this.staffRepository = staffRepository;
 		this.timeCardRepository = timecardRepository;
+	}
+
+	public List<TimeCard> getAllTimeCard() {
+		return timeCardRepository.findAll();
+	}
+
+	public Optional<TimeCard> getTimeCardByUserName(StaffRequest request){
+		Staff staff = staffRepository.findByUsername(request.getUsername())
+				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
+        return timeCardRepository.findTopByStaffOrderByStartDesc(staff);
 	}
 
 	public void clockIn(StaffRequest request) {
