@@ -24,4 +24,8 @@ public class StaffService {
     public List<Staff> getAllStaff() {
         return staffRepository.findAll();
     }
+
+    public void deleteStaff(Long id) {
+        staffRepository.deleteById(id);
+    }
 }

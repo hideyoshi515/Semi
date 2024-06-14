@@ -5,11 +5,13 @@ import co.kr.necohost.semi.domain.model.entity.Position;
 import co.kr.necohost.semi.domain.service.PositionService;
 import co.kr.necohost.semi.domain.service.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Controller
 public class StaffController {
@@ -49,4 +51,16 @@ public class StaffController {
         model.addAttribute("staffs", staffService.getAllStaff());
         return "staff/staffList.html";
     }
+
+    @RequestMapping(value = "/deleteStaff", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteStaff(@RequestBody Map<String, Long> payload) {
+        Long id = payload.get("id");
+        try {
+            staffService.deleteStaff(id);
+            return ResponseEntity.ok("Staff deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting staff: " + e.getMessage());
+        }
+    }
+
 }

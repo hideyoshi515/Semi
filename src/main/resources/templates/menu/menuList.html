@@ -138,6 +138,42 @@
         </div>
     </div>
     <script>
+        // 원래 방식
+        // function detail(pk) {
+        //     currentMenu = pk;
+        //     // AJAX를 사용하여 메뉴 상세 정보를 가져옴
+        //     $.ajax({
+        //         url: '/menuDetail?id=' + pk,
+        //         type: 'GET',
+        //         success: function (data) {
+        //             console.log(data)
+        //             // 데이터가 성공적으로 로드되면 모달에 데이터를 설정
+        //             $('#modalTitle').text(data.menu.name);
+        //             $('#modalImage').attr('src', data.menu.image);
+        //             $('#modalPrice').text('価格 : ' + data.menu.price + ' ₩');
+        //             $('#modalCategory').text('カテゴリー : ' + data.category.name);
+        //             if (data.menu.stockorder > 0) {
+        //                 $('#modalStock').text('ストック : ' + data.menu.stock + ' + ' + data.menu.stockorder);
+        //                 $('#modalStock').off('click').on('click', updateStockAndOrder);
+        //             } else {
+        //                 $('#modalStock').text('ストック : ' + data.menu.stock);
+        //                 $('#modalStock').off('click');
+        //             }
+        //             // 상품별 매상관리 페이지로 보냄.
+        //             $('#modalDescription').text(data.menu.description);
+        //
+        //             // 상품별 매상관리 페이지로 보냄.
+        //             $('#salesManagementButton').attr('onclick', 'toSalesAnalysis()');
+        //
+        //             // 모달을 표시
+        //             var myModal = new bootstrap.Modal(document.getElementById('menuModal'), {});
+        //             myModal.show();
+        //         },
+        //         error: function () {
+        //             alert('メニューロードエラー');
+        //         }
+        //     });
+        // }
         let currentMenu;
 
         function detail(pk) {
@@ -146,22 +182,21 @@
             $.ajax({
                 url: '/menuDetail?id=' + pk,
                 type: 'GET',
-                success: function (data) {
-                    console.log(data)
+                success: function (result) {
                     // 데이터가 성공적으로 로드되면 모달에 데이터를 설정
-                    $('#modalTitle').text(data.menu.name);
-                    $('#modalImage').attr('src', data.menu.image);
-                    $('#modalPrice').text('価格 : ' + data.menu.price + ' ₩');
-                    $('#modalCategory').text('カテゴリー : ' + data.category.name);
-                    if (data.menu.stockorder > 0) {
-                        $('#modalStock').text('ストック : ' + data.menu.stock + ' + ' + data.menu.stockorder);
+                    $('#modalTitle').text(result.menu.name);
+                    $('#modalImage').attr('src', result.menu.image);
+                    $('#modalPrice').text('価格 : ' + result.menu.price + ' ₩');
+                    $('#modalCategory').text('カテゴリー : ' + result.category.name);
+                    if (result.menu.stockorder > 0) {
+                        $('#modalStock').text('ストック : ' + result.menu.stock + ' + ' + result.menu.stockorder);
                         $('#modalStock').off('click').on('click', updateStockAndOrder);
                     } else {
-                        $('#modalStock').text('ストック : ' + data.menu.stock);
+                        $('#modalStock').text('ストック : ' + result.menu.stock);
                         $('#modalStock').off('click');
                     }
                     // 상품별 매상관리 페이지로 보냄.
-                    $('#modalDescription').text(data.menu.description);
+                    $('#modalDescription').text(result.menu.description);
 
                     // 상품별 매상관리 페이지로 보냄.
                     $('#salesManagementButton').attr('onclick', 'toSalesAnalysis()');

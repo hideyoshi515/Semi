@@ -11,6 +11,7 @@ import co.kr.necohost.semi.domain.service.CategoryService;
 import co.kr.necohost.semi.domain.service.MenuService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -126,15 +127,31 @@ public class MenuController {
     }
 
     // 메뉴 상세 정보를 반환. JSON 형태로 반환받기 위해 ResponseBody 사용
+//    @RequestMapping(value = "/menuDetail", method = RequestMethod.GET)
+//    @ResponseBody
+//    public MenuWithCategoryRequest getDetailMenu(Model model, @RequestParam Map<String, Object> params) {
+//        Menu menu = menuService.getMenuById(Long.parseLong(params.get("id").toString()));
+//        Category category = categoryService.findById((int) menu.getCategory());
+//        MenuWithCategoryRequest MWCR = new MenuWithCategoryRequest();
+//        MWCR.setCategory(category);
+//        MWCR.setMenu(menu);
+//        return MWCR;
+//    }
+
+    // ResponseEntity 이용해보기
     @RequestMapping(value = "/menuDetail", method = RequestMethod.GET)
-    @ResponseBody
-    public MenuWithCategoryRequest getDetailMenu(Model model, @RequestParam Map<String, Object> params) {
+    public ResponseEntity<MenuWithCategoryRequest> getDetailMenu(Model model, @RequestParam Map<String, Object> params) {
+        try {
         Menu menu = menuService.getMenuById(Long.parseLong(params.get("id").toString()));
         Category category = categoryService.findById((int) menu.getCategory());
         MenuWithCategoryRequest MWCR = new MenuWithCategoryRequest();
         MWCR.setCategory(category);
         MWCR.setMenu(menu);
-        return MWCR;
+        return ResponseEntity.ok(MWCR);
+        } catch (Exception e) {
+            MenuWithCategoryRequest MWCR = new MenuWithCategoryRequest();
+            return new ResponseEntity<>(MWCR, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 
