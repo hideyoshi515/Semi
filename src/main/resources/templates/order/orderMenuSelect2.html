@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/plain_layout}">
+<head>
+
+    <meta charset="UTF-8">
+    <title>Scroll Navigation Menu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            height: 100vh;
+        }
+
+        #sidebar {
+            background-color: gray;
+            padding: 10px;
+            width: 200px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow-y: auto;
+        }
+
+        #sidebar .btn {
+            background-color: #ffcc00;
+            color: white;
+            margin-bottom: 10px;
+            width: 100%;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        #sidebar .btn:hover {
+            background-color: red;
+            transform: scale(1.05);
+        }
+
+        #content {
+            margin-left: 220px;
+            padding: 20px;
+            width: calc(100% - 240px);
+            overflow-y: auto;
+        }
+
+        .menu-category {
+            margin-bottom: 40px;
+        }
+
+        .menu-item {
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<th:block layout:fragment="content">
+    <div id="sidebar">
+        <button class="btn" onclick="scrollToCategory('all')">すべて</button>
+        <div th:each="category : ${categories}">
+            <button class="btn" th:text="${category.name}" th:onclick="|scrollToCategory('${category.id}')|"></button>
+        </div>
+    </div>
+    <div id="content">
+        <div id="all" class="menu-category">
+            <h2>すべて</h2>
+            <div th:each="menu : ${menus}">
+                <div class="menu-item" th:attr="data-category=${menu.category}">
+                    <div class="card rounded rounded-3" style="width: 180px;">
+                        <div class="card-body text-center">
+                            <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'" style="width: 8rem; height: auto;">
+                            <h5 class="card-title marquee"><span th:text="${menu.name}"></span></h5>
+                            <p class="card-text mb-0"><span th:text="${#numbers.formatInteger(menu.price, 1, 'COMMA')}+₩"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div th:each="category : ${categories}" th:id="${category.id}" class="menu-category">
+            <h2 th:text="${category.name}"></h2>
+            <div th:each="menu : ${menus}" th:if="${menu.category == category.id}">
+                <div class="menu-item">
+                    <div class="card rounded rounded-3" style="width: 180px;">
+                        <div class="card-body text-center">
+                            <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'" style="width: 8rem; height: auto;">
+                            <h5 class="card-title marquee"><span th:text="${menu.name}"></span></h5>
+                            <p class="card-text mb-0"><span th:text="${#numbers.formatInteger(menu.price, 1, 'COMMA')}+₩"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+
+<script>
+    function scrollToCategory(category) {
+        const content = document.getElementById('content');
+        if (category === 'all') {
+            content.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        } else {
+            const element = document.getElementById(category);
+            if (element) {
+                const offsetTop = element.offsetTop - content.offsetTop + content.scrollTop;
+                content.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    }
+</script>
+
+</html>

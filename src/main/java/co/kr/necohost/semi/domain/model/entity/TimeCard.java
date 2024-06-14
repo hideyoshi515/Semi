@@ -14,16 +14,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TimeCard {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "staff_id")
-    private Staff staff;
-
-    private LocalDateTime start;
-
-    private LocalDateTime end;
+	@ManyToOne
+	@JoinColumn(name = "staff_id")
+	private Staff staff;
+	private LocalDateTime start;
+	private LocalDateTime end;
 }

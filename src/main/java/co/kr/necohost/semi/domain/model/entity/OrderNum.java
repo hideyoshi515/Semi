@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderNum {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long orderNum;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long orderNum;
 }

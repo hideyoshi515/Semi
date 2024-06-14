@@ -13,15 +13,15 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 public class Menu {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    private String name;
-    private int price;
-    private long category;
-    private int stock;
-    private int stockorder;
-    private int cost;
-    private String image;
-    private String description;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long id;
+	private String name;
+	private int price;
+	private long category;
+	private int stock;
+	private int cost;
+	private String image;
+	private String description;
+	private int stockorder;
 }
