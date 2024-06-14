@@ -224,7 +224,7 @@
         }
 
         function handleDateClick(button) {
-            let date = button.getAttribute('data-date');
+            var date = button.getAttribute('data-date');
             const buttons = document.querySelectorAll('.selbtn');
             buttons.forEach(button => {
                 button.classList.remove('btn-primary');
