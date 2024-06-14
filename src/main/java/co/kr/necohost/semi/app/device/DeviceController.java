@@ -22,6 +22,7 @@ import org.springframework.web.socket.WebSocketSession;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,8 +80,23 @@ public class DeviceController {
 		model.addAttribute("categorizedMenus", categorizedMenus);
 		List<Menu> menus = menuService.getAllMenus();
 		List<Category> categories = categoryService.getAllCategories();
+
+		int categoryCount = 0;
+		List<List<Menu>> menusList = new ArrayList<>();
+		for(Category category : categories) {
+			categoryCount++;
+			menusList.add(menuService.getMenuByCategory((int) category.getId()));
+		}
+
+		int index = 0;
+		for(List<Menu> listItems : menusList){
+			model.addAttribute("section"+(index+1)+"Items", listItems.get(index));
+		}
+
 		model.addAttribute("menus", menus);
 		model.addAttribute("categories", categories);
+		model.addAttribute("categoryCount", categoryCount);
+		model.addAttribute("menusList", menusList);
 		return "order/orderMenuSelect.html";
 	}
 

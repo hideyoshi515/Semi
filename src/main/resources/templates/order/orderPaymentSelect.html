@@ -5,20 +5,27 @@
         layout:decorate="~{layout/plain_layout}">
 <head>
     <style>
-        @media only screen and (min-width: 768px) and (max-width: 1024px) {
+        @media only screen and (min-width: 768px) and (max-width: 1366px) {
             .tablet-container {
                 width: 50%;
                 margin: 0 auto;
             }
+            #menuContainer{
+
+            }
+
+
         }
+
         .h1 {
             background-color: #ffcc00;
             text-align: center;
             padding: 20px;
             border-bottom: 2px solid #e1c542;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .h1 h1{
+
+        .h1 h1 {
             margin: 0;
             color: #333;
             font-size: 1em;
@@ -29,6 +36,13 @@
             text-align: center;
             color: #333;
         }
+
+        #img{
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+        }
+
         .tablet-container {
             display: flex;
             justify-content: center;
@@ -43,32 +57,38 @@
             padding: 20px;
             margin: 10px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             background-color: #f9f9f9;
         }
-        .point{
+
+        .point {
             text-align: center;
             margin: 20px;
         }
-        .point input[type="text"]{
+
+        .point input[type="text"] {
             padding: 10px;
             width: 200px;
             border-radius: 4px;
             border: 1px solid #ccc;
             margin: 5px 0;
         }
-        .paymentSelect{
+
+        .paymentSelect {
             text-align: center;
             margin: 20px 0;
         }
-        .paymentSelect button:hover{
+
+        .paymentSelect button:hover {
             background-color: #45a049;
         }
-        .cancel{
+
+        .cancel {
             text-align: center;
             margin: 20px 0;
         }
-        .cancel button{
+
+        .cancel button {
             padding: 10px 20px;
             border: none;
             border-radius: 4px;
@@ -76,9 +96,11 @@
             color: white;
             cursor: pointer;
         }
-        .cancel button:hover{
+
+        .cancel button:hover {
             background-color: #da190b;
         }
+
 
     </style>
 </head>
@@ -89,9 +111,8 @@
     <form th:object="${deviceRequest}" method="post" action="orderPaymentSelect">
         <br>
         <div class="tablet-container">
-            <div th:each="entry : ${orderedItems}">
-                <img th:src="${entry.key.image}"
-                     style="width: 150px" height="150px">
+            <div th:each="entry : ${orderedItems}" id="menuContainer">
+                <img th:src="${entry.key.image}" id="img">
                 <br>
                 <div>
                     <span th:text="${entry.key.name}"></span>
@@ -128,10 +149,11 @@
             <button type="submit" name="paymentMethod" value="PAY">PAY</button>
         </div>
     </form>
-    <br>
-    <div class="cancel">
+    <div class="cancel" style="display: flex; justify-content: center">
         <button onclick="location.href='/order'">取り消し</button>
-        <button onclick="">戻る</button>
+        <form action="orderStart" method="post">
+            <button>戻る</button>
+        </form>
     </div>
 </th:block>
 <!--멤버십 모달-->
@@ -211,8 +233,12 @@
                 <h5 class="modal-title" id="paymentModalLabel">お支払方法</h5>
             </div>
             <div class="modal-body d-flex justify-content-center flex-row">
-                <button type="button" class="btn btn-success btn-lg mx-2 fs-4" style="width: 145px; height: 72.5px;" onclick="payEnd()"><i class="bi bi-credit-card me-1"></i>カード</button>
-                <button type="button" class="btn btn-warning btn-lg mx-2 fs-4" style="width: 145px; height: 72.5px;" onclick="payEnd()"><i class="bi bi-cash me-1"></i>現金</button>
+                <button type="button" class="btn btn-success btn-lg mx-2 fs-4" style="width: 145px; height: 72.5px;"
+                        onclick="payEnd()"><i class="bi bi-credit-card me-1"></i>カード
+                </button>
+                <button type="button" class="btn btn-warning btn-lg mx-2 fs-4" style="width: 145px; height: 72.5px;"
+                        onclick="payEnd()"><i class="bi bi-cash me-1"></i>現金
+                </button>
             </div>
         </div>
     </div>
@@ -310,7 +336,8 @@
         const maskedChars = '*'.repeat(name.length - 2);
         return firstChar + maskedChars + lastChar;
     }
-/*뒤로가는 스크립트*/
+
+    /*뒤로가는 스크립트*/
     document.getElementById('orderButton').onclick = function () {
         var form = document.createElement('form');
         form.method = 'POST';
@@ -319,5 +346,13 @@
         document.body.append(form);
         form.submit();
     };
+
+    function back() {
+        let back = document.createElement('form');
+        back.setAttribute('method', 'post');
+        back.setAttribute('action', 'orderStart');
+        document.body.appendChild(back);
+        back.submit();
+    }
 </script>
 </html>

@@ -2,8 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/plain_layout}">
 <head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     <script>
         let idleTime = 0;
         let idleInterval;
@@ -32,272 +30,63 @@
             startIdleTimer();
         };
     </script>
-    <style>
-
-        body {
-            background-color: #f8f9fa !important;
-            margin: 0 !important;
-            padding: 20px !important;
-            display: flex;
-            height: 100vh;
-            flex-direction: column;
-        }
-        #wrapper{
-            display: flex;
-            flex: 1;
-            overflow: visible;
-        }
-        #menuContainer {
-            display: flex;
-            flex-wrap: wrap;
-        }
-        #sidebarMein{
-            text-align: center;
-
-        }
-
-        #sidebar {
-            background-color: gray;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            height: 80vh;
-            position: sticky;
-            top: 0;
-            width: 200px;
-            transition: top 0.3s ease-in-out, background-color 0.3s ease-in-out;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-radius: 10px;
-        }
-
-        #sidebar .btn-group-vertical {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        #sidebar .btn {
-            background-color: #ffcc00; !important;
-            color: white; !important;
-            padding: 15px;
-            font-size: 30px;
-            width: 100%;
-            box-sizing: border-box;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-            border-radius: 5px;
-            flex-grow: 1;
-        }
-        #sidebar .btn i{
-            margin-right: 10px;
-            font-size: 24px;
-        }
-
-        #sidebar .btn:hover {
-            background-color: red !important;
-            transform: scale(1.05);
-        }
-
-        #content {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            margin-left: 20px;
-        }
-
-        .btn-group .btn {
-            background-color: #ffcc00 !important;
-            color: white !important;
-            margin-right: 5px !important;
-        }
-
-        .btn-group .btn:hover {
-            background-color: red !important;
-        }
-
-        .menuItem {
-            margin-bottom: 20px !important;
-        }
-
-        .card {
-            border: 1px solid #ced4da !important;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
-        }
-
-        .card-body {
-            background-color: white !important;
-            padding: 20px !important;
-        }
-
-        .card-title {
-            font-size: 1.25rem !important;
-            font-weight: bold !important;
-        }
-
-        .card-text {
-            font-size: 1rem !important;
-            color: #495057 !important;
-        }
-
-        .card .rounded-3 {
-            overflow: hidden !important;
-            position: relative !important;
-        }
-
-        .card .rounded-3 .w-100.h-100 {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            color: white !important;
-            font-size: 1.5rem !important;
-            font-weight: bold !important;
-        }
-
-        #categoryTitle{
-            border-bottom: solid #ffcc00;
-            width: 1380px;
-        }
-
-
-
-        #menuModal .modal-body {
-            padding: 20px !important;
-        }
-
-        #menuModal img {
-            border-radius: 8px !important;
-            margin-bottom: 15px !important;
-        }
-
-        #menuModal .form-label {
-            margin-bottom: 10px !important;
-            font-size: 1.1rem !important;
-        }
-
-        #menuModal .input-group {
-            display: flex !important;
-            justify-content: center !important;
-            align-items: center !important;
-        }
-
-        #menuModal .input-group .btn {
-            padding: 0.375rem 0.75rem !important;
-        }
-
-        #cartModal .modal-body {
-            padding: 20px !important;
-        }
-
-        .cart-item {
-            background-color: #f8f9fa !important;
-            padding: 10px !important;
-            border-bottom: 1px solid #e9ecef !important;
-        }
-
-        .cart-item:last-child {
-            border-bottom: none !important;
-        }
-
-        .cart-item .btn {
-            padding: 0.375rem 0.75rem !important;
-        }
-
-        .cart-item .input-group {
-            display: flex !important;
-            justify-content: center !important;
-            align-items: center !important;
-        }
-
-        .modal-footer {
-            justify-content: space-between !important;
-        }
-
-        #paymentbuttonContainer{
-            transform: translateX(1650px);
-            width: 5%;
-            position: sticky;
-            bottom: 0;
-        }
-
-        @media (min-width: 1100px) and (max-width: 1250px) and (min-height: 750px) and (max-height: 850px) {
-            #categoryTitle{
-                border-bottom: solid #ffcc00;
-                width: 780px;
-            }
-            #paymentbuttonContainer{
-                transform: translateX(1020px);
-                width: 20%;
-                position: sticky;
-                bottom: 0;
-            }
-
-
-        }
-        @keyframes hoverAnimation {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        .menuItem:hover {
-            animation: hoverAnimation 0.3s ease-in-out;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/order.css">
 </head>
 <body>
 <th:block layout:fragment="content">
-    <div id="wrapper">
-
+    <div id="wrapper" class="mt-0" style="min-height: 2400px">
         <div id="sidebarMein"></div>
-
         <div id="sidebar">
             <div class="btn-group-vertical" role="group" aria-label="Category filter">
-                <button type="button" class="btn btn-secondary" onclick="filterMenu('all')">すべて</button>
-                <button type="button" class="btn btn-secondary"
-                        th:each="category : ${categories}"
-                        th:text="${category.name}"
-                        th:onclick="|filterMenu('${category.id}')|">
+                <a type="button" class="rounded-0 border border-1 btn scrollNav btn-warning"
+                   th:each="category : ${categories}"
+                   th:text="${category.name}"
+                   th:href="|#section${categoryStat.count}|"
+                   th:if="${categoryStat.count == 1}">
+                    <!--                        th:onclick="|filterMenu('${category.id}')|">-->
                     <i class="fas fa-clipboard-list"></i>
-                </button>
+                </a>
+                <a type="button" class="rounded-0 border border-1 btn scrollNav btn-light"
+                   th:each="category : ${categories}"
+                   th:text="${category.name}"
+                   th:href="|#section${categoryStat.count}|"
+                   th:if="${categoryStat.count > 1}">
+                    <!--                        th:onclick="|filterMenu('${category.id}')|">-->
+                    <i class="fas fa-clipboard-list"></i>
+                </a>
             </div>
         </div>
-
-
-
-
         <div id="content">
-            <h2 id="categoryTitle">すべて</h2>
-            <div class="row" id="menuContainer">
-                <div class="mb-3 menuItem" th:each="menu : ${menus}"
-                     th:attr="data-category=${menu.category}, data-menu-id=${menu.id}"
-                     style="width: 200px">
-                    <a th:if="${menu.stock} > 0"
-                       th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ₩'}">
-                        <div class="card rounded rounded-3" style="width: 180px;">
+            <div class="section pb-5 mb-5" th:id="|section${sectionNumStat.count}|" th:each="sectionNum : ${#numbers.sequence(1,categoryCount)}">
+                <h2 id="categoryTitle" th:text="${category.name}" th:if="${categoryStat.count == sectionNumStat.count}" th:each="category : ${categories}"></h2>
+                <div class="row" id="menuContainer">
+                    <div class="mb-3 menuItem" th:each="menu : ${menusList[sectionNumStat.index]}"
+                         th:attr="data-category=${menu.category}, data-menu-id=${menu.id}"
+                         style="width: 200px">
+                        <a th:if="${menu.stock} > 0"
+                           th:attr="data-bs-toggle='modal', data-bs-target='#menuModal', data-menu-id=${menu.id}, data-menu-name=${menu.name}, data-menu-stock=${menu.stock}, data-menu-image=${menu.image}, data-menu-desc=${menu.description}, data-menu-priceInt=${menu.price}, data-menu-price=${#numbers.formatInteger(menu.price,1,'COMMA') + ' ₩'}">
+                            <div class="card rounded rounded-3" style="width: 180px;">
+                                <div class="card-body text-center">
+                                    <img th:src="${menu.image}"
+                                         onerror="this.onerror=null; this.src='/img/americano.png'"
+                                         style="width: 8rem; height: auto;">
+                                    <h5 class="card-title marquee"><span th:text="${menu.name}"></span></h5>
+                                    <p class="card-text mb-0"><span
+                                            th:text="${#numbers.formatInteger(menu.price, 1, 'COMMA')}+₩"></span></p>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="card rounded rounded-3" style="width: 180px;" th:if="${menu.stock} <= 0">
+                            <div class="rounded-3 w-100 h-100"
+                                 style="background: rgba(0, 0, 0, 0.7); position: absolute;">
+                            </div>
                             <div class="card-body text-center">
                                 <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'"
                                      style="width: 8rem; height: auto;">
                                 <h5 class="card-title" th:text="${menu.name}"></h5>
-                                <p class="card-text mb-0"><span
-                                        th:text="${#numbers.formatInteger(menu.price, 1, 'COMMA')}+₩"></span></p>
+                                <p class="card-text mb-0" style="color: darkred; font-weight: bold; z-index: 100000;">
+                                    売れ切り</p>
                             </div>
-                        </div>
-                    </a>
-                    <div class="card rounded rounded-3" style="width: 180px;" th:if="${menu.stock} <= 0">
-                        <div class="rounded-3 w-100 h-100" style="background: rgba(0, 0, 0, 0.7); position: absolute;">
-                        </div>
-                        <div class="card-body text-center">
-                            <img th:src="${menu.image}" onerror="this.onerror=null; this.src='/img/americano.png'"
-                                 style="width: 8rem; height: auto;">
-                            <h5 class="card-title" th:text="${menu.name}"></h5>
-                            <p class="card-text mb-0" style="color: darkred; font-weight: bold; z-index: 100000;">
-                                売れ切り</p>
                         </div>
                     </div>
                 </div>
@@ -305,7 +94,6 @@
         </div>
         <p>어서오세요.>-<</p>
     </div>
-
 
     <!-- Modal -->
     <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel" aria-hidden="true">
@@ -351,7 +139,8 @@
         </form>
 
         <!-- Cart Modal -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cartModal" id="paymentCartBtn">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cartModal"
+                id="paymentCartBtn">
             カーゴ
         </button>
     </div>
@@ -376,7 +165,7 @@
             </div>
         </div>
     </div>
-<!-- 장바구니 잘 들어갔다는 모달-->
+    <!-- 장바구니 잘 들어갔다는 모달-->
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -436,7 +225,7 @@
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    var successModal = new bootstrap.Modal(document.getElementById('successModal'),{
+                    var successModal = new bootstrap.Modal(document.getElementById('successModal'), {
                         keyboard: false
                     });
 
@@ -444,10 +233,10 @@
 
                     let remainingTime = 3; // 3초를 설정할거면 3초 이건 상황에 맞춰서
                     document.getElementById('countdown').innerText = `이 창은 ${remainingTime}초 후에 창이닫힙니다.`
-                    const countdownInterval =setInterval(function (){
+                    const countdownInterval = setInterval(function () {
                         remainingTime -= 1;
                         document.getElementById('countdown').innerText = `이 창은 ${remainingTime}초 후에 창이닫힙니다.`
-                        if (remainingTime <= 0){
+                        if (remainingTime <= 0) {
                             clearInterval(countdownInterval);
                             successModal.hide();
                         }
@@ -463,7 +252,6 @@
             const data = JSON.stringify({"menuId": menuId, "quantity": quantity});
             xhr.send(data);
         }
-
 
         function filterMenu(category) {
             const menuItems = document.querySelectorAll('#menuContainer .menuItem');
@@ -535,10 +323,6 @@
             }
         }
 
-        // function checkTotalPrice(){
-        //     const ajxa
-        // }
-
         function changeCartQuantity(menuId, stock, amount) {
             const quantityInput = document.getElementById('quantity-' + menuId);
             const currentQuantity = parseInt(quantityInput.value);
@@ -594,7 +378,6 @@
             xhr.send(data);
         }
 
-
         function checkout() {
             // 결제하기 버튼 클릭 시 동작하는 함수
             const cartItemsContainer = document.getElementById('cartItemsContainer');
@@ -617,7 +400,6 @@
             }
         }
 
-
         // 장바구니 모달을 열 때 장바구니 데이터를 로드
         document.getElementById('cartModal').addEventListener('show.bs.modal', function () {
             loadCart();
@@ -625,35 +407,64 @@
 
         $().ready(function () {
             loadCart();
-        })
+        });
 
-        function filterMenu(category) {
-            const menuItems = document.querySelectorAll('#menuContainer .menuItem');
-            const title = document.getElementById('categoryTitle');
-            const getTitle = document.querySelector(`button[onclick="filterMenu('${category}')"]`);
-
-            if (category === 'all') {
-                title.innerText = "すべて";
-            } else {
-                title.innerText = getTitle.textContent;
-            }
-
-            menuItems.forEach(function (item) {
-                const itemCategory = item.getAttribute('data-category');
-                if (category === 'all' || itemCategory === category.toString()) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
 
         window.onload = function () {
             startIdleTimer();
-            filterMenu('all'); // 초기 로드 시 모든 카테고리 표시
         };
 
+        document.addEventListener("DOMContentLoaded", function () {
+            var marqueeElements = document.querySelectorAll('.marquee');
 
+            marqueeElements.forEach(function (marquee) {
+                var span = marquee.querySelector('span');
+
+                // span의 너비와 부모 요소의 너비를 비교
+                if (span.scrollWidth > marquee.clientWidth) {
+                    marquee.classList.add('animate');
+                } else {
+                    marquee.classList.remove('animate');
+                }
+            });
+        });
+
+        // 스크롤 네비게이션을 위한 JavaScript 추가
+        document.addEventListener("DOMContentLoaded", function () {
+            const sections = document.querySelectorAll(".section");
+            const navLinks = document.querySelectorAll(".scrollNav");
+
+            window.addEventListener("scroll", () => {
+                let current = "";
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - 100; // Adjust according to your header height
+                    if (pageYOffset >= sectionTop) {
+                        current = section.getAttribute("id");
+                    }
+                });
+
+                navLinks.forEach(a => {
+                    a.classList.add("btn-light");
+                    a.classList.remove("btn-warning");
+                    if (a.getAttribute("href").includes(current)) {
+                        a.classList.add("btn-warning");
+                        a.classList.remove("btn-light");
+                    }
+                });
+            });
+
+            navLinks.forEach(a => {
+                a.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const id = this.getAttribute("href").substring(1);
+                    const section = document.getElementById(id);
+                    window.scrollTo({
+                        top: section.offsetTop - 20, // Adjust according to your header height
+                        behavior: "smooth"
+                    });
+                });
+            });
+        });
     </script>
 </th:block>
 </body>
