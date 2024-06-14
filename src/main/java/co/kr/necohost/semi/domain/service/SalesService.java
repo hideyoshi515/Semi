@@ -10,6 +10,7 @@ import co.kr.necohost.semi.domain.repository.SalesRepository;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.text.DecimalFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -415,8 +416,82 @@ public class SalesService {
                 ));
     }
 
+    //6월 14일 작업 : 파라미터로 받아온 id로 sales data 읽기
+    public List<Sales> findSalesByMenuId(Long menuId) {
+        return salesRepository.findByMenu(menuId);
+    }
+
+    //
+//    public Map<String, Double> getTotalSalesAndQuantityByProcess(int process) {
+//        List<Sales> salesList = findByProcess(process);
+//        double totalSalesAmount = salesList.stream()
+//                .mapToDouble(s -> s.getPrice() * s.getQuantity())
+//                .sum();
+//        int totalQuantity = salesList.stream()
+//                .mapToInt(Sales::getQuantity)
+//                .sum();
+//
+//        Map<String, Double> result = new HashMap<>();
+//        result.put("totalSalesAmount", totalSalesAmount);
+//        result.put("totalQuantity", (double) totalQuantity);
+//        return result;
+//    }
+
+    public Map<String, Double> getTotalSalesAndQuantityByProcess(int process) {
+        List<Sales> salesList = findByProcess(process).stream()
+                .filter(s -> s.getProcess() == 1)
+                .collect(Collectors.toList());
+
+        double totalSalesAmount = salesList.stream()
+                .mapToDouble(s -> s.getPrice() * s.getQuantity())
+                .sum();
+        int totalQuantity = salesList.stream()
+                .mapToInt(Sales::getQuantity)
+                .sum();
+
+        Map<String, Double> result = new HashMap<>();
+        result.put("totalSalesAmount", totalSalesAmount);
+        result.put("totalQuantity", (double) totalQuantity);
+        return result;
+    }
 
 
+    //
+    public Map<String, Object> calculateMenuSalesData(Long menuId) {
+        Menu menu = menuRepository.findById(menuId).orElseThrow(() -> new RuntimeException("Menu not found"));
+        List<Sales> salesList = salesRepository.findByMenu(menuId);
+
+
+        int totalQuantity = 0;
+        double totalSalesAmount = 0.0;
+
+        //총매출, 총판매량 계산
+        for (Sales sale : salesList) {
+            totalQuantity += sale.getQuantity();
+            totalSalesAmount += sale.getPrice() * sale.getQuantity();
+        }
+
+        DecimalFormat salesFormatter = new DecimalFormat("#,###");
+        String formattedTotalSalesAmount = salesFormatter.format(totalSalesAmount);
+        //이익률 계산
+        double profitRate = 100.0 * (menu.getPrice() - menu.getCost()) / menu.getPrice();
+        DecimalFormat profitFormatter = new DecimalFormat("#0.0");
+        String formattedProfitRate = profitFormatter.format(profitRate);
+        //점유율 계산
+
+
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("menu", menu);
+        result.put("salesListall", salesList);
+        result.put("totalQuantity", totalQuantity);
+        result.put("totalSalesAmount", formattedTotalSalesAmount);
+        result.put("profitRate", formattedProfitRate);
+
+        System.out.println(result);
+
+        return result;
+    }
 
 
 

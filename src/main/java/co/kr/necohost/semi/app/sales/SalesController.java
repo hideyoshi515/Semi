@@ -184,8 +184,7 @@ public class SalesController {
     //메뉴별 판매액을 기간 검색하여 반환하는 메서드.
     @RequestMapping(value = "/totalSalesbyMenuAndPeriodInput", method = RequestMethod.GET)
     public String getTotalSalesByMenuAndPeriodInput(Model model) {
-//        Map<String, Double> totalByMenu = salesService.getTotalSalesByMenu();
-//        model.addAttribute("totalByMenu", totalByMenu);
+
 
         return "/sales/totalSalesbyMenuAndPeriodInput";
     }
@@ -373,15 +372,86 @@ public class SalesController {
         }
         return "sales/totalSalesByYearAndCategoryInput";
     }
-    //메뉴리스트에서 메뉴의 버튼 중 매출분석 버튼 클릭하면 그 메뉴 관련 매출 판매 보고서 반환
-    @RequestMapping(value="salesAnalysisByMenuInput" , method= RequestMethod.GET)
-    public String getSalesAnalysisByMenuInput(@RequestParam Map<String, Object> params ,Model model) {
-        //menuId 파라미터로 받은 숫자를 가진 메뉴의 테이블에 담긴 정보들
-        Menu menu = menuService.getMenuById(Long.parseLong(params.get("menuId").toString()));
-        model.addAttribute("menu", menu);
+    //메뉴리스트에서 메뉴의 버튼 중 매출분석 버튼 클릭하면 그 메뉴 관련 매출 판매 보고서 반환 넘 길어서 수정중
+//    @RequestMapping(value="salesAnalysisByMenuInput", method= RequestMethod.GET)
+//    public String getSalesAnalysisByMenuInput(@RequestParam Map<String, Object> params, Model model) {
+//        // menuId 파라미터로 받은 숫자를 가진 메뉴의 테이블에 담긴 정보들을 가져온다.
+//        Menu menu = menuService.getMenuById(Long.parseLong(params.get("menuId").toString()));
+//        model.addAttribute("menu", menu);
+//
+//        // menuId 파라미터로 받은 숫자를 가진 세일즈의 테이블 정보들 가져옴
+//        List<Sales> salesListall = salesService.findSalesByMenuId(Long.parseLong(params.get("menuId").toString()));
+//        model.addAttribute("salesListall", salesListall);
+//        System.out.println(salesListall);
+//
+//        // 총 판매량과 총 판매액 계산
+//        int totalQuantity = 0;
+//        double totalSalesAmount = 0.0;
+//
+//        for (Sales sale : salesListall) {
+//            totalQuantity += sale.getQuantity();
+//            totalSalesAmount += sale.getPrice() * sale.getQuantity();
+//        }
+//
+//        // 총 판매액 포맷팅
+//        DecimalFormat salesFormatter = new DecimalFormat("#,###");
+//        String formattedTotalSalesAmount = salesFormatter.format(totalSalesAmount);
+//
+//        // 이익률 계산 및 포맷팅
+//        double profitRate = 100.0 * (menu.getPrice() - menu.getCost()) / menu.getPrice();
+//        DecimalFormat profitFormatter = new DecimalFormat("#0.0"); // 소수점 첫째 자리까지 포맷팅
+//        String formattedProfitRate = profitFormatter.format(profitRate);
+//
+//        System.out.println("이익률은");
+//        System.out.println(formattedProfitRate);
+//
+//        // 모델에 총 판매량과 포맷된 총 판매액 및 이익률 추가
+//        model.addAttribute("totalQuantity", totalQuantity);
+//        model.addAttribute("totalSalesAmount", formattedTotalSalesAmount);
+//        model.addAttribute("profitRate", formattedProfitRate);
+//
+//        // process가 1인 판매량과 판매액 총합 계산
+//        Map<String, Double> totalSalesAndQuantityByProcess = salesService.getTotalSalesAndQuantityByProcess(1);
+//        String formattedTotalSalesAmountProcess1 = salesFormatter.format(totalSalesAndQuantityByProcess.get("totalSalesAmount"));
+//        model.addAttribute("totalQuantityProcess1", totalSalesAndQuantityByProcess.get("totalQuantity").intValue());
+//        model.addAttribute("totalSalesAmountProcess1", formattedTotalSalesAmountProcess1);
+//
+//        return "sales/salesAnalysisByMenuInput";
+//    }
+
+
+    @RequestMapping(value="salesAnalysisByMenuInput", method= RequestMethod.GET)
+    public String getSalesAnalysisByMenuInput(@RequestParam Map<String, Object> params, Model model) {
+        Long menuId = Long.parseLong(params.get("menuId").toString());
+
+        // 서비스 계층에서 데이터 처리
+        Map<String, Object> salesData = salesService.calculateMenuSalesData(menuId);
+        model.addAllAttributes(salesData);
+
+        // process가 1인 판매량과 판매액 총합 계산
+        Map<String, Double> totalSalesAndQuantityByProcess = salesService.getTotalSalesAndQuantityByProcess(1);
+        DecimalFormat salesFormatter = new DecimalFormat("#,###");
+        String formattedTotalSalesAmountProcess1 = salesFormatter.format(totalSalesAndQuantityByProcess.get("totalSalesAmount"));
+        model.addAttribute("totalQuantityProcess1", totalSalesAndQuantityByProcess.get("totalQuantity").intValue());
+        model.addAttribute("totalSalesAmountProcess1", formattedTotalSalesAmountProcess1);
 
         return "sales/salesAnalysisByMenuInput";
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @GetMapping("/salesAnalysisDesignExample")
     public String getSalesAnalysisDesignExample() {
