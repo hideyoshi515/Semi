@@ -18,14 +18,14 @@ public class TimeCardController {
     }
 
     @RequestMapping(value = "/timeCardInput", method = RequestMethod.GET)
-    public String timeCardInput(Model model) {
+    public String getTimeCardInput(Model model) {
         StaffRequest staffRequest = new StaffRequest();
         model.addAttribute("staffRequest", staffRequest);
         return "timeCard/timeCardInput.html";
     }
 
     @RequestMapping(value = "/timeCardIn", method = RequestMethod.POST)
-    public ResponseEntity<String> clockIn(@RequestBody StaffRequest request) {
+    public ResponseEntity<String> postTimeCardIn(@RequestBody StaffRequest request) {
         try {
             timeCardService.clockIn(request);
             return ResponseEntity.ok("Clock in attempted.");
@@ -35,7 +35,7 @@ public class TimeCardController {
     }
 
     @RequestMapping(value = "/timeCardOut", method = RequestMethod.POST)
-    public ResponseEntity<String> clockOut(@RequestBody StaffRequest request) {
+    public ResponseEntity<String> postTimeCardOut(@RequestBody StaffRequest request) {
         try {
             timeCardService.clockOut(request);
             return ResponseEntity.ok("Clock out attempted.");
