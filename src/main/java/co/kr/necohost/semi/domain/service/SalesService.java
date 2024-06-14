@@ -392,7 +392,6 @@ public class SalesService {
 		return salesRepository.findByMenu(menuId);
 	}
 
-	//
 //    public Map<String, Double> getTotalSalesAndQuantityByProcess(int process) {
 //        List<Sales> salesList = findByProcess(process);
 //        double totalSalesAmount = salesList.stream()
