@@ -31,16 +31,93 @@
     <h1 style="color: white;"><img style="width: 38px;height: 38px;" src="/img/storeownerpage/salereport.png">メニュー別売上販売の現状</h1>
     <img id="menu-detail-image" th:if="${menu.image} != null" th:src="${menu.image}" style="width: 16%; height: auto;"> </div>
 
+
+    <div class="content" style="display:block" >
+        <div class="menu-description container" style="display:flex" >
+
+
+
+
+        </div>
+
+        <div class="chart-container">
+            <table>
+                <thead>
+                <tr>
+                    <th>分類</th>
+                    <th>累積</th>
+                    <th>今日</th>
+                    <th>今週</th>
+                    <th>今月</th>
+                    <th>今四半期</th>
+                    <th>今年</th>
+                </tr>
+                </thead>
+                <tr>
+                    <th>販売量</th>
+                    <td th:text="${totalQuantity}+'個'"></td>
+                    <td th:text="${todayQuantity}+'個'"></td>
+                    <td th:text="${weekQuantity}+'個'"></td>
+                    <td th:text="${monthQuantity}+'個'"></td>
+                    <td th:text="${quarterQuantity}+'個'"></td>
+                    <td th:text="${yearQuantity}+'個'"></td>
+                </tr>
+                <tr>
+                    <th>販売量シェア</th>
+                    <td th:text="${quantityPercentage}+'%'"></td>
+                    <td th:text="${todayQuantityPercentage}+'%'"></td>
+                    <td th:text="${weekQuantityPercentage}+'%'"></td>
+                    <td th:text="${monthQuantityPercentage}+'%'"></td>
+                    <td th:text="${quarterQuantityPercentage}+'%'"></td>
+                    <td th:text="${yearQuantityPercentage}+'%'"></td>
+                </tr>
+                <tr>
+                    <th>売上高</th>
+                    <td th:text="${totalSalesAmount}+'円'"></td>
+                    <td th:text="${todaySalesAmount}+'円'"></td>
+                    <td th:text="${weekSalesAmount}+'円'"></td>
+                    <td th:text="${monthSalesAmount}+'円'"></td>
+                    <td th:text="${quarterSalesAmount}+'円'"></td>
+                    <td th:text="${yearSalesAmount}+'円'"></td>
+                </tr>
+                <tr>
+                    <th>売上高シェア</th>
+                    <td th:text="${salesPercentage}+'%'"></td>
+                    <td th:text="${todaySalesPercentage}+'%'"></td>
+                    <td th:text="${weekSalesPercentage}+'%'"></td>
+                    <td th:text="${monthSalesPercentage}+'%'"></td>
+                    <td th:text="${quarterSalesPercentage}+'%'"></td>
+                    <td th:text="${yearSalesPercentage}+'%'"></td>
+                </tr>
+            </table>
+        </div>
+
+
+
+
+
+
+
+
+
+    </div>
+
+
+
+
+
+
     <div>
-        <h3>누적 판매량: <span th:text="${totalQuantity}"></span>個//점유율<span th:text="${quantityPercentage}"></span>%</h3>
+        <h3>누적 판매량:<span th:text="${totalQuantity}"></span>個//점유율<span th:text="${quantityPercentage}"></span>%</h3>
         <h3>누적 판매액: <span th:text="${totalSalesAmount}"></span>円//점유율 <span th:text="${salesPercentage}"></span>%</h3></h3>
-        <h3>누적 원가: <span th:text="${totalQuantity}*${menu.cost}"></span>円// 원가 점유율 <span th:text="${costPercentage}"></span>%</h3>
-        <h3>메뉴의 가격 <span th:text="${menu.price}"></span>円</h3>
-        <h3>메뉴의 원가 <span th:text="${menu.cost}"></span>円</h3>
+        <h3>누적 원가: <span th:text="${totalMenuCost}"></span>円// 원가 점유율 <span th:text="${costPercentage}"></span>%</h3>
+        <h3>메뉴의 1개당 가격 <span th:text="${menuprice}"></span>円</h3>
+        <h3>메뉴의 1개당 원가 <span th:text="${menucost}"></span>円</h3>
         <h3>이익률: <span th:text="${profitRate}"></span>%</h3>
 
 
-
+<!--        ${#numbers.formatInteger(totalSalesAmount, 'COMMA')}  + '円'"-->
+<!--${#numbers.formatInteger(entry.value,1,'COMMA')} + '円'"-->
 
 
     </div>
@@ -57,6 +134,8 @@
         <h3 style="color: black;">今年の販売量: <span th:text="${yearQuantity}"></span>個 // 今年の販売量のシェア: <span th:text="${yearQuantityPercentage}"></span>%</h3>
         <h3 style="color: black;">今年の売上: <span th:text="${yearSalesAmount}"></span>円 // 今年の売上シェア: <span th:text="${yearSalesPercentage}"></span>%</h3>
     </div>
+
+
 
 
 
