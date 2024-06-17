@@ -17,30 +17,14 @@ import java.util.stream.Collectors;
 public class TimeCardService {
 
 	private final StaffRepository staffRepository;
-
 	private final TimeCardRepository timeCardRepository;
 
-	public TimeCardService(StaffRepository staffRepository, TimeCardRepository timecardRepository) {
+	public TimeCardService(StaffRepository staffRepository, TimeCardRepository timeCardRepository) {
 		this.staffRepository = staffRepository;
-		this.timeCardRepository = timecardRepository;
+		this.timeCardRepository = timeCardRepository;
 	}
 
-	public List<TimeCard> getAllTimeCard() {
-		return timeCardRepository.findAll();
-	}
-
-	public List<TimeCardRequest> getAllTimeCardDesc() {
-		return timeCardRepository.findAllByOrderByStartDesc().stream()
-				.map(TimeCardRequest::new)
-				.collect(Collectors.toList());
-	}
-
-	public Optional<TimeCard> getTimeCardByUserName(StaffRequest request){
-		Staff staff = staffRepository.findByUsername(request.getUsername())
-				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
-        return timeCardRepository.findTopByStaffOrderByStartDesc(staff);
-	}
-
+	// 出勤を記録
 	public void clockIn(StaffRequest request) {
 		Staff staff = staffRepository.findByUsername(request.getUsername())
 				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
@@ -49,11 +33,12 @@ public class TimeCardService {
 		LocalDateTime now = LocalDateTime.now();
 
 		if (recentTimeCard.isPresent() && recentTimeCard.get().getStart().toLocalDate().isEqual(now.toLocalDate())) {
-			// 중복 출근
+			// 既に出勤記録がある場合
 			System.out.println("Already clocked in today.");
+			return;
 		}
 
-		// 새로운 타임카드 생성
+		// 新しいタイムカードを作成
 		TimeCard timeCard = new TimeCard();
 		timeCard.setStaff(staff);
 		timeCard.setStart(now);
@@ -61,6 +46,7 @@ public class TimeCardService {
 		System.out.println("Clock in recorded.");
 	}
 
+	// 退勤を記録
 	public void clockOut(StaffRequest request) {
 		Staff staff = staffRepository.findByUsername(request.getUsername())
 				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
@@ -78,8 +64,26 @@ public class TimeCardService {
 				System.out.println("Already clocked out today.");
 			}
 		} else {
-			// 현재 시각의 날짜와 다르다면 오류 발생
+			// 出勤記録がない場合のエラーメッセージ
 			System.out.println("Cannot clock out without clocking in today.");
 		}
+	}
+
+	// すべてのタイムカードを取得
+	public List<TimeCard> getAllTimeCard() {
+		return timeCardRepository.findAll();
+	}
+
+	public List<TimeCardRequest> getAllTimeCardDesc() {
+		return timeCardRepository.findAllByOrderByStartDesc().stream()
+				.map(TimeCardRequest::new)
+				.collect(Collectors.toList());
+	}
+
+	// ユーザー名でタイムカードを取得
+	public Optional<TimeCard> getTimeCardByUserName(StaffRequest request){
+		Staff staff = staffRepository.findByUsername(request.getUsername())
+				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
+		return timeCardRepository.findTopByStaffOrderByStartDesc(staff);
 	}
 }

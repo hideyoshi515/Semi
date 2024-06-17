@@ -18,10 +18,7 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @Controller
 public class POSController {
@@ -200,5 +197,23 @@ public class POSController {
 		discordBotService.sendOrderNotification("クーポンが発行されました: " + coupon);
 
 		return coupon;
+	}
+  
+	@RequestMapping(value = "/pos/applyCoupon", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> applyCoupon(@RequestBody Map<String, String> request) {
+		String couponNum = request.get("couponNum");
+
+		Coupon coupon = couponService.findByCouponNum(couponNum);
+
+		Map<String, Object> response = new HashMap<>();
+
+		if (coupon != null && coupon.getProcess() == 0) {
+			response.put("valid", true);
+		} else {
+			response.put("valid", false);
+		}
+
+		return response;
 	}
 }

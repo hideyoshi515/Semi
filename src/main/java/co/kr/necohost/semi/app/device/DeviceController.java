@@ -38,8 +38,9 @@ public class DeviceController {
 	private final OrderRepository orderRepository;
 	private final OrderNumRepository orderNumRepository;
 	private final OrderWebSocketHandler orderWebSocketHandler;
+	private final CouponService couponService;
 
-	public DeviceController(MenuService menuService, DeviceService deviceService, SalesService salesService, MenuRepository menuRepository, AccountService accountService, CategoryService categoryService, OrderRepository orderRepository, OrderNumRepository orderNumRepository, OrderWebSocketHandler orderWebSocketHandler) {
+	public DeviceController(MenuService menuService, DeviceService deviceService, SalesService salesService, MenuRepository menuRepository, AccountService accountService, CategoryService categoryService, OrderRepository orderRepository, OrderNumRepository orderNumRepository, OrderWebSocketHandler orderWebSocketHandler, CouponService couponService) {
 		this.menuService = menuService;
 		this.deviceService = deviceService;
 		this.salesService = salesService;
@@ -49,6 +50,7 @@ public class DeviceController {
 		this.orderRepository = orderRepository;
 		this.orderNumRepository = orderNumRepository;
 		this.orderWebSocketHandler = orderWebSocketHandler;
+		this.couponService = couponService;
 	}
 
 	private int calculatePoints(long price) {
@@ -374,7 +376,8 @@ public class DeviceController {
 			return "redirect:/order/kiosk/menu"; // 주문이 없는 경우
 		}
 
-		long totalPrice = calculateTotalPrice(orders);
+		int salePrice = 0;
+
 		LocalDateTime localDate = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		String formattedDateTime = localDate.format(formatter);
@@ -382,12 +385,38 @@ public class DeviceController {
 
 		for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
 			Menu menu = entry.getKey();
+
 			int quantity = entry.getValue();
+
 			SalesRequest sales = new SalesRequest();
+
+			salePrice = menu.getPrice();
+			String couponNum = (String) params.get("couponNum");
+
+			if (couponNum != null && !couponNum.isEmpty()) {
+				System.out.println("쿠폰 사용 준비: " + couponNum);
+
+				Coupon coupon = couponService.findByCouponNum(couponNum);
+				if (coupon != null) {
+					System.out.println("쿠폰 찾음: " + coupon);
+					if (coupon.getProcess() == 0) {
+						salePrice *= 0.9;  // 10% 할인 적용
+						coupon.setProcess(1);  // 쿠폰 사용 처리
+						couponService.save(coupon);
+						System.out.println(salePrice);
+						System.out.println("쿠폰 사용됨: " + couponNum);
+					} else {
+						System.out.println("쿠폰 이미 사용됨: " + couponNum);
+					}
+				} else {
+					System.out.println("쿠폰을 찾을 수 없음: " + couponNum);
+				}
+			}
+
 			sales.setDate(LocalDateTime.parse(formattedDateTime, formatter));
 			sales.setCategory(menu.getCategory());
 			sales.setMenu(menu.getId());
-			sales.setPrice(menu.getPrice());
+			sales.setPrice(salePrice);
 			sales.setQuantity(quantity);
 			sales.setDevice(2);
 			sales.setDeviceNum(1);
@@ -402,7 +431,7 @@ public class DeviceController {
 		if (params.get("phone") != null) {
 			String phoneNum = (String) params.get("phone");
 			Account account = accountService.getAccountByPhone(phoneNum);
-			account.setMsPoint((int) (account.getMsPoint() + (totalPrice * 0.01)));
+			account.setMsPoint((int) (account.getMsPoint() + (salePrice * 0.01)));
 			accountService.save(account);
 		}
 

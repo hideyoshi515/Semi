@@ -12,12 +12,21 @@ public class CouponService {
 		this.couponRepository = couponRepository;
 	}
 
+	// クーポンを保存
 	public void saveCoupon(String couponCode) {
 		Coupon coupon = new Coupon();
 
 		coupon.setCouponNum(couponCode);
 		coupon.setProcess(0);
 
+		couponRepository.save(coupon);
+	}
+
+	public Coupon findByCouponNum(String couponNum) {
+		return couponRepository.findByCouponNum(couponNum);
+	}
+
+	public void save(Coupon coupon) {
 		couponRepository.save(coupon);
 	}
 }

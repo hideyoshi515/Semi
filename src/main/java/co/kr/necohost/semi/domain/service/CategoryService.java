@@ -18,23 +18,27 @@ public class CategoryService {
 		this.categoryRepository = categoryRepository;
 	}
 
+	// カテゴリを削除（キャッシュ無効化）
+	@Transactional
+	@CacheEvict(value = "categories", allEntries = true)
+	public void deleteCategory(int id) {
+		categoryRepository.deleteById(id);
+	}
+
+	// IDでカテゴリを検索
 	public Category findById(int id) {
 		return categoryRepository.findById(id).get();
 	}
 
+	// すべてのカテゴリを取得（キャッシュ有効）
 	@Cacheable(value = "categories")
 	public List<Category> getAllCategories() {
 		return categoryRepository.findAll();
 	}
 
+	// カテゴリを保存（キャッシュ無効化）
 	@CacheEvict(value = "categories", allEntries = true)
 	public void saveCategory(CategoryRequest categoryRequest) {
 		categoryRepository.save(categoryRequest.toEntity());
-	}
-
-	@Transactional
-	@CacheEvict(value = "categories", allEntries = true)
-	public void deleteCategory(int id) {
-		categoryRepository.deleteById(id);
 	}
 }

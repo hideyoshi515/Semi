@@ -60,14 +60,15 @@
         </h3>
 
         <div th:if="${formattedStartDate != null && formattedEndDate != null}">
-            <div class="date-range">
-                <h2>
-                    <p>検索期間: <span th:text="${formattedStartDate}"></span> ~ <span th:text="${formattedEndDate}"></span></p>
-                </h2>
-            </div>
+
 
             <div class="content">
-                <div class="table-container limited-width">
+                <div class="table-container limited-width" style="display:block">
+                    <div class="date-range">
+                        <h2>
+                            <p>検索期間: <span th:text="${formattedStartDate}"></span> ~ <span th:text="${formattedEndDate}"></span></p>
+                        </h2>
+                    </div>
                     <table>
                         <thead>
                         <tr>

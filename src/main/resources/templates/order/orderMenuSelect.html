@@ -34,7 +34,7 @@
 </head>
 <body>
 <th:block layout:fragment="content">
-    <div id="wrapper" class="mt-0" style="min-height: 2400px">
+    <div id="wrapper" class="mt-0">
         <div id="sidebarMein"></div>
         <div id="sidebar">
             <div class="btn-group-vertical" role="group" aria-label="Category filter">
@@ -59,7 +59,6 @@
         <div id="content">
             <div class="section pb-5 mb-5" th:id="|section${sectionNumStat.count}|" th:each="sectionNum : ${#numbers.sequence(1,categoryCount)}">
                 <h2 id="categoryTitle" th:text="${category.name}" th:if="${categoryStat.count == sectionNumStat.count}" th:each="category : ${categories}"></h2>
-                <br>
                 <div class="row" id="menuContainer">
                     <div class="mb-3 menuItem" th:each="menu : ${menusList[sectionNumStat.index]}"
                          th:attr="data-category=${menu.category}, data-menu-id=${menu.id}"
@@ -93,7 +92,7 @@
                 </div>
             </div>
         </div>
-        <p>어서오세요.>-<</p>
+        <p>어서오세요.>-< <br> 하와와</p>
     </div>
 
     <!-- Modal -->
@@ -136,11 +135,11 @@
     <div id="paymentbuttonContainer">
         <form method="post" action="orderPayment" id="orderForm" onsubmit="return checkoutForm()">
             <input type="hidden" name="orderData" id="orderData">
-            <button type="submit" class="btn btn-success" id="paymentBtn">お支払い</button>
+            <button type="submit" class="btn btn-success rounded-0" id="paymentBtn">お支払い</button>
         </form>
 
         <!-- Cart Modal -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cartModal"
+        <button type="button" class="btn btn-primary rounded-0" data-bs-toggle="modal" data-bs-target="#cartModal"
                 id="paymentCartBtn">
             カーゴ
         </button>
@@ -150,7 +149,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="cartModalLabel">カーゴ</h5>
+                    <h5 class="modal-title" id="cartModalLabel">장바구니</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -177,23 +176,6 @@
                 <div class="modal-body">
                     상품이 장바구니에 추가되었습니다.<br>
                     <div id="countdown" class="mt-2"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                </div>
-            </div>
-        </div>
-    </div>
-<!-- 장바구니 비어있을때 알림 모달 -->
-    <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="alertModalLabel">알림</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="alertModalBody">
-                    <!-- 알림 내용이 여기에 동적으로 추가됩니다 -->
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
@@ -333,7 +315,7 @@
                     </div>
                 </div>
                 <div style="width: 60px;">
-                    <button type="button" class="btn btn-danger" onclick="deleteCartItem(${menuId})">削除</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteCartItem(${menuId})">삭제</button>
                 </div>
             </div>
             `;
@@ -402,7 +384,7 @@
             const items = cartItemsContainer.querySelectorAll('.cart-item');
 
             if (items.length === 0) {
-                showAlertModal('장바구니에 주문이 없습니다. 주문을 추가해주세요.');
+                alert('장바구니에 주문이 없습니다. 주문을 추가해주세요.');
                 return false;
             } else {
                 window.location.href = '/orderPayment';
@@ -413,7 +395,7 @@
             if (cartData && Object.keys(cartData).length > 0) {
                 return true;
             } else {
-                showAlertModal('장바구니에 주문이 없습니다. 주문을 추가해주세요.');
+                alert('장바구니에 주문이 없습니다. 주문을 추가해주세요.');
                 return false;
             }
         }
@@ -483,14 +465,6 @@
                 });
             });
         });
-    // 장바구니 메뉴안담겼다는 알림 로직
-        function showAlertModal(messge){
-            const alertModalBody = document.getElementById('alertModalBody');
-            alertModalBody.innerText = messge;
-            const alertModal = new bootstrap.Modal(document.getElementById('alertModal'));
-            alertModal.show();
-        }
-
     </script>
 </th:block>
 </body>

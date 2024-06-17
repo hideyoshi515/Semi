@@ -17,10 +17,12 @@ public class PositionService {
         this.positionRepository = positionRepository;
     }
 
+    // すべてのポジションを取得
     public List<Position> getAllPositions() {
         return positionRepository.findAll();
     }
 
+    // IDでポジションを取得
     public Position getPositionById(Long id) {
         return positionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid position ID"));

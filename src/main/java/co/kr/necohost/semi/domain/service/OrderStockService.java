@@ -14,8 +14,8 @@ public class OrderStockService {
         this.orderStockRepository = orderStockRepository;
     }
 
+    // すべての注文在庫を取得
     public List<OrderStock> getAllOrderStocks() {
         return orderStockRepository.findAll();
     }
-
 }

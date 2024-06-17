@@ -19,16 +19,41 @@ public class AccountService {
 		this.accountRepository = accountRepository;
 	}
 
-	public boolean isExit(AccountRequest accountRequest) {
+	// アカウントIDでアカウントを取得
+	public Account getAccountById(long id) {
+		return accountRepository.findById(id).orElse(null);
+	}
+
+	// 電話番号でアカウントを取得
+	public Account getAccountByPhone(String phone) {
+		return accountRepository.findByPhone(phone).orElse(null);
+	}
+
+	// メールでアカウントが存在するかチェック
+	public boolean isExisted(AccountRequest accountRequest) {
 		Account check = accountRepository.findByEmail(accountRequest.getEmail()).orElse(null);
 		return check != null;
 	}
 
-	public boolean isPhoneExit(AccountRequest accountRequest) {
+	// 電話番号でアカウントが存在するかチェック
+	public boolean isPhoneExisted(AccountRequest accountRequest) {
 		Account check = accountRepository.findByPhone(accountRequest.getPhone()).orElse(null);
 		return check != null;
 	}
 
+	// アカウントリクエストをエンティティに変換して保存
+	@Transactional
+	public void save(AccountRequest accountRequest) {
+		accountRepository.save(accountRequest.toEntity());
+	}
+
+	// アカウントを保存
+	@Transactional
+	public void save(Account account) {
+		accountRepository.save(account);
+	}
+
+	// エラーメッセージを処理してマップに格納
 	public Map<String, String> validateHandling(Errors errors) {
 		Map<String, String> errorMap = new HashMap<String, String>();
 
@@ -38,23 +63,5 @@ public class AccountService {
 		}
 
 		return errorMap;
-	}
-
-	@Transactional
-	public void save(AccountRequest accountRequest) {
-		accountRepository.save(accountRequest.toEntity());
-	}
-
-	@Transactional
-	public void save(Account account) {
-		accountRepository.save(account);
-	}
-
-	public Account getAccountByid(long id) {
-		return accountRepository.findById(id).orElse(null);
-	}
-
-	public Account getAccountByPhone(String phone) {
-		return accountRepository.findByPhone(phone).orElse(null);
 	}
 }
