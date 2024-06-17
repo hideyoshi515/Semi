@@ -6,12 +6,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff List</title>
+    <title>TimeCard List</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .time-card-row:nth-child(odd) {
+            background-color: #f2f2f2; /* 회색 */
+        }
+
+        .time-card-row:nth-child(even) {
+            background-color: #ffffff; /* 흰색 */
+        }
+
+        .table-body {
+            border-top: 1px solid #ddd;
+        }
+
+        .time-card-row {
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
 </head>
 <body>
 <th:block layout:fragment="content">
     <div class="container mt-5">
         <h2>TimeCard List</h2>
+        <div class="mb-3">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search by Username" oninput="filterTimeCards()">
+        </div>
         <div class="table-responsive">
             <div class="table">
                 <div class="table-header">
@@ -22,7 +43,7 @@
                     </div>
                 </div>
                 <div class="table-body">
-                    <div th:each="timeCard : ${timeCards}" class="row">
+                    <div th:each="timeCard : ${timeCards}" class="row time-card-row">
                         <div class="col" th:text="${timeCard.staffName}"></div>
                         <div class="col" th:text="${timeCard.start}"></div>
                         <div class="col" th:text="${timeCard.end}"></div>
@@ -32,8 +53,27 @@
         </div>
     </div>
     <script>
+        function filterTimeCards() {
+            let input, filter, rows, staffName, i, txtValue;
+            input = document.getElementById('searchInput');
+            filter = input.value.toLowerCase();
+            rows = document.getElementsByClassName('time-card-row');
 
+            for (i = 0; i < rows.length; i++) {
+                staffName = rows[i].getElementsByClassName('col')[0]; // 첫 번째 컬럼 (Username)
+                if (staffName) {
+                    txtValue = staffName.textContent.toLowerCase() || staffName.innerText.toLowerCase();
+                    // 브라우저 호환성 고려, 두 속성 중 하나를 사용할 수 있도록
+                    if (txtValue.includes(filter)) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }
+            }
+        }
     </script>
+
 </th:block>
 </body>
 </html>
