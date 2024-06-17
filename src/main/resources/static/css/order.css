@@ -38,12 +38,13 @@ nav a.active {
     flex: 1;
     overflow: visible;
     margin-top: 60px; /* Adjust for the fixed navbar */
-    min-height: 2700px
+    min-height: 2850px
 }
 
 #menuContainer {
     display: flex;
     flex-wrap: wrap;
+    padding-top: 15px;
 }
 
 #sidebarMein {
@@ -206,6 +207,7 @@ nav a.active {
 
 #paymentbuttonContainer {
     background-color: #ffcc00;
+    opacity: 0.6;
     position: sticky;
     bottom: 0;
     display: flex;
@@ -225,6 +227,7 @@ nav a.active {
 
     #paymentbuttonContainer {
         background-color: #ffcc00;
+        opacity: 0.6;
         position: sticky;
         bottom: 0;
         display: flex;
@@ -271,6 +274,7 @@ nav a.active {
         flex-grow: 1;
         text-align: center;
     }
+
 }
 
 @keyframes hoverAnimation {
@@ -326,3 +330,7 @@ nav a.active {
     background-color: red;
     transform: scale(1.05);
 }
+#paymentbuttonContainer:hover{
+    opacity: 1;
+    transition: opacity 0.5s ease, transform 0.3s ease;
+ }
