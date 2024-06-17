@@ -210,7 +210,7 @@ public class DeviceController {
 				salesRequest.setOrderNum(orderNum.getOrderNum());
 
 				try {
-					salesService.save2(salesRequest);
+					salesService.save(salesRequest);
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.out.println("Error Saving sales request" + e.getMessage());

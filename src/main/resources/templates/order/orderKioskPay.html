@@ -21,7 +21,7 @@
                 <h2 id="categoryTitle">お支払い</h2>
                 <div class="row align-top ms-2" id="menuContainer"
                      style="width: 660px; max-height: 1052.62px; overflow-y: auto; overflow-x: hidden;">
-                    <div class="menu-item mb-2 me-4" th:each="item : ${orderedItems}"
+                    <div class="menu-item mb-5 me-4" th:each="item : ${orderedItems}"
                          style="width: 645px; height: 130px;">
                         <div class="border border-1 rounded-1 d-flex w-100" style="width: 180px;">
                             <img class="col-3" th:src="${item.key.image}"
@@ -147,8 +147,7 @@
     </div>
 
     <!-- 쿠폰 입력 모달 -->
-    <div class="modal fade" id="couponModal" tabindex="-1" role="dialog" aria-labelledby="couponModalLabel"
-         aria-hidden="true">
+    <div class="modal fade" id="couponModal" tabindex="-1" role="dialog" aria-labelledby="couponModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -156,18 +155,14 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group mb-0" style="width: 300px; display: flex; justify-content: center;">
-                        <input type="text" class="form-control coupon-input" id="couponPart1" maxlength="4"
-                               style="width: 70px; text-align: center;" required>
+                    <div class="form-group mb-0" style="width: 300px; display: flex; justify-content: center; align-items: center;">
+                        <input type="text" class="form-control coupon-input" id="couponPart1" maxlength="4" style="width: 70px; text-align: center;" required>
                         <span style="margin: 0 10px;">-</span>
-                        <input type="text" class="form-control coupon-input" id="couponPart2" maxlength="4"
-                               style="width: 70px; text-align: center;" required>
+                        <input type="text" class="form-control coupon-input" id="couponPart2" maxlength="4" style="width: 70px; text-align: center;" required>
                         <span style="margin: 0 10px;">-</span>
-                        <input type="text" class="form-control coupon-input" id="couponPart3" maxlength="4"
-                               style="width: 70px; text-align: center;" required>
+                        <input type="text" class="form-control coupon-input" id="couponPart3" maxlength="4" style="width: 70px; text-align: center;" required>
                         <span style="margin: 0 10px;">-</span>
-                        <input type="text" class="form-control coupon-input" id="couponPart4" maxlength="4"
-                               style="width: 70px; text-align: center;" required>
+                        <input type="text" class="form-control coupon-input" id="couponPart4" maxlength="4" style="width: 70px; text-align: center;" required>
                     </div>
                     <button type="button" class="btn btn-warning mt-3" onclick="applyCoupon()" style="width: 100%;">
                         適用
@@ -176,6 +171,7 @@
             </div>
         </div>
     </div>
+
 
     <script>
         let account;
@@ -333,6 +329,9 @@
             form.submit();
         }
 
+        let couponApplied = false;
+        let originalTotalPrice = 0;
+
         function showCouponModal() {
             document.getElementById('couponPart1').value = null;
             document.getElementById('couponPart2').value = null;
@@ -343,6 +342,12 @@
         }
 
         function applyCoupon() {
+            if (couponApplied) {
+                cancelCoupon();
+
+                return;
+            }
+
             const part1 = document.getElementById('couponPart1').value;
             const part2 = document.getElementById('couponPart2').value;
             const part3 = document.getElementById('couponPart3').value;
@@ -368,6 +373,11 @@
 
                     if (response.valid) {
                         applyDiscount();
+
+                        couponApplied = true;
+
+                        document.querySelector('.btn-warning').textContent = '쿠폰 취소';
+
                         alert('クーポンが適用されました。');
                     } else {
                         alert('無効なクーポン番号です。');
@@ -388,16 +398,32 @@
         function applyDiscount() {
             // 현재 총 금액에서 10% 할인 적용
             let totalPriceElement = document.querySelector('.order-summary .fs-2');
-            let totalPrice = parseInt(totalPriceElement.textContent.replace(/[^\d]/g, ''), 10);
-            let discountedPrice = totalPrice * 0.9;
+
+            originalTotalPrice = parseInt(totalPriceElement.textContent.replace(/[^\d]/g, ''), 10);
+
+            let discountedPrice = originalTotalPrice * 0.9;
 
             totalPriceElement.textContent = `合計 : ${discountedPrice.toLocaleString()} ₩`;
+        }
+
+        function cancelCoupon() {
+            // 총 금액을 원래대로 복원
+            let totalPriceElement = document.querySelector('.order-summary .fs-2');
+
+            totalPriceElement.textContent = `合計 : ${originalTotalPrice.toLocaleString()} ₩`;
+
+            couponApplied = false;
+
+            document.querySelector('.btn-warning').textContent = 'クーポン';
+
+            alert('クーポンが取り消されました。');
         }
 
         // 입력 필드에 숫자만 입력되도록 제한하고, 자동으로 다음 필드로 이동
         document.querySelectorAll('.coupon-input').forEach((input, index, inputs) => {
             input.addEventListener('input', function () {
                 this.value = this.value.replace(/\D/g, '');
+
                 if (this.value.length === 4) {
                     if (index < inputs.length - 1) {
                         inputs[index + 1].focus();
@@ -413,14 +439,17 @@
 
             input.addEventListener('paste', function (e) {
                 e.preventDefault();
+
                 const paste = (e.clipboardData || window.clipboardData).getData('text');
                 const cleanedPaste = paste.replace(/\D/g, '');
                 const parts = [cleanedPaste.slice(0, 4), cleanedPaste.slice(4, 8), cleanedPaste.slice(8, 12), cleanedPaste.slice(12, 16)];
+
                 for (let i = 0; i < parts.length; i++) {
                     if (parts[i]) {
                         inputs[i].value = parts[i];
                     }
                 }
+
                 if (parts[0].length === 4) inputs[1].focus();
                 if (parts[1].length === 4) inputs[2].focus();
                 if (parts[2].length === 4) inputs[3].focus();
