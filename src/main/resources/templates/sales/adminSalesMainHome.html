@@ -9,121 +9,155 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-<div class="navbar">
-    <a onclick="location.href='/adminSalesMainHome'">ホーム</a>
-    <a onclick="location.href='/adminSalesMainMenu'">メニュー</a>
-</div>
-<h1 style="width: 100%">
-    <img style="width: 38px; height: 38px;" src="/img/storeownerpage/money.png">今日の売上高
+<div class="container">
+    <header class="header" style="height:42px !important;">
+        <a onclick="location.href='/adminSalesMainHome'">ホーム</a>
+        <a onclick="location.href='/adminSalesMainMenu'">メニュー</a>
+    </header>
+    <main class="main-content">
+        <section class="menu-title">
+            <h1>今日の売上高</h1>
+        </section>
+        <div class="content" style="display: flex; justify-content: space-around">
 
-</h1>
-<div class="content" style="display: flex; justify-content: space-around">
+            <div class="chart-wrapper" style="display:block">
+                <h1 style="color:rgb(11, 94, 215)" id="clock">clock</h1>
+                <h1 style="font-size: 24pt;color:rgb(11, 94, 215)">今までの売上高：<span th:text="${totalSalesToday}"></span>円</h1>
+                <div class="chart-container" style="height:430px">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
 
-    <div class="chart-wrapper" style="display:block">
-        <h1 id="clock" style="color:black;">clock</h1>
-        <div style="font-size: 21pt">今までの売上高：<span th:text="${totalSalesToday}"></span>円</div>
-        <div class="chart-container">
-            <canvas id="salesChart"></canvas>
+            <div class="table-container" style="display:block">
+                <div id="wrapper">
+                    <div class="outerDiv">
+                        <div class="m-center">
+                            <div class="ms-3 mt-3 text-center" style="width: 500px; height: auto;">
+                                <div>本日の販売状況</div>
+                                <div class="chart-container" style="width: 480px; height: 400px;">
+                                    <canvas id="todaySalesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <div class="table-container" style="display:block" >
-        http://localhost:8080/admin 갖다써
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            var todaySalesData = /*[[${todaySales}]]*/ {};
+            var hourlySales = /*[[${hourlySales}]]*/ {};
+            /*]]>*/
 
-        <table>
-            <thead>
-            <tr>
-                <th>時間</th>
-                <th>売上</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="entry : ${hourlySales}">
-                <td th:text="${entry.key} + 'から 1時間'"></td>
-                <td th:text="${#numbers.formatInteger(entry.value,1,'COMMA')} + '円'"></td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-
-
-</div>
-
-
-<!--    <div>現在時間：<span th:text="${currentTime}"></span>　<br></div>-->
-
-
-
-
-<script th:inline="javascript">
-    // JavaScript로 hourlySales 데이터를 전달
-    const hourlySales = /*[[${hourlySales}]]*/ {};
-    const labels = Object.keys(hourlySales);
-    const data = Object.values(hourlySales);
-
-    const ctx = document.getElementById('salesChart').getContext('2d');
-
-    // Chart.js를 이용하여 꺾은선 그래프 생성
-    const salesChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels, // 시간 데이터를 배열로 전달
-            datasets: [{
-                label: '今日の累積売上高',
-                data: data, // 누적 매출 데이터를 배열로 전달
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                fill: true
-            }]
-        },
-        options: {
-            scales: {
-                x: {
-                    type: 'category',
-                    title: {
-                        display: true,
-                        text: '時間'
-                    },
-                    ticks: {
-                        autoSkip: false,
-                        maxRotation: 0,
-                        minRotation: 0
-                    }
+            // today's sales chart
+            var labels = Object.keys(todaySalesData);
+            var data = Object.values(todaySalesData);
+            var ctxTodaySales = document.getElementById('todaySalesChart').getContext('2d');
+            var todaySalesChart = new Chart(ctxTodaySales, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '総売上高 (棒グラフ)',
+                            data: data,
+                            backgroundColor: 'rgba(0, 107, 214, 0.5)',
+                            borderColor: '#006BD6',
+                            borderWidth: 1,
+                            yAxisID: 'y'
+                        }
+                    ]
                 },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: '累積売上高 (円)'
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 500,
+                        easing: 'easeInOutBounce'
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            },
+                            suggestedMax: 10
+                        }
                     }
                 }
+            });
+
+            // hourly sales chart
+            var hourlyLabels = Object.keys(hourlySales);
+            var hourlyData = Object.values(hourlySales);
+            var ctxHourlySales = document.getElementById('salesChart').getContext('2d');
+            var salesChart = new Chart(ctxHourlySales, {
+                type: 'line',
+                data: {
+                    labels: hourlyLabels, // 시간 데이터를 배열로 전달
+                    datasets: [{
+                        label: '今日の累積売上高',
+                        data: hourlyData, // 누적 매출 데이터를 배열로 전달
+                        borderColor: '##006BD6',
+                        backgroundColor: 'rgba(0, 107, 214, 0.5)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'category',
+                            title: {
+                                display: true,
+                                text: '時間'
+                            },
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 0,
+                                minRotation: 0
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '累積売上高 (円)'
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
+        <script>
+            var Target = document.getElementById("clock");
+
+            function clock() {
+                var time = new Date();
+
+                var month = time.getMonth();
+                var date = time.getDate();
+                var day = time.getDay();
+                var week = ['日', '月', '火', '水', '木', '金', '土'];
+
+                var hours = time.getHours();
+                var minutes = time.getMinutes();
+                var seconds = time.getSeconds();
+
+                Target.innerText =
+                    `${month + 1}月 ${date}日 ${week[day]}曜日 ` +
+                    `${hours < 10 ? `0${hours}` : hours}:${minutes < 10 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
             }
-        }
-    });
-</script>
-<script>
-    var Target = document.getElementById("clock");
 
-    function clock() {
-        var time = new Date();
-
-        var month = time.getMonth();
-        var date = time.getDate();
-        var day = time.getDay();
-        var week = ['日', '月', '火', '水', '木', '金', '土'];
-
-        var hours = time.getHours();
-        var minutes = time.getMinutes();
-        var seconds = time.getSeconds();
-
-        Target.innerText =
-            `${month + 1}月 ${date}日 ${week[day]}曜日 ` +
-            `${hours < 10 ? `0${hours}` : hours}:${minutes < 10 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
-
-    }
-
-    clock();
-    setInterval(clock, 1000); // 1초마다 실행
-</script>
+            clock();
+            setInterval(clock, 1000); // 1초마다 실행
+        </script>
+    </main>
+</div>
 </body>
 </html>
