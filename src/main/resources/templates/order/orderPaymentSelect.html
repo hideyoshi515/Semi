@@ -5,17 +5,6 @@
         layout:decorate="~{layout/plain_layout}">
 <head>
     <style>
-        @media only screen and (min-width: 768px) and (max-width: 1366px) {
-            .tablet-container {
-                width: 50%;
-                margin: 0 auto;
-            }
-            #menuContainer{
-
-            }
-
-
-        }
 
         .h1 {
             background-color: #ffcc00;
@@ -43,13 +32,11 @@
             object-fit: cover;
         }
 
-        .tablet-container {
+        #menuContainer2{
             display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            padding: 10px;
-            margin-bottom: 20px;
-            text-align: center;
+            align-items: center;
+            justify-content: space-around;
+            transform: translateX(-180px);
         }
 
         .tablet-container > div {
@@ -100,6 +87,15 @@
         .cancel button:hover {
             background-color: #da190b;
         }
+        @media only screen and (min-width: 768px) and (max-width: 1366px) {
+            #menuContainer2{
+                display: flex;
+                align-items: center;
+                justify-content: space-around;
+                transform: translateX(-115px);
+            }
+        }
+
 
 
     </style>
@@ -112,20 +108,20 @@
         <br>
         <div class="tablet-container">
             <div th:each="entry : ${orderedItems}" id="menuContainer">
-                <img th:src="${entry.key.image}" id="img">
-                <br>
-                <div>
-                    <span th:text="${entry.key.name}"></span>
+                <div id="menuContainer2">
+                    <img th:src="${entry.key.image}" id="img">
+                    <div>
+                        <span th:text="${entry.key.name}"></span>
+                    </div>
+                    <div>
+                        數量 : <span th:text="${entry.value}"></span>
+                    </div>
+                    <div>
+                        總收量 : <span th:text="${#numbers.formatInteger(entry.key.price * entry.value,1,'COMMA')}"></span>
+                        <input type="hidden" th:field="*{quantities[__${entry.key.id}__]}" th:value="${entry.value}">
+                    </div>
                 </div>
-                <br>
-                <div>
-                    數量 : <span th:text="${entry.value}"></span>
-                </div>
-                <br>
-                總收量 : <span th:text="${#numbers.formatInteger(entry.key.price * entry.value,1,'COMMA')}"></span>
-                <br>
-                <br>
-                <input type="hidden" th:field="*{quantities[__${entry.key.id}__]}" th:value="${entry.value}">
+
             </div>
         </div>
 
