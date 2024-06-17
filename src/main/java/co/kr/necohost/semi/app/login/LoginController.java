@@ -24,49 +24,8 @@ public class LoginController {
         this.accountRepository = accountRepository;
     }
 
-    @GetMapping("/register")
-    public String getRegister(Model model, HttpSession session, HttpServletRequest request) {
-        setPreviousPage(session, request, "/register");
-        if (session.getAttribute("account") != null) {
-            return "redirect:" + session.getAttribute("prevpage");
-        }
-        AccountRequest accountRequest = (AccountRequest) session.getAttribute("accountRequest");
-        if (accountRequest == null) {
-            accountRequest = new AccountRequest();
-        }
-        model.addAttribute("session", session);
-        model.addAttribute("accountRequest", accountRequest);
-        return "login/register.html";
-    }
-
-    @PostMapping("/register")
-    public String postRegister(Model model, @Valid @ModelAttribute("accountRequest") AccountRequest accountRequest, Errors errors, HttpSession session) {
-        if (errors.hasErrors()) {
-            model.addAttribute("accountRequest", accountRequest);
-            Map<String, String> validatorResult = accountService.validateHandling(errors);
-            validatorResult.forEach(model::addAttribute);
-            return "login/register.html";
-        }
-
-        if (accountService.isExit(accountRequest)) {
-            model.addAttribute("valid_email", "既に存在するメールアドレスです");
-            return "login/register.html";
-        }
-
-        if (accountService.isPhoneExit(accountRequest)) {
-            model.addAttribute("valid_phone", "既に存在する携帯電話番号です");
-            return "login/register.html";
-        }
-
-        accountService.save(accountRequest);
-        Account account = accountRepository.findByEmail(accountRequest.getEmail()).orElse(null);
-        session.setAttribute("account", account);
-        session.setMaxInactiveInterval(60 * 60 * 24); // 24 hours
-        session.removeAttribute("accountRequest");
-        return "redirect:" + session.getAttribute("prevpage");
-    }
-
-    @GetMapping("/login")
+    // ログインページのGETリクエストを処理するメソッド
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String getLogin(Model model, HttpSession session, HttpServletRequest request) {
         setPreviousPage(session, request, "/login");
         AccountRequest accountRequest = new AccountRequest();
@@ -75,7 +34,15 @@ public class LoginController {
         return "login/login.html";
     }
 
-    @GetMapping("/mypage")
+    // ログインページのPOSTリクエストを処理するメソッド（実装は必要に応じて追加）
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public String postLogin() {
+        // postLoginの実装をここに追加します（必要な場合）
+        return "login/login.html";
+    }
+
+    // マイページのGETリクエストを処理するメソッド
+    @RequestMapping(value = "/mypage", method = RequestMethod.GET)
     public String getMypage(Model model, HttpSession session) {
         Account account = (Account) session.getAttribute("account");
         if (account == null) {
@@ -87,7 +54,8 @@ public class LoginController {
         return "user/mypage.html";
     }
 
-    @PostMapping("/mypage")
+    // マイページのPOSTリクエストを処理するメソッド
+    @RequestMapping(value = "/mypage", method = RequestMethod.POST)
     public String postMypage(HttpSession session, @ModelAttribute("accountRequest") AccountRequest accountRequest, @RequestParam Map<String, Object> params) {
         Account account = (Account) session.getAttribute("account");
         AccountRequest newRequest = account.toAccountRequest();
@@ -112,6 +80,51 @@ public class LoginController {
         return "redirect:/";
     }
 
+    // 登録ページのGETリクエストを処理するメソッド
+    @RequestMapping(value = "/register", method = RequestMethod.GET)
+    public String getRegister(Model model, HttpSession session, HttpServletRequest request) {
+        setPreviousPage(session, request, "/register");
+        if (session.getAttribute("account") != null) {
+            return "redirect:" + session.getAttribute("prevpage");
+        }
+        AccountRequest accountRequest = (AccountRequest) session.getAttribute("accountRequest");
+        if (accountRequest == null) {
+            accountRequest = new AccountRequest();
+        }
+        model.addAttribute("session", session);
+        model.addAttribute("accountRequest", accountRequest);
+        return "login/register.html";
+    }
+
+    // 登録ページのPOSTリクエストを処理するメソッド
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public String postRegister(Model model, @Valid @ModelAttribute("accountRequest") AccountRequest accountRequest, Errors errors, HttpSession session) {
+        if (errors.hasErrors()) {
+            model.addAttribute("accountRequest", accountRequest);
+            Map<String, String> validatorResult = accountService.validateHandling(errors);
+            validatorResult.forEach(model::addAttribute);
+            return "login/register.html";
+        }
+
+        if (accountService.isExit(accountRequest)) {
+            model.addAttribute("valid_email", "既に存在するメールアドレスです");
+            return "login/register.html";
+        }
+
+        if (accountService.isPhoneExit(accountRequest)) {
+            model.addAttribute("valid_phone", "既に存在する携帯電話番号です");
+            return "login/register.html";
+        }
+
+        accountService.save(accountRequest);
+        Account account = accountRepository.findByEmail(accountRequest.getEmail()).orElse(null);
+        session.setAttribute("account", account);
+        session.setMaxInactiveInterval(60 * 60 * 24); // 24時間
+        session.removeAttribute("accountRequest");
+        return "redirect:" + session.getAttribute("prevpage");
+    }
+
+    // 前のページを設定するメソッド
     private void setPreviousPage(HttpSession session, HttpServletRequest request, String currentPath) {
         String uri = request.getHeader("Referer");
         if (uri != null && !uri.contains(currentPath) && !uri.contains("/login")) {
