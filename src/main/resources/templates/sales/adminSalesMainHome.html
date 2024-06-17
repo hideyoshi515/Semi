@@ -15,12 +15,20 @@
 </div>
 <h1 style="width: 100%">
     <img style="width: 38px; height: 38px;" src="/img/storeownerpage/money.png">今日の売上高
+
 </h1>
-<div class="content">
-    <div>現在時間：<span th:text="${currentTime}"></span>　<br></div>
-    <div>今までの売上高：<span th:text="${totalSalesToday}"></span>円</div>
+<div class="content" style="display: flex; justify-content: space-around">
+
+    <div class="chart-wrapper" style="display:block">
+        <h1 id="clock" style="color:black;">clock</h1>
+        <div style="font-size: 21pt">今までの売上高：<span th:text="${totalSalesToday}"></span>円</div>
+        <div class="chart-container">
+            <canvas id="salesChart"></canvas>
+        </div>
+    </div>
 
     <div class="table-container">
+
         <table>
             <thead>
             <tr>
@@ -36,12 +44,15 @@
             </tbody>
         </table>
     </div>
+
+
 </div>
-<div class="chart-wrapper">
-    <div class="chart-container">
-        <canvas id="salesChart"></canvas>
-    </div>
-</div>
+
+
+<!--    <div>現在時間：<span th:text="${currentTime}"></span>　<br></div>-->
+
+
+
 
 <script th:inline="javascript">
     // JavaScript로 hourlySales 데이터를 전달
@@ -88,6 +99,30 @@
             }
         }
     });
+</script>
+<script>
+    var Target = document.getElementById("clock");
+
+    function clock() {
+        var time = new Date();
+
+        var month = time.getMonth();
+        var date = time.getDate();
+        var day = time.getDay();
+        var week = ['日', '月', '火', '水', '木', '金', '土'];
+
+        var hours = time.getHours();
+        var minutes = time.getMinutes();
+        var seconds = time.getSeconds();
+
+        Target.innerText =
+            `${month + 1}月 ${date}日 ${week[day]}曜日 ` +
+            `${hours < 10 ? `0${hours}` : hours}:${minutes < 10 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+
+    }
+
+    clock();
+    setInterval(clock, 1000); // 1초마다 실행
 </script>
 </body>
 </html>

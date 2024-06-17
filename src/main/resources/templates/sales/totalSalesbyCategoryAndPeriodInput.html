@@ -63,15 +63,16 @@
 
 
         <div th:if="${formattedStartDate != null && formattedEndDate != null}">
-            <div class="date-range">
-                <h2>
-                    <p>検索期間: <span th:text="${formattedStartDate}"></span> ~ <span
-                            th:text="${formattedEndDate}"></span></p>
-                </h2>
-            </div>
+
 
             <div class="content">
-                <div class="table-container">
+                <div class="table-container" style="display:block">
+                    <div class="date-range">
+                        <h2>
+                            <p>検索期間: <span th:text="${formattedStartDate}"></span> ~ <span
+                                    th:text="${formattedEndDate}"></span></p>
+                        </h2>
+                    </div>
                     <table>
                         <thead>
                         <tr>
@@ -103,7 +104,7 @@
             </div>
         </div>
 
-        <div class="button-container" style="margin-top: 20px; text-align: center; justify-content: space-around">
+        <div class="button-container" style="margin-top: 10px; text-align: center; justify-content: space-around">
             <button type="submit" class="button">検索</button>
             <button class="button" type="button" onclick="location.href='/adminSalesMainMenu'"><p>管理者画面に復帰</p>
             </button>
@@ -126,7 +127,7 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'カテゴリ別総売上高',
+                    label: '',
                     data: salesValues,
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.8)',
@@ -153,6 +154,31 @@
                 animation: {
                     duration: 1000,
                     easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            font: {
+                                size: 14 // 라벨 글씨 크기 설정
+                            },
+                            padding: 20 // 라벨 간격 설정
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'カテゴリ別総売上高',
+                        font: {
+                            size: 18 // 제목 글씨 크기 설정
+                        }
+                    },
+                    tooltip: {
+                        bodyFont: {
+                            size: 16 // Tooltip 글씨 크기 설정
+                        },
+                        titleFont: {
+                            size: 16 // Tooltip 제목 글씨 크기 설정
+                        }
+                    }
                 }
             }
         });
@@ -163,7 +189,7 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'カテゴリ別販売量',
+                    label: '',
                     data: quantityValues,
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.8)',
@@ -190,6 +216,31 @@
                 animation: {
                     duration: 1000,
                     easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            font: {
+                                size: 14 // 라벨 글씨 크기 설정
+                            },
+                            padding: 20 // 라벨 간격 설정
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'カテゴリ別販売量',
+                        font: {
+                            size: 18 // 제목 글씨 크기 설정
+                        }
+                    },
+                    tooltip: {
+                        bodyFont: {
+                            size: 16 // Tooltip 글씨 크기 설정
+                        },
+                        titleFont: {
+                            size: 16 // Tooltip 제목 글씨 크기 설정
+                        }
+                    }
                 }
             }
         });

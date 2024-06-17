@@ -11,11 +11,14 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,89 +34,276 @@ public class SalesService {
 		this.categoryRepository = categoryRepository;
 	}
 
-	// プロセスでフィルタリングされた販売リストを取得
-	public double calculateTotalCostByProcess(int process) {
-		List<Sales> salesList = findByProcess(process).stream()
-				.filter(s -> s.getProcess() == 1)
-				.collect(Collectors.toList());
-
-		double totalCost = 0.0;
-
-		for (Sales sale : salesList) {
-			Menu menu = menuRepository.findById(sale.getMenu()).orElseThrow(() -> new RuntimeException("Menu not found"));
-			totalCost += sale.getQuantity() * menu.getCost();
-		}
-
-		return totalCost;
+	// 새로운 판매 기록을 저장
+	public void save(SalesRequest salesRequest) {
+		salesRepository.save(salesRequest.toEntity());
 	}
 
-	// メニューの販売データを計算
-	public Map<String, Object> calculateMenuSalesData(Long menuId) {
-		Menu menu = menuRepository.findById(menuId).orElseThrow(() -> new RuntimeException("Menu not found"));
-		List<Sales> salesList = salesRepository.findByMenu(menuId);
-
-		int totalQuantity = 0;
-		double totalSalesAmount = 0.0;
-
-		// 総売上、総販売量を計算
-		for (Sales sale : salesList) {
-			totalQuantity += sale.getQuantity();
-			totalSalesAmount += sale.getPrice() * sale.getQuantity();
-		}
-
-		DecimalFormat salesFormatter = new DecimalFormat("#,###");
-		String formattedTotalSalesAmount = salesFormatter.format(totalSalesAmount);
-
-		// 利益率を計算
-		double profitRate = 100.0 * (menu.getPrice() - menu.getCost()) / menu.getPrice();
-		DecimalFormat profitFormatter = new DecimalFormat("#0.0");
-		String formattedProfitRate = profitFormatter.format(profitRate);
-
-		Map<String, Object> result = new HashMap<>();
-		result.put("menu", menu);
-		result.put("salesListall", salesList);
-		result.put("totalQuantity", totalQuantity);
-		result.put("totalSalesAmount", formattedTotalSalesAmount);
-		result.put("profitRate", formattedProfitRate);
-
-		return result;
+	public void save2(SalesRequest salesRequest) {
+		Sales sales = salesRequest.toEntity();
+		salesRepository.save(sales);
 	}
 
-	// 販売をIDで削除
-	public void deleteById(SalesRequest salesRequest) {
-		salesRepository.deleteById(salesRequest.getId());
-	}
-
-	// すべての販売を検索
+	// 모든 판매 기록을 조회
 	public List<Sales> findAll() {
 		return salesRepository.findAll();
 	}
 
-	// プロセスで販売を検索
-	public List<Sales> findByProcess(int process) {
-		return salesRepository.findByProcess(process);
-	}
-
-	// IDで販売を検索
+	// ID로 판매 기록을 조회
 	public Sales findById(Long id) {
 		return salesRepository.findById(id).orElse(null);
 	}
 
-	// 今日の販売を検索
+	// 판매 기록을 ID로 삭제
+	public void deleteById(SalesRequest salesRequest) {
+		salesRepository.deleteById(salesRequest.getId());
+	}
+
+	// 시간별 판매액을 계산 관리자 페이지 - 홈 페이지
+	public Map<LocalDateTime, Double> getHourlySalesByDay(LocalDateTime startOfDay, LocalDateTime endOfDay) {
+		List<Sales> salesList = salesRepository.findSalesByDateRangeAndProcess(startOfDay, endOfDay);
+		Map<LocalDateTime, Double> hourlySales = new TreeMap<>();
+
+		for (Sales sales : salesList) {
+			LocalDateTime hour = sales.getDate().withMinute(0).withSecond(0).withNano(0);
+			hour = hour.withHour(hour.getHour());
+			double salesAmount = sales.getPrice() * sales.getQuantity();
+			hourlySales.put(hour, hourlySales.getOrDefault(hour, 0.0) + salesAmount);
+		}
+
+		return hourlySales;
+	}
+
+	// 오늘 현재시간까지의 판매액을 계산 관리자 페이지 - 홈 페이지
+	public double getTotalSalesUntilNow(LocalDateTime now) {
+		LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+		List<Sales> salesList = salesRepository.findSalesByDateRangeAndProcess(startOfDay, now);
+		return salesList.stream()
+				.mapToDouble(s -> s.getPrice() * s.getQuantity())
+				.sum();
+	}
+
+	// 시간별 누적 매출 데이터를 포맷팅 관리자 페이지 - 홈 페이지
+	public Map<String, Double> getFormattedHourlySales(Map<LocalDateTime, Double> hourlySales) {
+		Map<String, Double> formattedHourlySales = new TreeMap<>();
+		DateTimeFormatter hourFormatter = DateTimeFormatter.ofPattern("HH:mm");
+		double cumulativeSales = 0.0;
+
+		for (Map.Entry<LocalDateTime, Double> entry : hourlySales.entrySet()) {
+			cumulativeSales += entry.getValue();
+			formattedHourlySales.put(entry.getKey().format(hourFormatter), cumulativeSales);
+		}
+
+		return formattedHourlySales;
+	}
+
+	// 오늘 현재시간까지의 포맷된 총 매출을 반환 관리자 페이지 - 홈 페이지
+	public String getFormattedTotalSalesUntilNow(LocalDateTime now) {
+		double totalSalesToday = getTotalSalesUntilNow(now);
+		NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
+		return numberFormat.format(totalSalesToday);
+	}
+
+	// 프로세스로 연간 총 판매량을 계산/1번째 버튼 年度別総売上高
+	public Map<Integer, Double> getYearlySalesByProcess() {
+		List<Sales> salesList = salesRepository.findYearlySalesByProcess();
+		return salesList.stream()
+				.collect(Collectors.groupingBy(
+						s -> s.getDate().atZone(java.time.ZoneId.systemDefault()).getYear(),
+						Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
+				));
+	}
+
+	// 연도별 매출 데이터를 포맷팅/1번째 버튼 年度別総売上高
+	public Map<String, Double> getFormattedYearlySales(Map<Integer, Double> yearlySales) {
+		return yearlySales.entrySet()
+				.stream()
+				.sorted(Map.Entry.comparingByKey())
+				.collect(Collectors.toMap(
+						entry -> entry.getKey().toString(),
+						Map.Entry::getValue,
+						(e1, e2) -> e1,
+						LinkedHashMap::new
+				));
+	}
+
+	//월별 총 판매액을 반환하는 메서드/2번째 버튼 月別総売上高
+	public Map<String, Double> getMonthlySalesByProcess() {
+		List<Sales> salesList = salesRepository.findMonthlySalesByProcess();
+		Map<String, Double> monthlySales = new TreeMap<>();
+
+		// 초기값 설정
+		LocalDate currentDate = LocalDate.now();
+		for (int year = salesList.get(0).getDate().getYear(); year <= currentDate.getYear(); year++) {
+			for (int month = 1; month <= 12; month++) {
+				String key = String.format("%d-%02d", year, month);
+				monthlySales.put(key, 0.0);
+			}
+		}
+
+		// 매출 데이터 업데이트
+		for (Sales sales : salesList) {
+			String key = String.format("%d-%02d", sales.getDate().getYear(), sales.getDate().getMonthValue());
+			monthlySales.put(key, monthlySales.get(key) + sales.getPrice() * sales.getQuantity());
+		}
+
+		return monthlySales;
+	}
+
+	// 입력된 날짜(연-월일)의  총 판매량을 계산//3번째 버튼 日商/週間売上
+	public double getTotalSalesByDay(int year, int month, int day) {
+		List<Sales> salesList = salesRepository.findSalesByDayAndProcess(year, month, day);
+		return salesList.stream()
+				.mapToDouble(s -> s.getPrice() * s.getQuantity())
+				.sum();
+	}
+
+	//입력된 날짜(연-월-일)가 속한 주의 주별 매출(1주간 총매출, 요일별 매출)을 반환하는 메서드//3번째 버튼 日商/週間売上
+	public Map<LocalDate, Double> getWeeklySalesByDay(int year, int month, int day) {
+		LocalDate date = LocalDate.of(year, month, day);
+		LocalDate startOfWeek = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+		LocalDate endOfWeek = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
+
+		// Adjust to LocalDateTime for querying
+		LocalDateTime startOfWeekDateTime = startOfWeek.atStartOfDay();
+		LocalDateTime endOfWeekDateTime = endOfWeek.atTime(23, 59, 59);
+
+		List<Sales> salesList = salesRepository.findSalesByDateRange(startOfWeekDateTime, endOfWeekDateTime);
+		Map<LocalDate, Double> weeklySales = new TreeMap<>();
+
+		for (Sales sales : salesList) {
+			LocalDate salesDate = sales.getDate().toLocalDate(); // Convert LocalDateTime to LocalDate
+			double salesAmount = sales.getPrice() * sales.getQuantity();
+			weeklySales.put(salesDate, weeklySales.getOrDefault(salesDate, 0.0) + salesAmount);
+		}
+
+		return weeklySales;
+	}
+
+	// 카테고리와 프로세스로 총 판매량을 계산
+	public int getTotalSalesByCategory(int categoryId, int process) {
+		List<Sales> allSales = salesRepository.findByCategoryAndProcess(categoryId, process);
+
+		int totalSales = 0;
+
+		for (Sales sale : allSales) {
+			totalSales += sale.getPrice() * sale.getQuantity();
+		}
+
+		return totalSales;
+	}
+
+	// 프로세스로 판매 기록을 조회
+	public List<Sales> findByProcess(int process) {
+		return salesRepository.findByProcess(process);
+	}
+
+	// 오늘 날짜의 판매 기록을 조회
 	public Map<String, Long> findSalesByToday() {
+
 		LocalDate localDate = LocalDate.now();
 		List<Sales> salesList = salesRepository.findSalesByToday(localDate);
 		List<Menu> menuList = menuRepository.findAll();
 		Map<Long, String> menuMap = menuList.stream()
 				.collect(Collectors.toMap(Menu::getId, Menu::getName));
-		return salesList.stream()
+		Map<String, Long> result = salesList.stream()
 				.collect(Collectors.groupingBy(
 						sales -> menuMap.get(Long.parseLong(String.valueOf(sales.getMenu()))),
 						Collectors.counting()
 				));
+		return result;
 	}
 
-	// プロセスでフィルタリングされた販売リストを取得
+
+
+	//카테고리별 판매액 계산
+	public Map<String, Double> getTotalSalesByCategory() {
+		List<Sales> salesList = salesRepository.findAllSales();
+		List<Category> categoryList = categoryRepository.findAll();
+
+		// 카테고리 ID와 이름을 매핑
+		Map<Integer, String> categoryMap = categoryList.stream()
+				.collect(Collectors.toMap(category -> Math.toIntExact(category.getId()), Category::getName));
+
+		// 판매 데이터를 카테고리 이름으로 그룹화
+		return salesList.stream()
+				.collect(Collectors.groupingBy(
+						sales -> categoryMap.get(sales.getCategory()),
+						Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
+				));
+	}
+
+	//메뉴별 판매액 계싼
+	public Map<String, Double> getTotalSalesByMenu() {
+		List<Sales> salesList = salesRepository.findAllSales();
+		List<Menu> menuList = menuRepository.findAll();
+
+		// 메뉴 ID와 이름을 매핑
+		Map<Integer, String> menuMap = menuList.stream()
+				.collect(Collectors.toMap(menu -> Math.toIntExact(menu.getId()), Menu::getName));
+
+		// menuMap에 없는 키를 가진 판매 항목을 필터링
+		return salesList.stream()
+				.filter(sales -> menuMap.containsKey(sales.getMenu()))
+				.collect(Collectors.groupingBy(
+						sales -> menuMap.get(sales.getMenu()),
+						Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
+				));
+	}
+
+	// 연도별 총 판매량을 계산
+	public double getTotalSalesByYear(int year) {
+		List<Sales> salesList = salesRepository.findSalesByYearAndProcess(year);
+		return salesList.stream()
+				.mapToDouble(s -> s.getPrice() * s.getQuantity())
+				.sum();
+	}
+
+	// 연도와 월별 총 판매량을 계산
+	public double getTotalSalesByYearAndMonth(int year, int month) {
+		List<Sales> salesList = salesRepository.findSalesByYearAndMonthAndProcess(year, month);
+		return salesList.stream()
+				.mapToDouble(s -> s.getPrice() * s.getQuantity())
+				.sum();
+	}
+
+
+
+
+
+	public int getCountByMenuAfterDaysAgo(long menuId, int days) {
+		return salesRepository.getCountByMenuAfterDaysAgo(menuId, days);
+	}
+
+	// 현재 월과 전월의 매출을 계산하여 전월대비 매출 상승률을 계산
+	public double getMonthlySalesGrowthRate(int year, int month) {
+		// 현재 월 매출
+		double currentMonthSales = getTotalSalesByYearAndMonth(year, month);
+
+		// 전월 매출 계산 (년과 월을 고려하여 처리)
+		int previousYear = month == 1 ? year - 1 : year;
+		int previousMonth = month == 1 ? 12 : month - 1;
+		double previousMonthSales = getTotalSalesByYearAndMonth(previousYear, previousMonth);
+
+		// 전월대비 매출 상승률 계산
+		if (previousMonthSales == 0) {
+			return 0; // 전월 매출이 0인 경우 상승률 계산 불가
+		}
+		return ((currentMonthSales - previousMonthSales) / previousMonthSales) * 100;
+	}
+
+
+
+
+	//연도와 카테고리별 총 판매액을 계산
+	public double getTotalSalesByYearAndCategory(int year, int category) {
+		List<Sales> salesList = salesRepository.findSalesByYearAndCategory(year, category);
+		return salesList.stream()
+				.mapToDouble(s -> s.getPrice() * s.getQuantity())
+				.sum();
+	}
+
+	// 날짜 범위에 따른 카테고리별 매출액 도출 4번째 버튼 カテゴリ別売上販売の現状
 	public Map<String, Double> getSalesByCategoryInRange(LocalDateTime startDate, LocalDateTime endDate) {
 		List<Sales> salesList = salesRepository.findSalesByDateRangeWithProcess(startDate, endDate);
 		List<Category> categoryList = categoryRepository.findAll();
@@ -129,7 +319,7 @@ public class SalesService {
 				));
 	}
 
-	// 範囲内の日付でメニューの販売数を取得
+	// 날짜 범위에 따른 카테고리별 판매량 도출 4번째 버튼 カテゴリ別売上販売の現状
 	public Map<String, Integer> getQuantityByCategoryInRange(LocalDateTime startDate, LocalDateTime endDate) {
 		List<Sales> salesList = salesRepository.findSalesByDateRangeWithProcess(startDate, endDate);
 		List<Category> categoryList = categoryRepository.findAll();
@@ -145,23 +335,7 @@ public class SalesService {
 				));
 	}
 
-	// 範囲内の日付でメニューの販売数を取得
-	public Map<String, Integer> getQuantityByMenuInRange(LocalDateTime startDate, LocalDateTime endDate) {
-		List<Sales> salesList = salesRepository.findSalesByDateRangeWithProcess(startDate, endDate);
-		List<Menu> menuList = menuRepository.findAll();
-
-		Map<Long, String> menuMap = menuList.stream()
-				.collect(Collectors.toMap(Menu::getId, Menu::getName));
-
-		return salesList.stream()
-				.filter(sales -> menuMap.containsKey(sales.getMenu()))
-				.collect(Collectors.groupingBy(
-						sales -> menuMap.get(sales.getMenu()),
-						Collectors.summingInt(Sales::getQuantity)
-				));
-	}
-
-	// 範囲内の日付でメニューの販売を取得
+	//날짜범위에 따른 메뉴별 매출액 도출 위한 쿼리 5번째 버튼 メニュー別売上販売の現状
 	public Map<String, Double> getSalesByMenuInRange(LocalDateTime startDate, LocalDateTime endDate) {
 		List<Sales> salesList = salesRepository.findSalesByDateRangeWithProcess(startDate, endDate);
 		List<Menu> menuList = menuRepository.findAll();
@@ -177,134 +351,30 @@ public class SalesService {
 				));
 	}
 
-	// 日毎の時間ごとの販売を取得
-	public Map<LocalDateTime, Double> getHourlySalesByDay(LocalDateTime startOfDay, LocalDateTime endOfDay) {
-		List<Sales> salesList = salesRepository.findSalesByDateRangeAndProcess(startOfDay, endOfDay);
-		Map<LocalDateTime, Double> hourlySales = new TreeMap<>();
-
-		for (Sales sales : salesList) {
-			LocalDateTime hour = sales.getDate().withMinute(0).withSecond(0).withNano(0);
-			hour = hour.withHour(hour.getHour());
-			double salesAmount = sales.getPrice() * sales.getQuantity();
-			hourlySales.put(hour, hourlySales.getOrDefault(hour, 0.0) + salesAmount);
-		}
-
-		return hourlySales;
-	}
-
-	// メニューIDで特定の日数後の販売数を取得
-	public int getCountByMenuAfterDaysAgo(long menuId, int days) {
-		return salesRepository.getCountByMenuAfterDaysAgo(menuId, days);
-	}
-
-	// 月ごとの販売成長率を取得
-	public double getMonthlySalesGrowthRate(int year, int month) {
-		// 現在の月の売上
-		double currentMonthSales = getTotalSalesByYearAndMonth(year, month);
-
-		// 前月の売上を計算
-		int previousYear = month == 1 ? year - 1 : year;
-		int previousMonth = month == 1 ? 12 : month - 1;
-		double previousMonthSales = getTotalSalesByYearAndMonth(previousYear, previousMonth);
-
-		// 前月比の売上成長率を計算
-		if (previousMonthSales == 0) {
-			return 0; // 前月の売上が0の場合、成長率を計算できない
-		}
-		return ((currentMonthSales - previousMonthSales) / previousMonthSales) * 100;
-	}
-
-	// 月ごとの売上を取得
-	public Map<String, Double> getMonthlySalesByProcess() {
-		List<Sales> salesList = salesRepository.findMonthlySalesByProcess();
-		Map<String, Double> monthlySales = new TreeMap<>();
-
-		// 初期値を設定
-		LocalDate currentDate = LocalDate.now();
-		for (int year = salesList.get(0).getDate().getYear(); year <= currentDate.getYear(); year++) {
-			for (int month = 1; month <= 12; month++) {
-				String key = String.format("%d-%02d", year, month);
-				monthlySales.put(key, 0.0);
-			}
-		}
-
-		// 売上データを更新
-		for (Sales sales : salesList) {
-			String key = String.format("%d-%02d", sales.getDate().getYear(), sales.getDate().getMonthValue());
-			monthlySales.put(key, monthlySales.get(key) + sales.getPrice() * sales.getQuantity());
-		}
-
-		return monthlySales;
-	}
-
-	// (旧)年別とカテゴリ別の総販売額を計算
-	public double getTotalSalesByYearAndCategory(int year, int category) {
-		List<Sales> salesList = salesRepository.findSalesByYearAndCategory(year, category);
-		return salesList.stream()
-				.mapToDouble(s -> s.getPrice() * s.getQuantity())
-				.sum();
-	}
-
-	// 範囲内の日付の総販売額を計算
-	public double getTotalSalesByDay(int year, int month, int day) {
-		List<Sales> salesList = salesRepository.findSalesByDayAndProcess(year, month, day);
-		return salesList.stream()
-				.mapToDouble(s -> s.getPrice() * s.getQuantity())
-				.sum();
-	}
-
-	// 年別と月別の総販売額を計算
-	public double getTotalSalesByYearAndMonth(int year, int month) {
-		List<Sales> salesList = salesRepository.findSalesByYearAndMonthAndProcess(year, month);
-		return salesList.stream()
-				.mapToDouble(s -> s.getPrice() * s.getQuantity())
-				.sum();
-	}
-
-	// 年別の総販売額を計算
-	public double getTotalSalesByYear(int year) {
-		List<Sales> salesList = salesRepository.findSalesByYearAndProcess(year);
-		return salesList.stream()
-				.mapToDouble(s -> s.getPrice() * s.getQuantity())
-				.sum();
-	}
-
-	// カテゴリ別の総販売額を取得
-	public Map<String, Double> getTotalSalesByCategory() {
-		List<Sales> salesList = salesRepository.findAllSales();
-		List<Category> categoryList = categoryRepository.findAll();
-
-		// カテゴリIDと名前をマッピング
-		Map<Integer, String> categoryMap = categoryList.stream()
-				.collect(Collectors.toMap(category -> Math.toIntExact(category.getId()), Category::getName));
-
-		// 販売データをカテゴリ名でグループ化
-		return salesList.stream()
-				.collect(Collectors.groupingBy(
-						sales -> categoryMap.get(sales.getCategory()),
-						Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
-				));
-	}
-
-	// メニュー別の総販売額を取得
-	public Map<String, Double> getTotalSalesByMenu() {
-		List<Sales> salesList = salesRepository.findAllSales();
+	//날짜범위에 따른 메뉴별 판매량 도출 위한 쿼리 5번째 버튼 メニュー別売上販売の現状
+	public Map<String, Integer> getQuantityByMenuInRange(LocalDateTime startDate, LocalDateTime endDate) {
+		List<Sales> salesList = salesRepository.findSalesByDateRangeWithProcess(startDate, endDate);
 		List<Menu> menuList = menuRepository.findAll();
 
-		// メニューIDと名前をマッピング
-		Map<Integer, String> menuMap = menuList.stream()
-				.collect(Collectors.toMap(menu -> Math.toIntExact(menu.getId()), Menu::getName));
+		Map<Long, String> menuMap = menuList.stream()
+				.collect(Collectors.toMap(Menu::getId, Menu::getName));
 
-		// menuMapに存在しないキーを持つ販売項目をフィルタリング
 		return salesList.stream()
 				.filter(sales -> menuMap.containsKey(sales.getMenu()))
 				.collect(Collectors.groupingBy(
 						sales -> menuMap.get(sales.getMenu()),
-						Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
+						Collectors.summingInt(Sales::getQuantity)
 				));
 	}
 
-	// 総販売と数量をプロセス別に取得
+
+
+	//파라미터로 받아온 id로 sales data 읽기
+	public List<Sales> findSalesByMenuId(Long menuId) {
+		return salesRepository.findByMenu(menuId);
+	}
+
+	//프로세스가 1인(판매완료) 매출량, 매출액 계산
 	public Map<String, Double> getTotalSalesAndQuantityByProcess(int process) {
 		List<Sales> salesList = findByProcess(process).stream()
 				.filter(s -> s.getProcess() == 1)
@@ -323,55 +393,130 @@ public class SalesService {
 		return result;
 	}
 
-	// 注文を保存
-	public void save(SalesRequest salesRequest) {
-		salesRepository.save(salesRequest.toEntity());
-	}
+	//프로세스가 1인(판매완료) 원가의 총합 계산
+	public double calculateTotalCostByProcess(int process) {
+		List<Sales> salesList = findByProcess(process).stream()
+				.filter(s -> s.getProcess() == 1)
+				.collect(Collectors.toList());
 
-	// 注文を保存
-	public void save2(SalesRequest salesRequest) {
-		Sales sales = salesRequest.toEntity();
-		salesRepository.save(sales);
-	}
+		double totalCost = 0.0;
 
-	// 入力された日付の週ごとの販売を取得
-	public Map<LocalDate, Double> getWeeklySalesByDay(int year, int month, int day) {
-		LocalDate date = LocalDate.of(year, month, day);
-		LocalDate startOfWeek = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
-		LocalDate endOfWeek = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
-
-		// クエリのためにLocalDateTimeに調整
-		LocalDateTime startOfWeekDateTime = startOfWeek.atStartOfDay();
-		LocalDateTime endOfWeekDateTime = endOfWeek.atTime(23, 59, 59);
-
-		List<Sales> salesList = salesRepository.findSalesByDateRange(startOfWeekDateTime, endOfWeekDateTime);
-		Map<LocalDate, Double> weeklySales = new TreeMap<>();
-
-		for (Sales sales : salesList) {
-			LocalDate salesDate = sales.getDate().toLocalDate(); // LocalDateTimeをLocalDateに変換
-			double salesAmount = sales.getPrice() * sales.getQuantity();
-			weeklySales.put(salesDate, weeklySales.getOrDefault(salesDate, 0.0) + salesAmount);
+		for (Sales sale : salesList) {
+			Menu menu = menuRepository.findById(sale.getMenu()).orElseThrow(() -> new RuntimeException("Menu not found"));
+			totalCost += sale.getQuantity() * menu.getCost();
 		}
 
-		return weeklySales;
+		return totalCost;
 	}
 
-	// 現在までの総販売額を取得
-	public double getTotalSalesUntilNow(LocalDateTime now) {
-		LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
-		List<Sales> salesList = salesRepository.findSalesByDateRangeAndProcess(startOfDay, now);
+	//특정 메뉴의 매출 데이터
+	public Map<String, Object> calculateMenuSalesData(Long menuId) {
+		Menu menu = menuRepository.findById(menuId).orElseThrow(() -> new RuntimeException("Menu not found"));
+		List<Sales> salesList = salesRepository.findByMenu(menuId);
+
+		int totalQuantity = 0;
+		double totalSalesAmount = 0.0;
+
+		//총매출, 총판매량 계산
+		for (Sales sale : salesList) {
+			totalQuantity += sale.getQuantity();
+			totalSalesAmount += sale.getPrice() * sale.getQuantity();
+		}
+
+		//이익률 계산
+		double profitRate = 100.0 * (menu.getPrice() - menu.getCost()) / menu.getPrice();
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("menu", menu);
+		result.put("salesListall", salesList);
+		result.put("totalQuantity", totalQuantity);
+		result.put("totalSalesAmount", totalSalesAmount); // Double 형식으로 유지
+		result.put("profitRate", profitRate);
+
+		return result;
+	}
+
+	// 오늘의 총 판매량과 판매액을 계산
+	public Map<String, Double> getTotalSalesAndQuantityToday() {
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime startOfToday = now.toLocalDate().atStartOfDay();
+
+		return getTotalSalesAndQuantityByDateRange(startOfToday, now);
+	}
+
+	// 이번 주의 총 판매량과 판매액을 계산
+	public Map<String, Double> getTotalSalesAndQuantityThisWeek() {
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime startOfWeek = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)).toLocalDate().atStartOfDay();
+		LocalDateTime endOfWeek = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY)).toLocalDate().atTime(23, 59, 59);
+
+		return getTotalSalesAndQuantityByDateRange(startOfWeek, endOfWeek);
+	}
+
+	// 이번 달의 총 판매량과 판매액을 계산
+	public Map<String, Double> getTotalSalesAndQuantityThisMonth() {
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime startOfMonth = now.withDayOfMonth(1).toLocalDate().atStartOfDay();
+
+		return getTotalSalesAndQuantityByDateRange(startOfMonth, now);
+	}
+
+	// 이번 분기의 총 판매량과 판매액을 계산
+	public Map<String, Double> getTotalSalesAndQuantityThisQuarter() {
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime startOfQuarter = now.with(now.getMonth().firstMonthOfQuarter()).withDayOfMonth(1).toLocalDate().atStartOfDay();
+
+		return getTotalSalesAndQuantityByDateRange(startOfQuarter, now);
+	}
+
+	// 금년도의 총 판매량과 판매액을 계산
+	public Map<String, Double> getTotalSalesAndQuantityThisYear() {
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime startOfYear = now.withDayOfYear(1).toLocalDate().atStartOfDay();
+
+		return getTotalSalesAndQuantityByDateRange(startOfYear, now);
+	}
+
+	// 날짜 범위에 따른 총 판매량과 판매액을 계산
+	public Map<String, Double> getTotalSalesAndQuantityByDateRange(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+		List<Sales> salesList = salesRepository.findSalesByDateRangeWithProcess(startDateTime, endDateTime);
+		double totalSalesAmount = salesList.stream()
+				.mapToDouble(s -> s.getPrice() * s.getQuantity())
+				.sum();
+		int totalQuantity = salesList.stream()
+				.mapToInt(Sales::getQuantity)
+				.sum();
+
+		Map<String, Double> result = new HashMap<>();
+		result.put("totalSalesAmount", totalSalesAmount);
+		result.put("totalQuantity", Double.valueOf(totalQuantity));
+		return result;
+	}
+
+	//날짜 범위에 따른 총 판매액 계산
+	public double getTotalSalesByDateRange(LocalDateTime startDateTime, LocalDateTime endDateTime, Long menuId) {
+		List<Sales> salesList = salesRepository.findSalesByDateRangeWithProcess(startDateTime, endDateTime);
 		return salesList.stream()
+				.filter(s -> s.getMenu() == menuId)
 				.mapToDouble(s -> s.getPrice() * s.getQuantity())
 				.sum();
 	}
 
-	// プロセス別に年間の総販売額を取得
-	public Map<Integer, Double> getYearlySalesByProcess() {
-		List<Sales> salesList = salesRepository.findYearlySalesByProcess();
+	//날짜 범위에 따른 총 판매량 계산
+	public int getTotalQuantityByDateRange(LocalDateTime startDateTime, LocalDateTime endDateTime, Long menuId) {
+		List<Sales> salesList = salesRepository.findSalesByDateRangeWithProcess(startDateTime, endDateTime);
 		return salesList.stream()
-				.collect(Collectors.groupingBy(
-						s -> s.getDate().atZone(java.time.ZoneId.systemDefault()).getYear(),
-						Collectors.summingDouble(s -> s.getPrice() * s.getQuantity())
-				));
+				.filter(s -> s.getMenu() == menuId)
+				.mapToInt(Sales::getQuantity)
+				.sum();
 	}
+
+
+
+
+
+
+
+
+
 }
