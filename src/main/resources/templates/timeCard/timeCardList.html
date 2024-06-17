@@ -41,7 +41,7 @@
             <input type="text" id="searchInput" class="form-control" placeholder="Search by Username" oninput="filterTimeCards()" style="margin-right: 10px;">
             <input type="date" id="startDate" class="form-control" style="margin-right: 10px;">
             <input type="date" id="endDate" class="form-control" style="margin-right: 10px;">
-            <button class="btn btn-primary" onclick="filterByDate()">日付けで検索</button>
+            <button class="btn btn-primary" onclick="filterByDate()">日付で検索</button>
         </div>
         <div class="table-responsive">
             <div style="border-left: none; border-right: none" class="table">
@@ -100,7 +100,6 @@
             for (let i = 0; i < rows.length; i++) {
                 let inDateStr = rows[i].getElementsByClassName('col')[1].textContent.trim();
                 let outDateStr = rows[i].getElementsByClassName('col')[2].textContent.trim();
-                console.log(startDate, endDate, inDateStr, outDateStr);
                 // 날짜 형식이 올바른지 확인하고, 형식이 올바른 경우에만 Date 객체로 변환
                 let inDate = parseDate(inDateStr);
                 let outDate = parseDate(outDateStr);
@@ -118,6 +117,21 @@
                 }
             }
         }
+        document.getElementById('startDate').addEventListener('change', function() {
+            let startDateInput = this.value;
+            // YYYY-MM-DD 형식 문자열 얻어냄
+            let endDateInput = document.getElementById('endDate');
+
+            if (startDateInput) {
+                let startDate = new Date(startDateInput);
+                // 연산을 위해서 Date 타입 객체로 만듦
+                startDate.setDate(startDate.getDate() + 1); // 시작 날짜의 다음 날
+
+                // 다시 html의 input type="date"에 세팅해주기 위해 YYYY-MM-DD 형식 문자열로 변환
+                let nextDay = startDate.toISOString().split('T')[0];
+                endDateInput.value = nextDay;
+            }
+        });
 
         // 문자열을 Date 객체로 변환하는 함수
         function parseDate(dateStr) {

@@ -15,7 +15,7 @@ public class TimeCardRequest {
     private String end;
 
     public TimeCardRequest(TimeCard timeCard) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         this.id = timeCard.getId();
         this.staffName = timeCard.getStaff().getName();
         this.start = timeCard.getStart().format(formatter);
