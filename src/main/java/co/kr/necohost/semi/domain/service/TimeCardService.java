@@ -1,6 +1,7 @@
 package co.kr.necohost.semi.domain.service;
 
 import co.kr.necohost.semi.domain.model.dto.StaffRequest;
+import co.kr.necohost.semi.domain.model.dto.TimeCardRequest;
 import co.kr.necohost.semi.domain.model.entity.Staff;
 import co.kr.necohost.semi.domain.model.entity.TimeCard;
 import co.kr.necohost.semi.domain.repository.StaffRepository;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TimeCardService {
@@ -27,13 +29,19 @@ public class TimeCardService {
 		return timeCardRepository.findAll();
 	}
 
-//	public Optional<TimeCard> getTimeCardByUserName(StaffRequest request){
-//		Staff staff = staffRepository.findByUsername(request.getUsername())
-//				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
-//        return timeCardRepository.findTopByStaffOrderByStartDesc(staff);
-//	}
+	public List<TimeCardRequest> getAllTimeCardDesc() {
+		return timeCardRepository.findAllByOrderByStartDesc().stream()
+				.map(TimeCardRequest::new)
+				.collect(Collectors.toList());
+	}
 
-	public Optional<TimeCard> clockIn(StaffRequest request) {
+	public Optional<TimeCard> getTimeCardByUserName(StaffRequest request){
+		Staff staff = staffRepository.findByUsername(request.getUsername())
+				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
+        return timeCardRepository.findTopByStaffOrderByStartDesc(staff);
+	}
+
+	public void clockIn(StaffRequest request) {
 		Staff staff = staffRepository.findByUsername(request.getUsername())
 				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
 
@@ -43,7 +51,6 @@ public class TimeCardService {
 		if (recentTimeCard.isPresent() && recentTimeCard.get().getStart().toLocalDate().isEqual(now.toLocalDate())) {
 			// 중복 출근
 			System.out.println("Already clocked in today.");
-			return recentTimeCard;
 		}
 
 		// 새로운 타임카드 생성
@@ -52,11 +59,9 @@ public class TimeCardService {
 		timeCard.setStart(now);
 		timeCardRepository.save(timeCard);
 		System.out.println("Clock in recorded.");
-
-		return recentTimeCard;
 	}
 
-	public Optional<TimeCard> clockOut(StaffRequest request) {
+	public void clockOut(StaffRequest request) {
 		Staff staff = staffRepository.findByUsername(request.getUsername())
 				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
 
@@ -76,7 +81,5 @@ public class TimeCardService {
 			// 현재 시각의 날짜와 다르다면 오류 발생
 			System.out.println("Cannot clock out without clocking in today.");
 		}
-
-		return recentTimeCard;
 	}
 }
