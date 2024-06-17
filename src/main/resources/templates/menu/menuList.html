@@ -155,16 +155,11 @@
 
                 menuName.style.setProperty('--translate-x', translateX);
 
-                // 애니메이션 재시작을 위한 트릭
-                menuName.style.animation = 'none';
-                menuName.offsetHeight; /* trigger reflow */
-                menuName.style.animation = '';
-
-                // span의 너비와 부모 요소의 너비를 비교
-                if (menuName.scrollWidth > container.clientWidth) {
-                    container.querySelector('.menu-name').classList.add('marquee');
+                // span이 들어가는 div의 너비와 부모 요소의 너비를 비교
+                if (menuNameWidth > containerWidth) {
+                    menuName.classList.add('marquee');
                 } else {
-                    container.querySelector('.menu-name').classList.remove('marquee');
+                    menuName.classList.remove('marquee');
                 }
             });
 
@@ -471,7 +466,7 @@
 
         .menu-name.marquee span {
             display: inline-block;
-            animation: marquee 4s linear infinite;
+            animation: marquee 5s linear infinite;
         }
 
         @keyframes marquee {
