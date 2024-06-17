@@ -1,128 +1,163 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu Sales Report</title>
-    <link rel="stylesheet" href="/css/metroStyle.css"><!-- Provided CSS file link -->
+    <title>POSOLDESK 売上管理プログラム</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/metroStyle.css">
     <style>
-        .menu-report {
+        body {
+            background: linear-gradient(to right, #4CA1AF, #C4E0E5);
+            color: black; /* 모든 텍스트를 검정색으로 설정 */
+        }
+        .navbar {
+            background-color: whitesmoke;
+            padding: 10px;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            background-color: white;
+            justify-content: flex-start;
+        }
+        .navbar a {
+            color: black;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1.5rem;
+            transition: background-color 0.3s, font-size 0.3s, transform 0.3s;
+            padding: 8px 16px;
+            display: inline-block;
+            position: relative;
+        }
+        .navbar a:hover {
+            cursor: pointer;
+            background-color: #ADD8E6;
+            color: white;
+            transform: scale(1.05);
+        }
+        .content {
+            margin: 20px auto;
             padding: 20px;
+            background-color: white;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 80%;
-            margin: auto;
+            width: 90%;
+        }
+        h1, h2 {
+            text-align: center;
+            color: black; /* 제목을 검정색으로 설정 */
+        }
+        .table-container {
             margin-top: 20px;
         }
-        .menu-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .menu-header img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            margin-right: 20px;
-        }
-        .menu-details {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-        }
-        .menu-stats, .menu-info {
-            width: 48%;
-        }
-        .stat-box {
-            background-color: #f8f9fa;
-            padding: 10px;
+        .table-container img {
+            display: block;
+            margin: 0 auto 20px auto;
+            max-width: 100%;
+            height: auto;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            text-align: center;
         }
-        .stat-box h3 {
-            margin: 0;
-            color: #333;
+        .table-container table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 1rem;
         }
-        .stat-box p {
-            margin: 5px 0;
-            color: #555;
+        .table-container th, .table-container td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            color: black; /* 테이블 글씨를 검정색으로 설정 */
+        }
+        .table-container th {
+            background-color: #f2f2f2;
+            color: black; /* 테이블 헤더 글씨를 검정색으로 설정 */
         }
     </style>
 </head>
 <body>
-
 <div class="navbar">
-    <a href="#">Home</a>
-    <a href="#">Menu</a>
-    <a href="#">Reports</a>
-    <a href="#">Settings</a>
+    <a href="/adminSalesMainHome">ホーム</a>
+    <a href="/adminSalesMainMenu">メニュー</a>
 </div>
-
-<div class="menu-report">
-    <div class="menu-header">
-        <img src="menu-image.jpg" alt="Menu Image">
-        <div>
-            <h1>Americano</h1>
-            <p>Classic espresso with hot water</p>
-        </div>
-    </div>
-
-    <div class="menu-details">
-        <div class="menu-stats">
-            <div class="stat-box">
-                <h3>Current Sales</h3>
-                <p>Sales: $12,000</p>
-                <p>Share: 30%</p>
-            </div>
-            <div class="stat-box">
-                <h3>Recent Sales</h3>
-                <p>Today vs Yesterday: +10%</p>
-                <p>This Week vs Last Week: +5%</p>
-                <p>This Month vs Last Month: +7%</p>
-            </div>
-            <div class="stat-box">
-                <h3>Current Units Sold</h3>
-                <p>Units: 300</p>
-                <p>Share: 25%</p>
-            </div>
-            <div class="stat-box">
-                <h3>Recent Units Sold</h3>
-                <p>Today vs Yesterday: +8%</p>
-                <p>This Week vs Last Week: +4%</p>
-                <p>This Month vs Last Month: +6%</p>
-            </div>
-        </div>
-
-        <div class="menu-info">
-            <div class="stat-box">
-                <h3>Price</h3>
-                <p>$4.00</p>
-            </div>
-            <div class="stat-box">
-                <h3>Cost</h3>
-                <p>$1.50</p>
-            </div>
-            <div class="stat-box">
-                <h3>Stock</h3>
-                <p>150 units</p>
-            </div>
-            <div class="stat-box">
-                <h3>Best Selling Day</h3>
-                <p>Saturday</p>
-            </div>
-            <div class="stat-box">
-                <h3>Best Selling Month</h3>
-                <p>December</p>
-            </div>
-        </div>
+<div class="content">
+    <h1>カフェの売上管理プログラム</h1>
+    <h2>メニュー別売上と販売数量の分析</h2>
+    <div class="table-container">
+        <img id="menu-detail-image" src="path/to/image.jpg" alt="Menu Image">
+        <table class="table table-bordered">
+            <tr>
+                <th>メニュー名</th>
+                <td>サンプルメニュー</td>
+            </tr>
+            <tr>
+                <th>メニューの説明</th>
+                <td>これはサンプルメニューの説明です。</td>
+            </tr>
+            <tr>
+                <th>価格</th>
+                <td>1000円</td>
+            </tr>
+            <tr>
+                <th>原価</th>
+                <td>500円</td>
+            </tr>
+            <tr>
+                <th>利益率</th>
+                <td>50%</td>
+            </tr>
+            <tr>
+                <th>累積販売量</th>
+                <td>100個 // 10%</td>
+            </tr>
+            <tr>
+                <th>累積販売額</th>
+                <td>100000円 // 10%</td>
+            </tr>
+            <tr>
+                <th>累積原価</th>
+                <td>50000円 // 10%</td>
+            </tr>
+            <tr>
+                <th>今日の販売量</th>
+                <td>10個 // 10%</td>
+            </tr>
+            <tr>
+                <th>今日の販売額</th>
+                <td>10000円 // 10%</td>
+            </tr>
+            <tr>
+                <th>今週の販売量</th>
+                <td>50個 // 10%</td>
+            </tr>
+            <tr>
+                <th>今週の販売額</th>
+                <td>50000円 // 10%</td>
+            </tr>
+            <tr>
+                <th>今月の販売量</th>
+                <td>200個 // 10%</td>
+            </tr>
+            <tr>
+                <th>今月の販売額</th>
+                <td>200000円 // 10%</td>
+            </tr>
+            <tr>
+                <th>今年の販売量</th>
+                <td>1000個 // 10%</td>
+            </tr>
+            <tr>
+                <th>今年の販売額</th>
+                <td>1000000円 // 10%</td>
+            </tr>
+            <tr>
+                <th>特に売れる曜日 3つ</th>
+                <td>月曜日, 水曜日, 金曜日</td>
+            </tr>
+            <tr>
+                <th>特に売れる月 3つ</th>
+                <td>1月, 5月, 12月</td>
+            </tr>
+        </table>
     </div>
 </div>
-
 </body>
 </html>

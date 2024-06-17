@@ -10,7 +10,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Objects;
 
 @Controller
 public class IndexController {
@@ -23,20 +22,7 @@ public class IndexController {
 		this.menuRepository = menuRepository;
 	}
 
-	@RequestMapping(value = "/index", method = RequestMethod.GET)
-	public String getIndex(Model model, @RequestParam(name = "lang", required = false) String lang, HttpSession session) {
-		model.addAttribute("session", session);
-		return "redirect:/";
-	}
-
-	@RequestMapping(value = "/menu/getName", produces = MediaType.APPLICATION_JSON_VALUE)
-	@ResponseBody
-	@Cacheable("getName")
-	public String getName(@RequestParam Map<String, Object> params) {
-		String name = menuRepository.findById(Long.valueOf(params.get("id").toString())).orElse(null).getName();
-		return name;
-	}
-
+	// 管理者ページのGETリクエストを処理するメソッド
 	@RequestMapping(value = "/admin", method = RequestMethod.GET)
 	public String getAdmin(Model model, @RequestParam(name = "lang", required = false) String lang, HttpSession session) {
 		Map<String, Long> todaySales = salesService.findSalesByToday();
@@ -44,5 +30,21 @@ public class IndexController {
 		model.addAttribute("session", session);
 		model.addAttribute("lang", lang);
 		return "index.html";
+	}
+
+	// インデックスページのGETリクエストを処理するメソッド
+	@RequestMapping(value = "/index", method = RequestMethod.GET)
+	public String getIndex(Model model, @RequestParam(name = "lang", required = false) String lang, HttpSession session) {
+		model.addAttribute("session", session);
+		return "redirect:/";
+	}
+
+	// メニュー名を取得するメソッド
+	@RequestMapping(value = "/menu/getName", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	@Cacheable("getName")
+	public String getName(@RequestParam Map<String, Object> params) {
+		String name = menuRepository.findById(Long.valueOf(params.get("id").toString())).orElse(null).getName();
+		return name;
 	}
 }
