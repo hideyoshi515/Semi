@@ -47,8 +47,9 @@ public class TimeCardController {
         try {
             timeCardService.clockIn(request);
             Optional<TimeCard> timeCard = timeCardService.getTimeCardByUserName(request);
-            discordBotService.sendOrderNotification(request.getUsername() + "이/가 " + timeCard.get().getStart().format(formatter) + "에 출근했습니다.");
-            return ResponseEntity.ok("Clock in attempted.");
+            discordBotService.sendOrderNotification(request.getUsername() + "が " + timeCard.get().getStart().format(formatter) + "に出勤しました。");
+//            return ResponseEntity.ok("出勤処理しました。");
+            return ResponseEntity.ok("clock in");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -59,8 +60,9 @@ public class TimeCardController {
         try {
             timeCardService.clockOut(request);
             Optional<TimeCard> timeCard = timeCardService.getTimeCardByUserName(request);
-            discordBotService.sendOrderNotification(request.getUsername() + "이/가 " + timeCard.get().getEnd().format(formatter) + "에 퇴근했습니다.");
-            return ResponseEntity.ok("Clock out attempted.");
+            discordBotService.sendOrderNotification(request.getUsername() + "が " + timeCard.get().getEnd().format(formatter) + "に退勤しました。");
+//            return ResponseEntity.ok("退勤処理しました。");
+            return ResponseEntity.ok("clock out");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
