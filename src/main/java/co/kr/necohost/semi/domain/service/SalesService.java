@@ -9,6 +9,8 @@ import co.kr.necohost.semi.domain.repository.MenuRepository;
 import co.kr.necohost.semi.domain.repository.SalesRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Date;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -414,7 +416,8 @@ public class SalesService {
 		}
 
 		// 利益率を計算
-		double profitRate = 100.0 * (menu.getPrice() - menu.getCost()) / menu.getPrice();
+		double rawProfitRate = 100.0 * (menu.getPrice() - menu.getCost()) / menu.getPrice();
+		BigDecimal profitRate = new BigDecimal(rawProfitRate).setScale(2, RoundingMode.HALF_UP);
 
 		Map<String, Object> result = new HashMap<>();
 		result.put("menu", menu);

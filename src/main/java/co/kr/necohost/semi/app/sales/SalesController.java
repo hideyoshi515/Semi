@@ -6,6 +6,7 @@ import co.kr.necohost.semi.domain.model.entity.Sales;
 import co.kr.necohost.semi.domain.repository.MenuRepository;
 import co.kr.necohost.semi.domain.service.MenuService;
 import co.kr.necohost.semi.domain.service.SalesService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,14 +35,17 @@ public class SalesController {
         this.menuRepository = menuRepository;
     }
 
-    //관리자 페이지 - 홈 페이지(오늘의 현재 시간까지의 매출)를 반환하는 메서드(css있음)
+
+    //관리자 페이지 - 홈 페이지(오늘의 현재 시간까지의 매출/메뉴별 판매개수)를 반환하는 메서드(css있음)
     @RequestMapping(value = "/adminSalesMainHome", method = RequestMethod.GET)
-    public String getAdminSalesMainHome(Model model) {
+    public String getAdminSalesMainHome(Model model, @RequestParam(name = "lang", required = false) String lang, HttpSession session) {
+        // 현재 시간을 포맷팅하여 모델에 추가
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedNow = now.format(formatter);
         model.addAttribute("currentTime", formattedNow);
 
+        // 하루의 시작과 끝 시간 설정
         LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
         LocalDateTime endOfDay = now.withHour(23).withMinute(59).withSecond(59);
 
@@ -50,9 +54,22 @@ public class SalesController {
         Map<String, Double> formattedHourlySales = salesService.getFormattedHourlySales(hourlySales);
         String formattedTotalSalesToday = salesService.getFormattedTotalSalesUntilNow(now);
 
+        // 오늘의 매출 데이터 가져오기
+        Map<String, Long> todaySales = salesService.findSalesByToday();
+
+        // 모델에 필요한 속성 추가
         model.addAttribute("totalSalesToday", formattedTotalSalesToday);
         model.addAttribute("hourlySales", formattedHourlySales);
+        model.addAttribute("todaySales", todaySales);
+        model.addAttribute("session", session);
+        model.addAttribute("lang", lang);
 
+        System.out.println("관리자 홈페이지 통합 확인중");
+        System.out.println(todaySales);
+        System.out.println(session);
+        System.out.println(lang);
+
+        // 반환할 뷰 설정
         return "sales/adminSalesMainHome";
     }
 
@@ -301,6 +318,7 @@ public class SalesController {
         Long menuId = Long.parseLong(params.get("menuId").toString());
 
         Map<String, Object> salesData = salesService.calculateMenuSalesData(menuId);
+
         model.addAllAttributes(salesData);
 
         Map<String, Double> totalSalesAndQuantityByProcess = salesService.getTotalSalesAndQuantityByProcess(1);
