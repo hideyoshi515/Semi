@@ -5,17 +5,49 @@
         layout:decorate="~{layout/plain_layout}">
 <head>
     <style>
-        @media only screen and (min-width: 768px) and (max-width: 1024px) {
+        body, html{
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: black;
+        }
+        @media only screen and (min-width: 768px) and (max-width: 1366px) {
             .complete-container {
-                width: 50%;
-                margin: 0 auto;
-                text-align: center;
-                padding: 50px;
+                position: relative;
+                width: 100%;
+                height: 100%;
+            }
+            .complete-container video{
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            body, html {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: black;
             }
         }
             .complete-container {
-                text-align: center;
-                padding: 50px;
+                position: relative;
+                width: 100%;
+                height: 100%;
+            }
+            .complete-container video{
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
             }
 
             .complete-container h1 {
@@ -51,19 +83,22 @@
                 font-size: 1.2em;
                 color: #333;
             }
+            /*#completeAudio{*/
+            /*    display: none;*/
+            /*}*/
 
-            .complete-container .hidden {
-                display: none;
-            }
+
     </style>
 </head>
 <th:block layout:fragment="content">
     <div class="complete-container">
         <div class="image-text-container">
-            <img src="https://i.namu.wiki/i/Ri5jtdRbLUp4S2OsLoRVlQl4xnMxagEdAmE74F0kXwioKP6YtiwNL4zPkgW4LhB0ni0R2REYRvkjWmPoevlxH2ulPHC_bMeZTnqrgB-lzpdzzgJl2xRmMjuKMQOwKLBEwGaUM6L9iNWXA5CsqEizCQ.webp" style="width: 100%">
+            <video  autoplay style="width: 100%">
+                <source src="https://cdn.pixabay.com/video/2024/02/21/201308-915375262_large.mp4" type="video/mp4">
+            </video>
             <div class="text">결제가 성공적으로 완료되었습니다!</div>
             <audio id="completeAudio" class="" controls autoplay>
-                <source src="mp3/trap.mp3" type="audio/mpeg">
+                <source src="./mp3/ttsmaker-file-2024-6-17-12-22-0.mp3" type="audio/mpeg">
                 Your browser does not support the audio element.
             </audio>
         </div>
@@ -73,6 +108,10 @@
     window.onload = function () {
         var audio = document.getElementById('completeAudio');
         audio.play();
+
+    setTimeout(function () {
+        window.location.href = 'orderStart';
+    }, 5000);
     };
 </script>
 </html>
