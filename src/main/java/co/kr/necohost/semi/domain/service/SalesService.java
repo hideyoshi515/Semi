@@ -39,6 +39,12 @@ public class SalesService {
 		salesRepository.save(salesRequest.toEntity());
 	}
 
+	// 注文を保存
+	public void save2(SalesRequest salesRequest) {
+		Sales sales = salesRequest.toEntity();
+		salesRepository.save(sales);
+	}
+
 	// すべての販売記録を検索
 	public List<Sales> findAll() {
 		return salesRepository.findAll();

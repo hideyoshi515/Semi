@@ -1,6 +1,7 @@
 package co.kr.necohost.semi.domain.service;
 
 import co.kr.necohost.semi.domain.model.dto.StaffRequest;
+import co.kr.necohost.semi.domain.model.dto.TimeCardRequest;
 import co.kr.necohost.semi.domain.model.entity.Staff;
 import co.kr.necohost.semi.domain.model.entity.TimeCard;
 import co.kr.necohost.semi.domain.repository.StaffRepository;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TimeCardService {
@@ -70,6 +72,12 @@ public class TimeCardService {
 	// すべてのタイムカードを取得
 	public List<TimeCard> getAllTimeCard() {
 		return timeCardRepository.findAll();
+	}
+
+	public List<TimeCardRequest> getAllTimeCardDesc() {
+		return timeCardRepository.findAllByOrderByStartDesc().stream()
+				.map(TimeCardRequest::new)
+				.collect(Collectors.toList());
 	}
 
 	// ユーザー名でタイムカードを取得
