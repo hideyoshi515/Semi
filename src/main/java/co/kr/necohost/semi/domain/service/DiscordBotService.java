@@ -19,6 +19,7 @@ public class DiscordBotService {
 
 	private JDA jda;
 
+	// Discord Botを初期化
 	@PostConstruct
 	public void init() {
 		try {
@@ -29,6 +30,7 @@ public class DiscordBotService {
 		}
 	}
 
+	// 注文通知を送信
 	public void sendOrderNotification(String message) {
 		MessageChannel channel = jda.getChannelById(MessageChannel.class, channelId);
 

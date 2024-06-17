@@ -3,8 +3,6 @@ package co.kr.necohost.semi.domain.service;
 import co.kr.necohost.semi.domain.model.dto.MenuRequest;
 import co.kr.necohost.semi.domain.model.entity.Menu;
 import co.kr.necohost.semi.domain.repository.MenuRepository;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,62 +21,79 @@ public class MenuService {
 		this.menuRepository = menuRepository;
 	}
 
-	public List<Menu> getAllMenus() {
-		return menuRepository.findAllByOrderByIdDescCategoryAsc();
-	}
-
-	public void deleteMenuById(Long id) {
-		menuRepository.deleteById(id);
-	}
-
-	public Menu getMenuById(Long id) {
-		return menuRepository.findById(id).orElse(null);
-	}
-
-	public List<Menu> getMenuByCategory(int category) {
-		return menuRepository.findByCategoryOrderByIdDesc(category);
-	}
-
-	public Menu saveMenu(Menu menu) {
-		return menuRepository.save(menu);
-	}
-
+	// 在庫数を追加
 	public void addStockOrder(long id, int amount) {
-		Menu menu = menuRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid menu ID"));
+		var menu = menuRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid menu ID"));
 		menu.setStockorder(menu.getStockorder() + amount);
 		menuRepository.save(menu);
 	}
 
+	// ストックと注文数の更新をキャンセル
+	public void cancelUpdateStockAndOrder(long id) {
+		var menu = menuRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid menu ID"));
+		menu.setStockorder(0);
+		menuRepository.save(menu);
+	}
+
+	// メニューを削除
+	public void deleteMenuById(Long id) {
+		menuRepository.deleteById(id);
+	}
+
+	// すべてのメニューを取得
+	public List<Menu> getAllMenus() {
+		return menuRepository.findAllByOrderByIdDescCategoryAsc();
+	}
+
+	// カテゴリごとにメニューを分類
+	public Map<Long, List<Menu>> getCategorizedMenus() {
+		return menuRepository.findAll().stream().collect(Collectors.groupingBy(Menu::getCategory));
+	}
+
+	// カテゴリ別にメニューを取得
+	public List<Menu> getMenuByCategory(int category) {
+		return menuRepository.findByCategoryOrderByIdDesc(category);
+	}
+
+	// IDでメニューを取得
+	public Menu getMenuById(Long id) {
+		return menuRepository.findById(id).orElse(null);
+	}
+
+	// メニューを保存
+	public Menu saveMenu(Menu menu) {
+		return menuRepository.save(menu);
+	}
+
+	// メニューの画像付き保存
 	public void saveMenuWithImage(MenuRequest menuRequest, MultipartFile file) {
-		// 파일이 저장될 곳. 실제 서버의 로컬 경로를 의미함
-		String path = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\img\\menu\\";
-		File pathCheck = new File(path);
+		// ファイルが保存される場所
+		var path = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\img\\menu\\";
+		var pathCheck = new File(path);
 		if (!pathCheck.exists()) {
 			pathCheck.mkdirs();
 		}
-		// 서버에서 파일을 불러올 경로 설정. 다음과 같이 처리하면 serverPath는 img\menu\ 가 될 것
-		String serverPath = path.split("static\\\\")[1];
-		UUID uuid = UUID.randomUUID();
-		// 파일명 재정의. split을 통해 확장자만 남기고 파일명은 uuid로 설정해주는 과정
-		String fileName = null;
-		if (!file.getOriginalFilename().isEmpty()) {
-			fileName = uuid + "." + file.getOriginalFilename().split("\\.")[1];
-			// 임시 파일 생성. 재정의한 파일명으로 임시 파일 객체 생성.
-			// 실제 서버의 로컬 경로에, uuid로 처리한 파일
-			File saveTo = new File(path + fileName);
-			// 서버 경로 업데이트. 서버에서 불러올 경로를 파일 이름과 결합하여 완성
+		// サーバー上のファイルパスを設定
+		var serverPath = path.split("static\\\\")[1];
+		var uuid = UUID.randomUUID();
+		// ファイル名の再定義
+		var fileName = !file.getOriginalFilename().isEmpty() ? uuid + "." + file.getOriginalFilename().split("\\.")[1] : null;
+		if (fileName != null) {
+			// 一時ファイルの生成
+			var saveTo = new File(path + fileName);
+			// サーバーパスの更新
 			serverPath = serverPath + fileName;
 
-			Menu existingMenu = this.getMenuById(menuRequest.getId());
+			var existingMenu = this.getMenuById(menuRequest.getId());
 			if (existingMenu != null && existingMenu.getImage() != null) {
-				File existingFile = new File(System.getProperty("user.dir") + "\\src\\main\\resources\\static\\" + existingMenu.getImage());
+				var existingFile = new File(System.getProperty("user.dir") + "\\src\\main\\resources\\static\\" + existingMenu.getImage());
 				if (existingFile.exists()) {
 					existingFile.delete();
 				}
 			}
 
 			try {
-				// 업로드된 파일을 설정된 경로에 저장
+				// アップロードされたファイルを設定されたパスに保存
 				file.transferTo(saveTo);
 				menuRepository.save(menuRequest.toEntity(serverPath));
 			} catch (IOException e) {
@@ -86,24 +101,14 @@ public class MenuService {
 			}
 
 		} else {
-			menuRepository.save(menuRequest.toEntity(menuRepository.findById(menuRequest.getId()).get().getImage()));
+			menuRepository.save(menuRequest.toEntity(menuRepository.findById(menuRequest.getId()).orElseThrow().getImage()));
 		}
 	}
 
-	public Map<Long, List<Menu>> getCategorizedMenus() {
-		List<Menu> menus = menuRepository.findAll();
-		return menus.stream().collect(Collectors.groupingBy(Menu::getCategory));
-	}
-
+	// ストックと注文数を更新
 	public void updateStockAndOrder(long id) {
-		Menu menu = menuRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid menu ID"));
+		var menu = menuRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid menu ID"));
 		menu.setStock(menu.getStock() + menu.getStockorder());
-		menu.setStockorder(0);
-		menuRepository.save(menu);
-	}
-
-	public void cancelUpdateStockAndOrder(long id) {
-		Menu menu = menuRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid menu ID"));
 		menu.setStockorder(0);
 		menuRepository.save(menu);
 	}

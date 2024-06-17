@@ -106,12 +106,12 @@ public class LoginController {
             return "login/register.html";
         }
 
-        if (accountService.isExit(accountRequest)) {
+        if (accountService.isExisted(accountRequest)) {
             model.addAttribute("valid_email", "既に存在するメールアドレスです");
             return "login/register.html";
         }
 
-        if (accountService.isPhoneExit(accountRequest)) {
+        if (accountService.isPhoneExisted(accountRequest)) {
             model.addAttribute("valid_phone", "既に存在する携帯電話番号です");
             return "login/register.html";
         }

@@ -17,15 +17,18 @@ public class StaffService {
         this.staffRepository = staffRepository;
     }
 
-    public void insertStaff(Staff staff) {
-        staffRepository.save(staff);
-    }
-
+    // すべてのスタッフを取得
     public List<Staff> getAllStaff() {
         return staffRepository.findAll();
     }
 
+    // スタッフを削除
     public void deleteStaff(Long id) {
         staffRepository.deleteById(id);
+    }
+
+    // スタッフを挿入
+    public void insertStaff(Staff staff) {
+        staffRepository.save(staff);
     }
 }

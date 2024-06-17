@@ -12,6 +12,7 @@ public class CouponService {
 		this.couponRepository = couponRepository;
 	}
 
+	// クーポンを保存
 	public void saveCoupon(String couponCode) {
 		Coupon coupon = new Coupon();
 

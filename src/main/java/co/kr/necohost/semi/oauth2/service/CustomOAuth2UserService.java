@@ -19,7 +19,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
-
         OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
 
         try {
@@ -27,27 +26,23 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         } catch (AuthenticationException ex) {
             throw ex;
         } catch (Exception ex) {
-            // Throwing an instance of AuthenticationException will trigger the OAuth2AuthenticationFailureHandler
+            // AuthenticationExceptionのインスタンスをスローするとOAuth2AuthenticationFailureHandlerがトリガーされる
             throw new InternalAuthenticationServiceException(ex.getMessage(), ex.getCause());
         }
     }
 
+    // OAuth2ユーザーを処理
     private OAuth2User processOAuth2User(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
-
-        String registrationId = userRequest.getClientRegistration()
-                .getRegistrationId();
-
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
         String accessToken = userRequest.getAccessToken().getTokenValue();
 
-        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(registrationId,
-                accessToken,
-                oAuth2User.getAttributes());
-        // OAuth2UserInfo field value validation
+        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(registrationId, accessToken, oAuth2User.getAttributes());
+
+        // OAuth2UserInfoフィールド値の検証
         if (!StringUtils.hasText(oAuth2UserInfo.getEmail())) {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
         }
 
         return new OAuth2UserPrincipal(oAuth2UserInfo);
     }
-
 }

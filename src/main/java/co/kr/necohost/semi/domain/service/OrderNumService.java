@@ -6,13 +6,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class OrderNumService {
-	OrderNumRepository repo;
+	private final OrderNumRepository repo;
 
 	public OrderNumService(OrderNumRepository repo) {
 		this.repo = repo;
 	}
 
-	OrderNum save(OrderNum orderNum) {
+	// 注文番号を保存
+	public OrderNum save(OrderNum orderNum) {
 		return repo.save(orderNum);
 	}
 }

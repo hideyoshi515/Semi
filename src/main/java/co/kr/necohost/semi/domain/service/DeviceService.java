@@ -8,12 +8,13 @@ import java.util.List;
 
 @Service
 public class DeviceService {
-	DeviceRepository deviceRepository;
+	private final DeviceRepository deviceRepository;
 
 	public DeviceService(DeviceRepository deviceRepository) {
 		this.deviceRepository = deviceRepository;
 	}
 
+	// すべてのデバイスを取得
 	public List<Device> findAll() {
 		return deviceRepository.findAll();
 	}

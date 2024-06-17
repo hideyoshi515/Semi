@@ -28,29 +28,25 @@ public class SalesController {
     private final SalesService salesService;
     private final MenuRepository menuRepository;
 
-    public SalesController(MenuService menuService,SalesService salesService, MenuRepository menuRepository) {
+    public SalesController(MenuService menuService, SalesService salesService, MenuRepository menuRepository) {
         this.salesService = salesService;
         this.menuService = menuService;
         this.menuRepository = menuRepository;
     }
 
-
-    // 구버전 관리자 판매 메뉴 페이지를 반환하는 메서드(css없음)
-    @RequestMapping(value = "/adminSalesMenu", method=RequestMethod.GET)
+    // 古いバージョンの管理者販売メニューページを返すメソッド(cssなし)
+    @RequestMapping(value = "/adminSalesMenu", method = RequestMethod.GET)
     public String getOldAdminSalesMenu() {
         return "/sales/adminSalesMenu.html";
     }
 
-    // 신버전 관리자 페이지 - 판매 관리 페이지를 반환하는 메서드(css있음)
-    @RequestMapping(value = "/adminSalesMainMenu", method=RequestMethod.GET)
+    // 新しいバージョンの管理者ページ - 販売管理ページを返すメソッド(cssあり)
+    @RequestMapping(value = "/adminSalesMainMenu", method = RequestMethod.GET)
     public String getAdminSalesMainMenu() {
         return "/sales/adminSalesMainMenu.html";
     }
 
-
-
-
-    //관리자 페이지 - 홈 페이지(오늘의 현재 시간까지의 매출)를 반환하는 메서드(css있음)
+    // 管理者ページ - ホームページ（今日の現在の時刻までの売上）を返すメソッド(cssあり)
     @RequestMapping(value = "/adminSalesMainHome", method = RequestMethod.GET)
     public String getAdminSalesMainHome(Model model) {
         LocalDateTime now = LocalDateTime.now();
@@ -61,10 +57,10 @@ public class SalesController {
         LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
         LocalDateTime endOfDay = now.withHour(23).withMinute(59).withSecond(59);
 
-        // 서비스에서 시간별 매출 데이터를 가져옴
+        // サービスから時間ごとの売上データを取得
         Map<LocalDateTime, Double> hourlySales = salesService.getHourlySalesByDay(startOfDay, endOfDay);
 
-        // 누적 매출 계산 및 포맷된 시간 데이터를 담을 Map 생성
+        // 累積売上計算およびフォーマットされた時間データを格納するMapを生成
         Map<String, Double> formattedHourlySales = new TreeMap<>();
         DateTimeFormatter hourFormatter = DateTimeFormatter.ofPattern("HH:mm");
         double cumulativeSales = 0.0;
@@ -78,35 +74,13 @@ public class SalesController {
         String formattedTotalSalesToday = numberFormat.format(totalSalesToday);
         model.addAttribute("totalSalesToday", formattedTotalSalesToday);
 
-        model.addAttribute("hourlySales", formattedHourlySales); // 포맷된 시간 데이터 전달
-        System.out.println("hourlySales 확인 중");
-        System.out.println(formattedHourlySales);
+        model.addAttribute("hourlySales", formattedHourlySales); // フォーマットされた時間データを渡す
         return "sales/adminSalesMainHome";
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    @RequestMapping(value = "/adminSalesMainHome2", method=RequestMethod.GET)
-    public String getAdmininSalesMainHome2(Model model){
+    // 管理者ページ - ホームページの別バージョンを返すメソッド
+    @RequestMapping(value = "/adminSalesMainHome2", method = RequestMethod.GET)
+    public String getAdmininSalesMainHome2(Model model) {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedNow = now.format(formatter);
@@ -123,40 +97,31 @@ public class SalesController {
         model.addAttribute("totalSalesToday", formattedTotalSalesToday);
 
         model.addAttribute("hourlySales", hourlySales);
-        System.out.println("hourlySales관련 확인중");
-        System.out.println(hourlySales);
         return "/sales/adminSalesMainHome2.html";
-
     }
 
-
-
-
-
-
-
-    // 판매 데이터베이스 컨트롤러 메뉴 페이지를 반환하는 메서드
-    @RequestMapping(value = "/salesDataBaseControllerMenu", method=RequestMethod.GET)
+    // 販売データベースコントローラーメニューページを返すメソッド
+    @RequestMapping(value = "/salesDataBaseControllerMenu", method = RequestMethod.GET)
     public String getSalesDataBaseControllerMenu() {
         return "/sales/salesDataBaseControllerMenu.html";
     }
 
-    // 판매 생성 페이지를 반환하는 메서드 (GET 요청)
-    @RequestMapping(value="/createSales", method=RequestMethod.GET)
+    // 販売作成ページを返すメソッド (GETリクエスト)
+    @RequestMapping(value = "/createSales", method = RequestMethod.GET)
     public String getCreateSales(Model model) {
         model.addAttribute("salesRequest", new SalesRequest());
         return "/sales/createSales.html";
     }
 
-    // 새로운 판매를 생성하는 메서드 (POST 요청)
-    @RequestMapping(value="/createSales", method=RequestMethod.POST)
+    // 新しい販売を作成するメソッド (POSTリクエスト)
+    @RequestMapping(value = "/createSales", method = RequestMethod.POST)
     public String postCreateSales(Model model, @ModelAttribute("salesRequest") SalesRequest salesRequest) {
         salesService.save(salesRequest);
         return "/sales/createSales.html";
     }
 
-    // 판매 데이터를 읽어오는 메서드
-    @RequestMapping(value="/readSales", method=RequestMethod.GET)
+    // 販売データを読み込むメソッド
+    @RequestMapping(value = "/readSales", method = RequestMethod.GET)
     public String getReadSales(Model model) {
         List<Sales> sales = salesService.findByProcess(1);
         model.addAttribute("sales", sales);
@@ -164,33 +129,21 @@ public class SalesController {
         return "/sales/readSales.html";
     }
 
-
-    //각 카테고리별 총 판매액을 반환하는 메서드
+    // 各カテゴリー別の総販売額を返すメソッド
     @RequestMapping(value = "/totalSalesbyCategory", method = RequestMethod.GET)
     public String getTotalSalesByCategory(Model model) {
         Map<String, Double> totalByCategory = salesService.getTotalSalesByCategory();
         model.addAttribute("totalByCategory", totalByCategory);
-        System.out.println(totalByCategory);
         return "/sales/totalSalesByCategory.html";
     }
 
-
-
-
-
-
-
-
-    //메뉴별 판매액을 기간 검색하여 반환하는 메서드.
+    // メニュー別販売額を期間検索して返すメソッド (入力ページ)
     @RequestMapping(value = "/totalSalesbyMenuAndPeriodInput", method = RequestMethod.GET)
     public String getTotalSalesByMenuAndPeriodInput(Model model) {
-
-
         return "/sales/totalSalesbyMenuAndPeriodInput";
     }
 
-
-    //메뉴별 판매액을 기간 검색하여 반환하는 메서드.
+    // メニュー別販売額を期間検索して返すメソッド (検索結果)
     @RequestMapping(value = "/totalSalesbyMenuAndPeriodInput", method = RequestMethod.POST)
     public String getSalesByMenu(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                  @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
@@ -214,12 +167,13 @@ public class SalesController {
         return "sales/totalSalesbyMenuAndPeriodInput";
     }
 
-    //카테고리별 판매액을 기간 검색하여 반환하는 메서드.
+    // カテゴリー別販売額を期間検索して返すメソッド (入力ページ)
     @RequestMapping(value = "/totalSalesbyCategoryAndPeriodInput", method = RequestMethod.GET)
     public String getTotalSalesByCategoryAndPeriodInput(Model model) {
         return "/sales/totalSalesbyCategoryAndPeriodInput";
     }
 
+    // カテゴリー別販売額を期間検索して返すメソッド (検索結果)
     @RequestMapping(value = "/totalSalesbyCategoryAndPeriodInput", method = RequestMethod.POST)
     public String getSalesByCategory(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                      @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
@@ -243,12 +197,12 @@ public class SalesController {
         return "sales/totalSalesbyCategoryAndPeriodInput";
     }
 
-    //연도별 총 판매액을 반환하는 메서드
+    // 年度別の総販売額を返すメソッド
     @RequestMapping(value = "/totalSalesByYear", method = RequestMethod.GET)
     public String getTotalSalesByYear(Model model) {
         Map<Integer, Double> yearlySales = salesService.getYearlySalesByProcess();
 
-        // 연도별 오름차순으로 정렬
+        // 年度別の昇順でソート
         Map<String, Double> yearlySalesStringKey = yearlySales.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByKey())
@@ -264,9 +218,7 @@ public class SalesController {
         return "sales/totalSalesByYear";
     }
 
-
-
-    //월별 총 판매액을 반환하는 메서드
+    // 月別の総販売額を返すメソッド
     @RequestMapping(value = "/totalSalesByMonth", method = RequestMethod.GET)
     public String getTotalSalesByMonth(Model model) {
         Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
@@ -274,11 +226,8 @@ public class SalesController {
         return "sales/totalSalesByMonth";
     }
 
-
-
-
-    // 입력된 연도의 총 판매액을 반환하는 메서드
-    @RequestMapping(value= "/totalSalesByYearInput", method = RequestMethod.GET)
+    // 入力された年度の総販売額を返すメソッド
+    @RequestMapping(value = "/totalSalesByYearInput", method = RequestMethod.GET)
     public String getTotalSalesByYearInput(@RequestParam(value = "year", required = false) Integer year, Model model) {
         if (year != null) {
             double totalSales = salesService.getTotalSalesByYear(year);
@@ -288,8 +237,8 @@ public class SalesController {
         return "/sales/totalSalesByYearInput";
     }
 
-    // 입력된 연도와 월의 총 판매액 및 성장률을 반환하는 메서드
-    @RequestMapping(value="/totalSalesByYearAndMonthInput" , method = RequestMethod.GET)
+    // 入力された年度と月の総販売額および成長率を返すメソッド
+    @RequestMapping(value = "/totalSalesByYearAndMonthInput", method = RequestMethod.GET)
     public String getTotalSalesByYearAndMonthInput(@RequestParam(value = "year", required = false) Integer year,
                                                    @RequestParam(value = "month", required = false) Integer month, Model model) {
         if (year != null && month != null) {
@@ -303,18 +252,16 @@ public class SalesController {
         return "/sales/totalSalesByYearAndMonthInput";
     }
 
-    //입력된 날짜(연-월-일)의 총 판매액을 반환하는 메서드
+    // 入力された日付（年-月-日）の総販売額を返すメソッド
     @RequestMapping(value = "/totalSalesByDayInput", method = RequestMethod.GET)
-    public String getTotalSalesByDay(@RequestParam(value="year", required = false) Integer year,
-                                     @RequestParam(value="month", required = false) Integer month,
-                                     @RequestParam(value="day", required = false) Integer day,
+    public String getTotalSalesByDay(@RequestParam(value = "year", required = false) Integer year,
+                                     @RequestParam(value = "month", required = false) Integer month,
+                                     @RequestParam(value = "day", required = false) Integer day,
                                      Model model) {
-
         if (year != null && month != null && day != null) {
             double totalSales = salesService.getTotalSalesByDay(year, month, day);
             DecimalFormat decimalFormat = new DecimalFormat("#,##0");
             String formattedTotalSales = decimalFormat.format(totalSales);
-
 
             model.addAttribute("year", year);
             model.addAttribute("month", month);
@@ -324,22 +271,20 @@ public class SalesController {
         return "/sales/totalSalesByDayInput.html";
     }
 
-
-    // 입력된 날짜(연-월-일)가 속한 주의 주별 매출(1주간 총매출, 요일별 매출)을 반환하는 메서드
+    // 入力された日付（年-月-日）が含まれる週の週別売上（1週間の総売上、曜日別売上）を返すメソッド
     @RequestMapping(value = "/totalWeeklySalesByDayInput", method = RequestMethod.GET)
-    public String getTotalWeeklySalesByDay(@RequestParam(value="year", required = false) Integer year,
-                                           @RequestParam(value="month", required = false) Integer month,
-                                           @RequestParam(value="day", required = false) Integer day,
+    public String getTotalWeeklySalesByDay(@RequestParam(value = "year", required = false) Integer year,
+                                           @RequestParam(value = "month", required = false) Integer month,
+                                           @RequestParam(value = "day", required = false) Integer day,
                                            Model model) {
-
         if (year != null && month != null && day != null) {
             Map<LocalDate, Double> weeklySales = salesService.getWeeklySalesByDay(year, month, day);
             double totalWeeklySales = weeklySales.values().stream().mapToDouble(Double::doubleValue).sum();
 
-            // 매출 금액 형식 지정
+            // 売上金額のフォーマット指定
             DecimalFormat decimalFormat = new DecimalFormat("#,###");
 
-            // 천단위 콤마 추가 및 소수점 생략
+            // 千単位のカンマ追加および小数点以下の省略
             Map<LocalDate, String> formattedWeeklySales = new TreeMap<>();
             for (Map.Entry<LocalDate, Double> entry : weeklySales.entrySet()) {
                 formattedWeeklySales.put(entry.getKey(), decimalFormat.format(entry.getValue()));
@@ -355,13 +300,8 @@ public class SalesController {
         return "/sales/totalWeeklySalesByDayInput";
     }
 
-
-
-
-
-
-    // 입력된 연도와 카테고리의 총 판매액을 반환하는 메서드
-    @RequestMapping(value="/totalSalesByYearAndCategoryInput" , method = RequestMethod.GET)
+    // 入力された年度とカテゴリーの総販売額を返すメソッド
+    @RequestMapping(value = "/totalSalesByYearAndCategoryInput", method = RequestMethod.GET)
     public String getTotalSalesByYearAndCategoryInput(@RequestParam(value = "year", required = false) Integer year,
                                                       @RequestParam(value = "category", required = false) Integer category, Model model) {
         if (year != null && category != null) {
@@ -373,17 +313,17 @@ public class SalesController {
         return "sales/totalSalesByYearAndCategoryInput";
     }
 
-
+    // メニューごとの販売分析ページを返すメソッド
     @RequestMapping(value = "salesAnalysisByMenuInput", method = RequestMethod.GET)
     public String getSalesAnalysisByMenuInput(@RequestParam Map<String, Object> params, Model model) {
-        // 메뉴 ID를 파싱
+        // メニューIDをパース
         Long menuId = Long.parseLong(params.get("menuId").toString());
 
-        // 서비스 계층에서 데이터 처리
+        // サービス層でデータ処理
         Map<String, Object> salesData = salesService.calculateMenuSalesData(menuId);
         model.addAllAttributes(salesData);
 
-        // process가 1인 판매량과 판매액 총합 계산
+        // processが1の販売量と販売額の総合計を計算
         Map<String, Double> totalSalesAndQuantityByProcess = salesService.getTotalSalesAndQuantityByProcess(1);
         double totalSalesAmountProcess1 = totalSalesAndQuantityByProcess.get("totalSalesAmount");
         double totalQuantityProcess1 = totalSalesAndQuantityByProcess.get("totalQuantity");
@@ -391,7 +331,7 @@ public class SalesController {
         model.addAttribute("totalQuantityProcess1", (int) totalQuantityProcess1);
         model.addAttribute("totalSalesAmountProcess1", totalSalesAmountProcess1);
 
-        // 점유율 계산
+        // シェア率計算
         double totalSalesAmount = (double) salesData.get("totalSalesAmount");
         double totalQuantity = (double) salesData.get("totalQuantity");
 
@@ -401,14 +341,14 @@ public class SalesController {
         DecimalFormat df = new DecimalFormat("#.##");
         model.addAttribute("salesPercentage", df.format(salesPercentage));
         model.addAttribute("quantityPercentage", df.format(quantityPercentage));
-        model.addAttribute("totalQuantity", (long) totalQuantity); // 소수점 이하 절사
-        model.addAttribute("totalSalesAmount", (long) totalSalesAmount); // 소수점 이하 절사
+        model.addAttribute("totalQuantity", (long) totalQuantity); // 小数点以下切捨て
+        model.addAttribute("totalSalesAmount", (long) totalSalesAmount); // 小数点以下切捨て
 
-        // process가 1인 판매의 총 원가 계산
+        // processが1の販売の総コスト計算
         double totalCostByProcess = salesService.calculateTotalCostByProcess(1);
         model.addAttribute("totalCostByProcess", totalCostByProcess);
 
-        // 원가 점유율 계산
+        // コストシェア率計算
         Menu menu = (Menu) salesData.get("menu");
         double costPercentage = calculatePercentage(totalQuantity * menu.getCost(), totalCostByProcess);
         model.addAttribute("costPercentage", df.format(costPercentage));
@@ -416,42 +356,14 @@ public class SalesController {
         return "sales/salesAnalysisByMenuInput";
     }
 
-    /**
-     * 두 값을 기반으로 백분율을 계산합니다.
-     * @param value 부분 값
-     * @param total 전체 값
-     * @return 백분율 값
-     */
+    // 二つの値に基づいてパーセンテージを計算するメソッド
     private double calculatePercentage(double value, double total) {
         return total != 0 ? (value / total) * 100 : 0;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    // 販売分析デザイン例ページを返すメソッド
     @GetMapping("/salesAnalysisDesignExample")
     public String getSalesAnalysisDesignExample() {
         return "sales/salesAnalysisDesignExample";
     }
-
-
-
-
-
-
-
-
 }
