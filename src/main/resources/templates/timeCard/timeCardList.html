@@ -1,10 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff List</title>
 </head>
 <body>
-asd
+<th:block layout:fragment="content">
+    <div class="container mt-5">
+        <h2>TimeCard List</h2>
+        <div class="table-responsive">
+            <div class="table">
+                <div class="table-header">
+                    <div class="row">
+                        <div class="col"><strong>Username</strong></div>
+                        <div class="col"><strong>In</strong></div>
+                        <div class="col"><strong>Out</strong></div>
+                    </div>
+                </div>
+                <div class="table-body">
+                    <div th:each="timeCard : ${timeCards}" class="row">
+                        <div class="col" th:text="${timeCard.staffName}"></div>
+                        <div class="col" th:text="${timeCard.start}"></div>
+                        <div class="col" th:text="${timeCard.end}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+    </script>
+</th:block>
 </body>
 </html>

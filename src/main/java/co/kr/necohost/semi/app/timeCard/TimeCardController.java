@@ -1,6 +1,7 @@
 package co.kr.necohost.semi.app.timeCard;
 
 import co.kr.necohost.semi.domain.model.dto.StaffRequest;
+import co.kr.necohost.semi.domain.model.dto.TimeCardRequest;
 import co.kr.necohost.semi.domain.model.entity.TimeCard;
 import co.kr.necohost.semi.domain.service.DiscordBotService;
 import co.kr.necohost.semi.domain.service.StaffService;
@@ -12,24 +13,25 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
 public class TimeCardController {
     private final TimeCardService timeCardService;
-    private final StaffService staffService;
     private final DiscordBotService discordBotService;
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm");
 
     public TimeCardController(TimeCardService timeCardService, StaffService staffService, DiscordBotService discordBotService) {
         this.timeCardService = timeCardService;
-        this.staffService = staffService;
         this.discordBotService = discordBotService;
     }
 
     @RequestMapping(value = "/timeCardList", method = RequestMethod.GET)
     public String getTimeCardList(Model model) {
-        model.addAttribute("staffs", staffService.getAllStaff());
-        model.addAttribute("timeCards", timeCardService.getAllTimeCard());
+        List<TimeCardRequest> timeCards = timeCardService.getAllTimeCardDesc();
+        model.addAttribute("timeCards", timeCards);
         return "timeCard/timeCardList.html";
     }
 
@@ -45,7 +47,7 @@ public class TimeCardController {
         try {
             timeCardService.clockIn(request);
             Optional<TimeCard> timeCard = timeCardService.getTimeCardByUserName(request);
-            discordBotService.sendOrderNotification(request.getUsername() + "이/가 " + "" + "에 출근했습니다.");
+            discordBotService.sendOrderNotification(request.getUsername() + "이/가 " + timeCard.get().getStart().format(formatter) + "에 출근했습니다.");
             return ResponseEntity.ok("Clock in attempted.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -56,7 +58,8 @@ public class TimeCardController {
     public ResponseEntity<String> postTimeCardOut(@RequestBody StaffRequest request) {
         try {
             timeCardService.clockOut(request);
-            discordBotService.sendOrderNotification(request.getUsername() + "이/가" + "" + "에 퇴근했습니다.");
+            Optional<TimeCard> timeCard = timeCardService.getTimeCardByUserName(request);
+            discordBotService.sendOrderNotification(request.getUsername() + "이/가 " + timeCard.get().getEnd().format(formatter) + "에 퇴근했습니다.");
             return ResponseEntity.ok("Clock out attempted.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
