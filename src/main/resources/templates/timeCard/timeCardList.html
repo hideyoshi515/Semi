@@ -31,6 +31,18 @@
         .time-card-row {
             border-bottom: 1px solid #ddd;
         }
+        .date-input{
+            width: 8rem;
+        }
+        #searchInput {
+            width: 15rem;
+        }
+        .right-aligned {
+            margin-left: auto; /* 자동으로 오른쪽 정렬 */
+        }
+        .table-responsive {
+            overflow-x: hidden; /* 가로 스크롤 숨기기 */
+        }
     </style>
 </head>
 <body>
@@ -39,9 +51,11 @@
         <h2>TimeCard List</h2>
         <div class="mb-3 d-flex">
             <input type="text" id="searchInput" class="form-control" placeholder="Search by Username" oninput="filterTimeCards()" style="margin-right: 10px;">
-            <input type="date" id="startDate" class="form-control" style="margin-right: 10px;">
-            <input type="date" id="endDate" class="form-control" style="margin-right: 10px;">
-            <button class="btn btn-primary" onclick="filterByDate()">日付で検索</button>
+            <div class="right-aligned d-flex">
+                <input type="date" id="startDate" class="form-control date-input" style="margin-right: 10px;">
+                <input type="date" id="endDate" class="form-control date-input" style="margin-right: 10px;">
+                <button class="btn btn-primary" onclick="filterByDate()">日付で検索</button>
+            </div>
         </div>
         <div class="table-responsive">
             <div style="border-left: none; border-right: none" class="table">
