@@ -81,7 +81,7 @@
                         <tr th:each="entry : ${salesByMenu}">
                             <td th:text="${entry.key}"></td>
                             <td th:text="${#numbers.formatInteger(entry.value, 1, 'COMMA')} + '円'"></td>
-                            <td th:text="${#numbers.formatInteger(quantityByMenu[entry.key], 1, 'COMMA')}"></td>
+                            <td th:text="${#numbers.formatInteger(quantityByMenu[entry.key], 1, 'COMMA')} + '個'"></td>
                         </tr>
                         </tbody>
                     </table>
@@ -100,9 +100,9 @@
             </div>
         </div>
 
-        <div class="button-container" style="margin-top: 20px; text-align: center; justify-content: space-around">
+        <div class="button-container" style="margin-top: 10px; text-align: center; justify-content: space-around">
             <button type="submit" class="button">検索</button>
-            <button class="button" type="button" onclick="location.href='/adminSalesMainMenu'"><p>管理者画面に復帰</p>
+            <button class="button" type="button" onclick="location.href='/adminSalesMainMenu'"><p>管理者画面に復帰</p></button>
         </div>
     </form>
 
@@ -113,8 +113,8 @@
         /*]]>*/
 
         var labels = Object.keys(salesData);
-        var salesValues = Object.values(salesData);
-        var quantityValues = Object.values(quantityData);
+        var salesValues = labels.map(label => salesData[label]);
+        var quantityValues = labels.map(label => quantityData[label]);
 
         var ctxSales = document.getElementById('salesChart').getContext('2d');
         var salesChart = new Chart(ctxSales, {
@@ -122,7 +122,7 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'メニュー別総売上高',
+                    label: '',
                     data: salesValues,
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.8)',
@@ -145,10 +145,35 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true, // 비율을 유지하도록 설정
+                maintainAspectRatio: true,
                 animation: {
                     duration: 1000,
                     easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            font: {
+                                size: 14
+                            },
+                            padding: 20
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'メニュー別総売上高',
+                        font: {
+                            size: 18
+                        }
+                    },
+                    tooltip: {
+                        bodyFont: {
+                            size: 16
+                        },
+                        titleFont: {
+                            size: 16
+                        }
+                    }
                 }
             }
         });
@@ -159,7 +184,7 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'メニュー別総販売量',
+                    label: '',
                     data: quantityValues,
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.8)',
@@ -182,10 +207,35 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true, // 비율을 유지하도록 설정
+                maintainAspectRatio: true,
                 animation: {
                     duration: 1000,
                     easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            font: {
+                                size: 14
+                            },
+                            padding: 20
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'メニュー別総販売量',
+                        font: {
+                            size: 18
+                        }
+                    },
+                    tooltip: {
+                        bodyFont: {
+                            size: 16
+                        },
+                        titleFont: {
+                            size: 16
+                        }
+                    }
                 }
             }
         });
