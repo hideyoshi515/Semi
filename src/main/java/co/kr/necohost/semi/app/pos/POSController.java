@@ -86,7 +86,7 @@ public class POSController {
 	}
 
 	// 注文を確認するメソッド
-	@RequestMapping(value = "/pos/orderList/confirm", method = RequestMethod.POST)
+	@RequestMapping(value = "/pos/orderList/confirmOrder", method = RequestMethod.POST)
 	@ResponseBody
 	public String confirmOrder(@RequestParam Map<String, Object> params) {
 		int pk = params.get("pk") == null ? 0 : Integer.parseInt(params.get("pk").toString());
@@ -181,22 +181,40 @@ public class POSController {
 	@RequestMapping(value = "/pos/makeCoupon", method = RequestMethod.POST)
 	@ResponseBody
 	public String makeCoupon() {
+		String coupon = generateUniqueCoupon();
+
+		couponService.saveCoupon(coupon);
+		couponService.deleteOldCoupons();
+
+		discordBotService.sendOrderNotification("クーポンが発行されました : " + coupon);
+
+		return coupon;
+	}
+
+	//　クーポンの重複チェック
+	private String generateUniqueCoupon() {
+		String coupon;
+
+		do {
+			coupon = generateCouponCode();
+		} while (couponService.isCouponExists(coupon));
+
+		return coupon;
+	}
+
+	// クーポンの発行
+	private String generateCouponCode() {
 		StringBuilder couponCode = new StringBuilder();
 		Random random = new Random();
 
 		for (int i = 0; i < 16; i++) {
-			couponCode.append(random.nextInt(10)); // 0-9 사이の数字を追加
+			couponCode.append(random.nextInt(10)); // 0-9からの数字を追加
 			if ((i + 1) % 4 == 0 && i != 15) {
 				couponCode.append('-'); // 4桁ごとに '-' を追加
 			}
 		}
 
-		String coupon = couponCode.toString();
-
-		couponService.saveCoupon(coupon);
-		discordBotService.sendOrderNotification("クーポンが発行されました: " + coupon);
-
-		return coupon;
+		return couponCode.toString();
 	}
   
 	@RequestMapping(value = "/pos/applyCoupon", method = RequestMethod.POST)
@@ -209,9 +227,11 @@ public class POSController {
 		Map<String, Object> response = new HashMap<>();
 
 		if (coupon != null && coupon.getProcess() == 0) {
-			response.put("valid", true);
-		} else {
-			response.put("valid", false);
+			response.put("valid", "not-used");
+		} else if(coupon != null && coupon.getProcess() == 1){
+			response.put("valid", "used");
+		} else{
+			response.put("valid", "none");
 		}
 
 		return response;

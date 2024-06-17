@@ -34,8 +34,6 @@ public class SalesService {
 		this.categoryRepository = categoryRepository;
 	}
 
-
-
 	// 新しい販売記録を保存
 	public void save(SalesRequest salesRequest) {
 		salesRepository.save(salesRequest.toEntity());
