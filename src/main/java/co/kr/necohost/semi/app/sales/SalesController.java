@@ -214,6 +214,7 @@ public class SalesController {
     public String getTotalSalesByMenuAndPeriodInput(Model model) {
         return "/sales/totalSalesbyMenuAndPeriodInput";
     }
+    //내림차순 시도중 6월 17일 11시 10분
     @RequestMapping(value = "/totalSalesbyMenuAndPeriodInput", method = RequestMethod.POST)
     public String postTotalSalesbyMenuAndPeriodInput(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                                      @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
@@ -224,7 +225,18 @@ public class SalesController {
         Map<String, Double> salesByMenu = salesService.getSalesByMenuInRange(startDateTime, endDateTime);
         Map<String, Integer> quantityByMenu = salesService.getQuantityByMenuInRange(startDateTime, endDateTime);
 
-        model.addAttribute("salesByMenu", salesByMenu);
+        // salesByMenu를 내림차순으로 정렬
+        Map<String, Double> sortedSalesByMenu = salesByMenu.entrySet()
+                .stream()
+                .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
+
+        model.addAttribute("salesByMenu", sortedSalesByMenu);
         model.addAttribute("quantityByMenu", quantityByMenu);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -304,17 +316,36 @@ public class SalesController {
         double salesPercentage = calculatePercentage(totalSalesAmount, totalSalesAmountProcess1);
         double quantityPercentage = calculatePercentage(totalQuantity, totalQuantityProcess1);
 
+        DecimalFormat decimalFormat = new DecimalFormat("#,###");
         DecimalFormat df = new DecimalFormat("#.##");
+        //累積売り上げシェア
         model.addAttribute("salesPercentage", df.format(salesPercentage));
+        //累積販売量シェア
         model.addAttribute("quantityPercentage", df.format(quantityPercentage));
-        model.addAttribute("totalQuantity", totalQuantity);
-        model.addAttribute("totalSalesAmount", (long) totalSalesAmount);
+        //累積販売量
+        model.addAttribute("totalQuantity", decimalFormat.format(totalQuantity));
+        //累積売り上げ
+        model.addAttribute("totalSalesAmount", decimalFormat.format(totalSalesAmount));
+//        model.addAttribute("totalSalesAmount", (long) totalSalesAmount);
 
         double totalCostByProcess = salesService.calculateTotalCostByProcess(1);
-        model.addAttribute("totalCostByProcess", totalCostByProcess);
 
+        model.addAttribute("totalCostByProcess", decimalFormat.format(totalCostByProcess));
         Menu menu = (Menu) salesData.get("menu");
+
+        int totalMenuCost = totalQuantity * menu.getCost();
+        int menuPrice =   menu.getPrice();
+        int menuCost = menu.getCost();
+
+
+
+        model.addAttribute("menuprice", decimalFormat.format(menuPrice));
+        model.addAttribute("menucost", decimalFormat.format(menuCost));
+
         double costPercentage = calculatePercentage(totalQuantity * menu.getCost(), totalCostByProcess);
+        //累積原価
+        model.addAttribute("totalMenuCost", decimalFormat.format(totalMenuCost));
+        //累積シェア
         model.addAttribute("costPercentage", df.format(costPercentage));
 
         LocalDateTime now = LocalDateTime.now();
@@ -382,28 +413,28 @@ public class SalesController {
         double yearQuantityPercentage = calculatePercentage(yearQuantity, totalQuantityYear);
         double yearSalesPercentage = calculatePercentage(yearSalesAmount, totalSalesAmountYear);
 
-        model.addAttribute("todayQuantity", todayQuantity);
-        model.addAttribute("todaySalesAmount", todaySalesAmount);
+        model.addAttribute("todayQuantity", decimalFormat.format(todayQuantity));
+        model.addAttribute("todaySalesAmount", decimalFormat.format(todaySalesAmount));
         model.addAttribute("todayQuantityPercentage", df.format(todayQuantityPercentage));
         model.addAttribute("todaySalesPercentage", df.format(todaySalesPercentage));
 
-        model.addAttribute("weekQuantity", weekQuantity);
-        model.addAttribute("weekSalesAmount", weekSalesAmount);
+        model.addAttribute("weekQuantity", decimalFormat.format(weekQuantity));
+        model.addAttribute("weekSalesAmount", decimalFormat.format(weekSalesAmount));
         model.addAttribute("weekQuantityPercentage", df.format(weekQuantityPercentage));
         model.addAttribute("weekSalesPercentage", df.format(weekSalesPercentage));
 
-        model.addAttribute("monthQuantity", monthQuantity);
-        model.addAttribute("monthSalesAmount", monthSalesAmount);
+        model.addAttribute("monthQuantity", decimalFormat.format(monthQuantity));
+        model.addAttribute("monthSalesAmount", decimalFormat.format(monthSalesAmount));
         model.addAttribute("monthQuantityPercentage", df.format(monthQuantityPercentage));
         model.addAttribute("monthSalesPercentage", df.format(monthSalesPercentage));
 
-        model.addAttribute("quarterQuantity", quarterQuantity);
-        model.addAttribute("quarterSalesAmount", quarterSalesAmount);
+        model.addAttribute("quarterQuantity", decimalFormat.format(quarterQuantity));
+        model.addAttribute("quarterSalesAmount", decimalFormat.format(quarterSalesAmount));
         model.addAttribute("quarterQuantityPercentage", df.format(quarterQuantityPercentage));
         model.addAttribute("quarterSalesPercentage", df.format(quarterSalesPercentage));
 
-        model.addAttribute("yearQuantity", yearQuantity);
-        model.addAttribute("yearSalesAmount", yearSalesAmount);
+        model.addAttribute("yearQuantity", decimalFormat.format(yearQuantity));
+        model.addAttribute("yearSalesAmount", decimalFormat.format(yearSalesAmount));
         model.addAttribute("yearQuantityPercentage", df.format(yearQuantityPercentage));
         model.addAttribute("yearSalesPercentage", df.format(yearSalesPercentage));
 

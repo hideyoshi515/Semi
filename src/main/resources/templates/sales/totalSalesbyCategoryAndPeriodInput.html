@@ -85,7 +85,7 @@
                         <tr th:each="entry : ${salesByCategory}">
                             <td th:text="${entry.key}"></td>
                             <td th:text="${#numbers.formatInteger(entry.value, 1, 'COMMA')} + '円'"></td>
-                            <td th:text="${#numbers.formatInteger(quantityByCategory[entry.key], 1, 'COMMA')}"></td>
+                            <td th:text="${#numbers.formatInteger(quantityByCategory[entry.key], 1, 'COMMA')}+ '個'"></td>
                         </tr>
                         </tbody>
                     </table>
