@@ -13,6 +13,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import java.nio.charset.StandardCharsets;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -49,8 +52,9 @@ public class TimeCardController {
             timeCardService.clockIn(request);
             Optional<TimeCard> timeCard = timeCardService.getTimeCardByUserName(request);
             discordBotService.sendOrderNotification(request.getUsername() + "が " + timeCard.get().getStart().format(formatter) + "に出勤しました。");
-//            return ResponseEntity.ok("出勤処理しました。");
-            return ResponseEntity.ok("clock in");
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(new MediaType("text", "plain", StandardCharsets.UTF_8));
+            return new ResponseEntity<>("出勤処理しました。", headers, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -62,8 +66,9 @@ public class TimeCardController {
             timeCardService.clockOut(request);
             Optional<TimeCard> timeCard = timeCardService.getTimeCardByUserName(request);
             discordBotService.sendOrderNotification(request.getUsername() + "が " + timeCard.get().getEnd().format(formatter) + "に退勤しました。");
-//            return ResponseEntity.ok("退勤処理しました。");
-            return ResponseEntity.ok("clock out");
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(new MediaType("text", "plain", StandardCharsets.UTF_8));
+            return new ResponseEntity<>("退勤処理しました。", headers, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
