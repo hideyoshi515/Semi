@@ -76,8 +76,6 @@ nav a.active {
     border-radius: 5px;
     flex-grow: 1;
     display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 #sidebar .btn i {
@@ -190,10 +188,9 @@ nav a.active {
 }
 
 #paymentbuttonContainer {
-    transform: translateX(1700px);
-    width: 5%;
     position: sticky;
     bottom: 0;
+    display: flex;
 }
 
 @media only screen and (min-width: 768px) and (max-width: 1366px) {
@@ -202,11 +199,16 @@ nav a.active {
         width: 780px;
     }
 
+
     #paymentbuttonContainer {
-        transform: translateX(1020px);
-        width: 20%;
+        background-color: #ffcc00;
         position: sticky;
         bottom: 0;
+        display: flex;
+        transform: translateX(210px);
+        width: 780px;
+        height: 64px;
+        justify-content: flex-end;
     }
 
     #sidebar .btn {
