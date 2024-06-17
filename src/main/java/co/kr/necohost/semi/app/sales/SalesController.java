@@ -6,8 +6,6 @@ import co.kr.necohost.semi.domain.model.entity.Sales;
 import co.kr.necohost.semi.domain.repository.MenuRepository;
 import co.kr.necohost.semi.domain.service.MenuService;
 import co.kr.necohost.semi.domain.service.SalesService;
-import com.nimbusds.jose.shaded.gson.Gson;
-import org.apache.commons.collections4.bag.SynchronizedSortedBag;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,22 +34,6 @@ public class SalesController {
         this.menuRepository = menuRepository;
     }
 
-
-    // 구버전 관리자 판매 메뉴 페이지를 반환하는 메서드(css없음)
-    @RequestMapping(value = "/adminSalesMenu", method=RequestMethod.GET)
-    public String getOldAdminSalesMenu() {
-        return "/sales/adminSalesMenu.html";
-    }
-
-    // 신버전 관리자 페이지 - 판매 관리 페이지를 반환하는 메서드(css있음)
-    @RequestMapping(value = "/adminSalesMainMenu", method=RequestMethod.GET)
-    public String getAdminSalesMainMenu() {
-        return "/sales/adminSalesMainMenu.html";
-    }
-
-
-
-
     //관리자 페이지 - 홈 페이지(오늘의 현재 시간까지의 매출)를 반환하는 메서드(css있음)
     @RequestMapping(value = "/adminSalesMainHome", method = RequestMethod.GET)
     public String getAdminSalesMainHome(Model model) {
@@ -65,44 +47,27 @@ public class SalesController {
 
         // 서비스에서 시간별 매출 데이터를 가져옴
         Map<LocalDateTime, Double> hourlySales = salesService.getHourlySalesByDay(startOfDay, endOfDay);
+        Map<String, Double> formattedHourlySales = salesService.getFormattedHourlySales(hourlySales);
+        String formattedTotalSalesToday = salesService.getFormattedTotalSalesUntilNow(now);
 
-        // 누적 매출 계산 및 포맷된 시간 데이터를 담을 Map 생성
-        Map<String, Double> formattedHourlySales = new TreeMap<>();
-        DateTimeFormatter hourFormatter = DateTimeFormatter.ofPattern("HH:mm");
-        double cumulativeSales = 0.0;
-        for (Map.Entry<LocalDateTime, Double> entry : hourlySales.entrySet()) {
-            cumulativeSales += entry.getValue();
-            formattedHourlySales.put(entry.getKey().format(hourFormatter), cumulativeSales);
-        }
-
-        double totalSalesToday = salesService.getTotalSalesUntilNow(now);
-        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
-        String formattedTotalSalesToday = numberFormat.format(totalSalesToday);
         model.addAttribute("totalSalesToday", formattedTotalSalesToday);
+        model.addAttribute("hourlySales", formattedHourlySales);
 
-        model.addAttribute("hourlySales", formattedHourlySales); // 포맷된 시간 데이터 전달
-        System.out.println("hourlySales 확인 중");
-        System.out.println(formattedHourlySales);
         return "sales/adminSalesMainHome";
     }
 
 
+    // 구버전 관리자 판매 메뉴 페이지를 반환하는 메서드(css없음)
+    @RequestMapping(value = "/adminSalesMenu", method=RequestMethod.GET)
+    public String getOldAdminSalesMenu() {
+        return "/sales/adminSalesMenu.html";
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    // 신버전 관리자 페이지 - 판매 관리 페이지를 반환하는 메서드(css있음)
+    @RequestMapping(value = "/adminSalesMainMenu", method=RequestMethod.GET)
+    public String getAdminSalesMainMenu() {
+        return "/sales/adminSalesMainMenu.html";
+    }
 
 
 
@@ -123,38 +88,16 @@ public class SalesController {
         NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
         String formattedTotalSalesToday = numberFormat.format(totalSalesToday);
         model.addAttribute("totalSalesToday", formattedTotalSalesToday);
-
         model.addAttribute("hourlySales", hourlySales);
-        System.out.println("hourlySales관련 확인중");
-        System.out.println(hourlySales);
+
         return "/sales/adminSalesMainHome2.html";
 
     }
-
-
-
-
-
-
 
     // 판매 데이터베이스 컨트롤러 메뉴 페이지를 반환하는 메서드
     @RequestMapping(value = "/salesDataBaseControllerMenu", method=RequestMethod.GET)
     public String getSalesDataBaseControllerMenu() {
         return "/sales/salesDataBaseControllerMenu.html";
-    }
-
-    // 판매 생성 페이지를 반환하는 메서드 (GET 요청)
-    @RequestMapping(value="/createSales", method=RequestMethod.GET)
-    public String getCreateSales(Model model) {
-        model.addAttribute("salesRequest", new SalesRequest());
-        return "/sales/createSales.html";
-    }
-
-    // 새로운 판매를 생성하는 메서드 (POST 요청)
-    @RequestMapping(value="/createSales", method=RequestMethod.POST)
-    public String postCreateSales(Model model, @ModelAttribute("salesRequest") SalesRequest salesRequest) {
-        salesService.save(salesRequest);
-        return "/sales/createSales.html";
     }
 
     // 판매 데이터를 읽어오는 메서드
@@ -166,109 +109,18 @@ public class SalesController {
         return "/sales/readSales.html";
     }
 
-
-    //각 카테고리별 총 판매액을 반환하는 메서드
-    @RequestMapping(value = "/totalSalesbyCategory", method = RequestMethod.GET)
-    public String getTotalSalesByCategory(Model model) {
-        Map<String, Double> totalByCategory = salesService.getTotalSalesByCategory();
-        model.addAttribute("totalByCategory", totalByCategory);
-        System.out.println(totalByCategory);
-        return "/sales/totalSalesByCategory.html";
-    }
-
-
-
-
-
-
-
-
-    //메뉴별 판매액을 기간 검색하여 반환하는 메서드.
-    @RequestMapping(value = "/totalSalesbyMenuAndPeriodInput", method = RequestMethod.GET)
-    public String getTotalSalesByMenuAndPeriodInput(Model model) {
-
-
-        return "/sales/totalSalesbyMenuAndPeriodInput";
-    }
-
-
-    //메뉴별 판매액을 기간 검색하여 반환하는 메서드.
-    @RequestMapping(value = "/totalSalesbyMenuAndPeriodInput", method = RequestMethod.POST)
-    public String getSalesByMenu(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                 @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-                                 Model model) {
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
-
-        Map<String, Double> salesByMenu = salesService.getSalesByMenuInRange(startDateTime, endDateTime);
-        Map<String, Integer> quantityByMenu = salesService.getQuantityByMenuInRange(startDateTime, endDateTime);
-
-        model.addAttribute("salesByMenu", salesByMenu);
-        model.addAttribute("quantityByMenu", quantityByMenu);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedStartDate = startDate.format(formatter);
-        String formattedEndDate = endDate.format(formatter);
-
-        model.addAttribute("formattedStartDate", formattedStartDate);
-        model.addAttribute("formattedEndDate", formattedEndDate);
-
-        return "sales/totalSalesbyMenuAndPeriodInput";
-    }
-
-    //카테고리별 판매액을 기간 검색하여 반환하는 메서드.
-    @RequestMapping(value = "/totalSalesbyCategoryAndPeriodInput", method = RequestMethod.GET)
-    public String getTotalSalesByCategoryAndPeriodInput(Model model) {
-        return "/sales/totalSalesbyCategoryAndPeriodInput";
-    }
-
-    @RequestMapping(value = "/totalSalesbyCategoryAndPeriodInput", method = RequestMethod.POST)
-    public String getSalesByCategory(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                     @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-                                     Model model) {
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
-
-        Map<String, Double> salesByCategory = salesService.getSalesByCategoryInRange(startDateTime, endDateTime);
-        Map<String, Integer> quantityByCategory = salesService.getQuantityByCategoryInRange(startDateTime, endDateTime);
-
-        model.addAttribute("salesByCategory", salesByCategory);
-        model.addAttribute("quantityByCategory", quantityByCategory);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedStartDate = startDate.format(formatter);
-        String formattedEndDate = endDate.format(formatter);
-
-        model.addAttribute("formattedStartDate", formattedStartDate);
-        model.addAttribute("formattedEndDate", formattedEndDate);
-
-        return "sales/totalSalesbyCategoryAndPeriodInput";
-    }
-
-    //연도별 총 판매액을 반환하는 메서드
+    //연도별 총 판매액을 반환하는 메서드 1번째 버튼 年度別総売上高
     @RequestMapping(value = "/totalSalesByYear", method = RequestMethod.GET)
     public String getTotalSalesByYear(Model model) {
         Map<Integer, Double> yearlySales = salesService.getYearlySalesByProcess();
-
-        // 연도별 오름차순으로 정렬
-        Map<String, Double> yearlySalesStringKey = yearlySales.entrySet()
-                .stream()
-                .sorted(Map.Entry.comparingByKey())
-                .collect(Collectors.toMap(
-                        entry -> entry.getKey().toString(),
-                        Map.Entry::getValue,
-                        (e1, e2) -> e1,
-                        LinkedHashMap::new
-                ));
+        Map<String, Double> yearlySalesStringKey = salesService.getFormattedYearlySales(yearlySales);
 
         model.addAttribute("yearlySales", yearlySalesStringKey);
 
         return "sales/totalSalesByYear";
     }
 
-
-
-    //월별 총 판매액을 반환하는 메서드
+    //월별 총 판매액을 반환하는 메서드/2번째 버튼 月別総売上高
     @RequestMapping(value = "/totalSalesByMonth", method = RequestMethod.GET)
     public String getTotalSalesByMonth(Model model) {
         Map<String, Double> monthlySales = salesService.getMonthlySalesByProcess();
@@ -276,36 +128,7 @@ public class SalesController {
         return "sales/totalSalesByMonth";
     }
 
-
-
-
-    // 입력된 연도의 총 판매액을 반환하는 메서드
-    @RequestMapping(value= "/totalSalesByYearInput", method = RequestMethod.GET)
-    public String getTotalSalesByYearInput(@RequestParam(value = "year", required = false) Integer year, Model model) {
-        if (year != null) {
-            double totalSales = salesService.getTotalSalesByYear(year);
-            model.addAttribute("year", year);
-            model.addAttribute("totalSales", totalSales);
-        }
-        return "/sales/totalSalesByYearInput";
-    }
-
-    // 입력된 연도와 월의 총 판매액 및 성장률을 반환하는 메서드
-    @RequestMapping(value="/totalSalesByYearAndMonthInput" , method = RequestMethod.GET)
-    public String getTotalSalesByYearAndMonthInput(@RequestParam(value = "year", required = false) Integer year,
-                                                   @RequestParam(value = "month", required = false) Integer month, Model model) {
-        if (year != null && month != null) {
-            double totalSales = salesService.getTotalSalesByYearAndMonth(year, month);
-            double growthRate = salesService.getMonthlySalesGrowthRate(year, month);
-            model.addAttribute("year", year);
-            model.addAttribute("month", month);
-            model.addAttribute("totalSales", totalSales);
-            model.addAttribute("growthRate", growthRate);
-        }
-        return "/sales/totalSalesByYearAndMonthInput";
-    }
-
-    //입력된 날짜(연-월-일)의 총 판매액을 반환하는 메서드
+    //입력된 날짜(연-월-일)의 총 판매액을 반환하는 메서드//3번째 버튼 日商/週間売上
     @RequestMapping(value = "/totalSalesByDayInput", method = RequestMethod.GET)
     public String getTotalSalesByDay(@RequestParam(value="year", required = false) Integer year,
                                      @RequestParam(value="month", required = false) Integer month,
@@ -327,7 +150,7 @@ public class SalesController {
     }
 
 
-    // 입력된 날짜(연-월-일)가 속한 주의 주별 매출(1주간 총매출, 요일별 매출)을 반환하는 메서드
+    // 입력된 날짜(연-월-일)가 속한 주의 주별 매출(1주간 총매출, 요일별 매출)을 반환하는 메서드//3번째 버튼 日商/週間売上
     @RequestMapping(value = "/totalWeeklySalesByDayInput", method = RequestMethod.GET)
     public String getTotalWeeklySalesByDay(@RequestParam(value="year", required = false) Integer year,
                                            @RequestParam(value="month", required = false) Integer month,
@@ -358,6 +181,91 @@ public class SalesController {
     }
 
 
+    //카테고리별 판매액/판매량을 기간 검색하여 반환하는 메서드. 4번째 버튼 カテゴリ別売上販売の現状
+    @RequestMapping(value = "/totalSalesbyCategoryAndPeriodInput", method = RequestMethod.GET)
+    public String getTotalSalesByCategoryAndPeriodInput(Model model) {
+        return "/sales/totalSalesbyCategoryAndPeriodInput";
+    }
+    @RequestMapping(value = "/totalSalesbyCategoryAndPeriodInput", method = RequestMethod.POST)
+    public String postTotalSalesByCategoryAndPeriodInput(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                         @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                                                         Model model) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+        Map<String, Double> salesByCategory = salesService.getSalesByCategoryInRange(startDateTime, endDateTime);
+        Map<String, Integer> quantityByCategory = salesService.getQuantityByCategoryInRange(startDateTime, endDateTime);
+
+        model.addAttribute("salesByCategory", salesByCategory);
+        model.addAttribute("quantityByCategory", quantityByCategory);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedStartDate = startDate.format(formatter);
+        String formattedEndDate = endDate.format(formatter);
+
+        model.addAttribute("formattedStartDate", formattedStartDate);
+        model.addAttribute("formattedEndDate", formattedEndDate);
+
+        return "sales/totalSalesbyCategoryAndPeriodInput";
+    }
+
+    //메뉴별 판매액/판매량을 기간 검색하여 반환하는 메서드.  5번째 버튼 メニュー別売上販売の現状
+    @RequestMapping(value = "/totalSalesbyMenuAndPeriodInput", method = RequestMethod.GET)
+    public String getTotalSalesByMenuAndPeriodInput(Model model) {
+        return "/sales/totalSalesbyMenuAndPeriodInput";
+    }
+    @RequestMapping(value = "/totalSalesbyMenuAndPeriodInput", method = RequestMethod.POST)
+    public String postTotalSalesbyMenuAndPeriodInput(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                     @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                                                     Model model) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+        Map<String, Double> salesByMenu = salesService.getSalesByMenuInRange(startDateTime, endDateTime);
+        Map<String, Integer> quantityByMenu = salesService.getQuantityByMenuInRange(startDateTime, endDateTime);
+
+        model.addAttribute("salesByMenu", salesByMenu);
+        model.addAttribute("quantityByMenu", quantityByMenu);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedStartDate = startDate.format(formatter);
+        String formattedEndDate = endDate.format(formatter);
+
+        model.addAttribute("formattedStartDate", formattedStartDate);
+        model.addAttribute("formattedEndDate", formattedEndDate);
+
+        return "sales/totalSalesbyMenuAndPeriodInput";
+    }
+
+    // 입력된 연도의 총 판매액을 반환하는 메서드
+    @RequestMapping(value= "/totalSalesByYearInput", method = RequestMethod.GET)
+    public String getTotalSalesByYearInput(@RequestParam(value = "year", required = false) Integer year, Model model) {
+        if (year != null) {
+            double totalSales = salesService.getTotalSalesByYear(year);
+            model.addAttribute("year", year);
+            model.addAttribute("totalSales", totalSales);
+        }
+        return "/sales/totalSalesByYearInput";
+    }
+
+    // 입력된 연도와 월의 총 판매액 및 성장률을 반환하는 메서드
+    @RequestMapping(value="/totalSalesByYearAndMonthInput" , method = RequestMethod.GET)
+    public String getTotalSalesByYearAndMonthInput(@RequestParam(value = "year", required = false) Integer year,
+                                                   @RequestParam(value = "month", required = false) Integer month, Model model) {
+        if (year != null && month != null) {
+            double totalSales = salesService.getTotalSalesByYearAndMonth(year, month);
+            double growthRate = salesService.getMonthlySalesGrowthRate(year, month);
+            model.addAttribute("year", year);
+            model.addAttribute("month", month);
+            model.addAttribute("totalSales", totalSales);
+            model.addAttribute("growthRate", growthRate);
+        }
+        return "/sales/totalSalesByYearAndMonthInput";
+    }
+
+
+
+
 
 
 
@@ -375,62 +283,8 @@ public class SalesController {
         return "sales/totalSalesByYearAndCategoryInput";
     }
 
-    //6월 14일 6시 18분 확인중
-//    @RequestMapping(value = "salesAnalysisByMenuInput", method = RequestMethod.GET)
-//    public String getSalesAnalysisByMenuInput(@RequestParam Map<String, Object> params, Model model) {
-//        // 메뉴 ID를 파싱
-//        Long menuId = Long.parseLong(params.get("menuId").toString());
-//
-//        // 서비스 계층에서 데이터 처리
-//        Map<String, Object> salesData = salesService.calculateMenuSalesData(menuId);
-//        model.addAllAttributes(salesData);
-//
-//        // process가 1인 판매량과 판매액 총합 계산
-//        Map<String, Double> totalSalesAndQuantityByProcess = salesService.getTotalSalesAndQuantityByProcess(1);
-//        double totalSalesAmountProcess1 = totalSalesAndQuantityByProcess.get("totalSalesAmount");
-//        double totalQuantityProcess1 = totalSalesAndQuantityByProcess.get("totalQuantity");
-//
-//        model.addAttribute("totalQuantityProcess1", (int) totalQuantityProcess1);
-//        model.addAttribute("totalSalesAmountProcess1", totalSalesAmountProcess1);
-//
-//        // 점유율 계산
-//        double totalSalesAmount = (double) salesData.get("totalSalesAmount");
-//        double totalQuantity = (double) salesData.get("totalQuantity");
-//
-//        double salesPercentage = calculatePercentage(totalSalesAmount, totalSalesAmountProcess1);
-//        double quantityPercentage = calculatePercentage(totalQuantity, totalQuantityProcess1);
-//
-//        DecimalFormat df = new DecimalFormat("#.##");
-//        model.addAttribute("salesPercentage", df.format(salesPercentage));
-//        model.addAttribute("quantityPercentage", df.format(quantityPercentage));
-//        model.addAttribute("totalQuantity", (long) totalQuantity); // 소수점 이하 절사
-//        model.addAttribute("totalSalesAmount", (long) totalSalesAmount); // 소수점 이하 절사
-//
-//        // process가 1인 판매의 총 원가 계산
-//        double totalCostByProcess = salesService.calculateTotalCostByProcess(1);
-//        model.addAttribute("totalCostByProcess", totalCostByProcess);
-//
-//        // 원가 점유율 계산
-//        Menu menu = (Menu) salesData.get("menu");
-//        double costPercentage = calculatePercentage(totalQuantity * menu.getCost(), totalCostByProcess);
-//        model.addAttribute("costPercentage", df.format(costPercentage));
-//
-//        return "sales/salesAnalysisByMenuInput";
-//    }
-//
-//    /**
-//     * 두 값을 기반으로 백분율을 계산합니다.
-//     * @param value 부분 값
-//     * @param total 전체 값
-//     * @return 백분율 값
-//     */
-//    private double calculatePercentage(double value, double total) {
-//        return total != 0 ? (value / total) * 100 : 0;
-//    }
 
-    //6월 14일 6시 18분 확인중
-
-    @RequestMapping(value = "salesAnalysisByMenuInput", method = RequestMethod.GET)
+    @RequestMapping(value = "/salesAnalysisByMenuInput", method = RequestMethod.GET)
     public String getSalesAnalysisByMenuInput(@RequestParam Map<String, Object> params, Model model) {
         Long menuId = Long.parseLong(params.get("menuId").toString());
 
@@ -464,10 +318,39 @@ public class SalesController {
         model.addAttribute("costPercentage", df.format(costPercentage));
 
         LocalDateTime now = LocalDateTime.now();
+
+        // 오늘의 총 판매량과 판매액을 계산
+        Map<String, Double> todayTotalSalesAndQuantity = salesService.getTotalSalesAndQuantityToday();
+        double totalSalesAmountToday = todayTotalSalesAndQuantity.get("totalSalesAmount");
+        double totalQuantityToday = todayTotalSalesAndQuantity.get("totalQuantity");
+
+        // 이번 주의 총 판매량과 판매액을 계산 (일요일 시작, 토요일 끝)
+        LocalDateTime startOfWeek = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)).toLocalDate().atStartOfDay();
+        LocalDateTime endOfWeek = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY)).toLocalDate().atTime(23, 59, 59);
+
+        Map<String, Double> weekTotalSalesAndQuantity = salesService.getTotalSalesAndQuantityByDateRange(startOfWeek, endOfWeek);
+        double totalSalesAmountWeek = weekTotalSalesAndQuantity.get("totalSalesAmount");
+        double totalQuantityWeek = weekTotalSalesAndQuantity.get("totalQuantity");
+
+        // 이번 달의 총 판매량과 판매액을 계산
+        Map<String, Double> monthTotalSalesAndQuantity = salesService.getTotalSalesAndQuantityThisMonth();
+        double totalSalesAmountMonth = monthTotalSalesAndQuantity.get("totalSalesAmount");
+        double totalQuantityMonth = monthTotalSalesAndQuantity.get("totalQuantity");
+
+        // 이번 분기의 총 판매량과 판매액을 계산
+        Map<String, Double> quarterTotalSalesAndQuantity = salesService.getTotalSalesAndQuantityThisQuarter();
+        double totalSalesAmountQuarter = quarterTotalSalesAndQuantity.get("totalSalesAmount");
+        double totalQuantityQuarter = quarterTotalSalesAndQuantity.get("totalQuantity");
+
+        // 금년도의 총 판매량과 판매액을 계산
+        Map<String, Double> yearTotalSalesAndQuantity = salesService.getTotalSalesAndQuantityThisYear();
+        double totalSalesAmountYear = yearTotalSalesAndQuantity.get("totalSalesAmount");
+        double totalQuantityYear = yearTotalSalesAndQuantity.get("totalQuantity");
+
         LocalDateTime startOfToday = now.toLocalDate().atStartOfDay();
-        LocalDateTime startOfWeek = now.with(DayOfWeek.MONDAY).toLocalDate().atStartOfDay();
         LocalDateTime startOfMonth = now.withDayOfMonth(1).toLocalDate().atStartOfDay();
         LocalDateTime startOfQuarter = now.with(now.getMonth().firstMonthOfQuarter()).withDayOfMonth(1).toLocalDate().atStartOfDay();
+        LocalDateTime startOfYear = now.withDayOfYear(1).toLocalDate().atStartOfDay();
 
         int todayQuantity = salesService.getTotalQuantityByDateRange(startOfToday, now, menuId);
         double todaySalesAmount = salesService.getTotalSalesByDateRange(startOfToday, now, menuId);
@@ -481,29 +364,23 @@ public class SalesController {
         int quarterQuantity = salesService.getTotalQuantityByDateRange(startOfQuarter, now, menuId);
         double quarterSalesAmount = salesService.getTotalSalesByDateRange(startOfQuarter, now, menuId);
 
-        int totalTodayQuantity = salesService.getTotalQuantityByDateRange(startOfToday, now);
-        double totalTodaySalesAmount = salesService.getTotalSalesByDateRange(startOfToday, now);
+        int yearQuantity = salesService.getTotalQuantityByDateRange(startOfYear, now, menuId);
+        double yearSalesAmount = salesService.getTotalSalesByDateRange(startOfYear, now, menuId);
 
-        int totalWeekQuantity = salesService.getTotalQuantityByDateRange(startOfWeek, now);
-        double totalWeekSalesAmount = salesService.getTotalSalesByDateRange(startOfWeek, now);
+        double todayQuantityPercentage = calculatePercentage(todayQuantity, totalQuantityToday);
+        double todaySalesPercentage = calculatePercentage(todaySalesAmount, totalSalesAmountToday);
 
-        int totalMonthQuantity = salesService.getTotalQuantityByDateRange(startOfMonth, now);
-        double totalMonthSalesAmount = salesService.getTotalSalesByDateRange(startOfMonth, now);
+        double weekQuantityPercentage = calculatePercentage(weekQuantity, totalQuantityWeek);
+        double weekSalesPercentage = calculatePercentage(weekSalesAmount, totalSalesAmountWeek);
 
-        int totalQuarterQuantity = salesService.getTotalQuantityByDateRange(startOfQuarter, now);
-        double totalQuarterSalesAmount = salesService.getTotalSalesByDateRange(startOfQuarter, now);
+        double monthQuantityPercentage = calculatePercentage(monthQuantity, totalQuantityMonth);
+        double monthSalesPercentage = calculatePercentage(monthSalesAmount, totalSalesAmountMonth);
 
-        double todayQuantityPercentage = calculatePercentage(todayQuantity, totalTodayQuantity);
-        double todaySalesPercentage = calculatePercentage(todaySalesAmount, totalTodaySalesAmount);
+        double quarterQuantityPercentage = calculatePercentage(quarterQuantity, totalQuantityQuarter);
+        double quarterSalesPercentage = calculatePercentage(quarterSalesAmount, totalSalesAmountQuarter);
 
-        double weekQuantityPercentage = calculatePercentage(weekQuantity, totalWeekQuantity);
-        double weekSalesPercentage = calculatePercentage(weekSalesAmount, totalWeekSalesAmount);
-
-        double monthQuantityPercentage = calculatePercentage(monthQuantity, totalMonthQuantity);
-        double monthSalesPercentage = calculatePercentage(monthSalesAmount, totalMonthSalesAmount);
-
-        double quarterQuantityPercentage = calculatePercentage(quarterQuantity, totalQuarterQuantity);
-        double quarterSalesPercentage = calculatePercentage(quarterSalesAmount, totalQuarterSalesAmount);
+        double yearQuantityPercentage = calculatePercentage(yearQuantity, totalQuantityYear);
+        double yearSalesPercentage = calculatePercentage(yearSalesAmount, totalSalesAmountYear);
 
         model.addAttribute("todayQuantity", todayQuantity);
         model.addAttribute("todaySalesAmount", todaySalesAmount);
@@ -525,25 +402,17 @@ public class SalesController {
         model.addAttribute("quarterQuantityPercentage", df.format(quarterQuantityPercentage));
         model.addAttribute("quarterSalesPercentage", df.format(quarterSalesPercentage));
 
+        model.addAttribute("yearQuantity", yearQuantity);
+        model.addAttribute("yearSalesAmount", yearSalesAmount);
+        model.addAttribute("yearQuantityPercentage", df.format(yearQuantityPercentage));
+        model.addAttribute("yearSalesPercentage", df.format(yearSalesPercentage));
+
         return "sales/salesAnalysisByMenuInput";
     }
 
-    /**
-     * 두 값을 기반으로 백분율을 계산합니다.
-     * @param value 부분 값
-     * @param total 전체 값
-     * @return 백분율 값
-     */
     private double calculatePercentage(double value, double total) {
         return total != 0 ? (value / total) * 100 : 0;
     }
-
-
-    //6월 14일 6시 18분 확인중
-
-
-
-
 
 
 

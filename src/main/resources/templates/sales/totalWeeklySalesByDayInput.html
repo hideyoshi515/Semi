@@ -50,18 +50,20 @@
         </h3>
     </form>
 
-    <div th:if="${year != null && month != null && day != null}" class="result-container">
-        <h3>
-            <span th:text="${year}"></span>年
-            <span th:text="${month}"></span>月
-            <span th:text="${day}"></span>日が属している一週間の総売上高は
-            <span th:text="${totalWeeklySales}"></span>円です。
-        </h3>
-    </div>
+
 
     <div th:if="${weeklySales != null}">
         <div class="content">
-            <div class="table-container">
+
+            <div class="table-container" style="display:block">
+                <div th:if="${year != null && month != null && day != null}" class="result-container" >
+                    <h3>
+                        <span th:text="${year}"></span>年
+                        <span th:text="${month}"></span>月
+                        <span th:text="${day}"></span>日が属している一週間の総売上高は<br>
+                        <span th:text="${totalWeeklySales}"></span>円です。
+                    </h3>
+                </div>
                 <table>
                     <thead>
                     <tr>
@@ -85,7 +87,7 @@
             </div>
         </div>
 
-        <div class="button-container" style="justify-content: space-around; margin-top: 20px;">
+        <div class="button-container" style="justify-content: space-around; margin-top: 10px;">
             <div class="button" onclick="document.forms[0].submit()">
                 <p>日商閲覧</p>
             </div>
@@ -149,6 +151,15 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    },
+                    hover: {
+                        mode: 'nearest',
+                        intersect: false
+                    },
                     animation: {
                         duration: 500,
                         easing: 'easeInOutBounce'
@@ -164,6 +175,7 @@
             updateBarColors(data);
             weeklySalesChart.update();
         </script>
+
     </div>
 </th:block>
 </body>

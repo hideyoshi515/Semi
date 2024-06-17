@@ -28,17 +28,21 @@
         <a href="/adminSalesMainHome">ホーム</a>
         <a href="/adminSalesMainMenu">メニュー</a>
     </div>
-    <h1 style="color: black;"><img style="width: 38px;height: 38px;" src="/img/storeownerpage/salereport.png">メニュー別売上販売の現状</h1>
+    <h1 style="color: white;"><img style="width: 38px;height: 38px;" src="/img/storeownerpage/salereport.png">メニュー別売上販売の現状</h1>
     <img id="menu-detail-image" th:if="${menu.image} != null" th:src="${menu.image}" style="width: 16%; height: auto;"> </div>
-    <h3 style="color: black;">メニュー名: <span th:text="${menu.name}"></span></h3>
 
     <div>
-        <h3 style="color: black;">누적 판매량: <span th:text="${totalQuantity}"></span>個//점유율<span th:text="${quantityPercentage}"></span>%</h3>
-        <h3 style="color: black;">누적 판매액: <span th:text="${totalSalesAmount}"></span>円//점유율 <span th:text="${salesPercentage}"></span>%</h3></h3>
-        <h3 style="color: black;">누적 원가: <span th:text="${totalQuantity}*${menu.cost}"></span>円// 원가 점유율 <span th:text="${costPercentage}"></span>%</h3>
-        <h3 style="color: black;">메뉴의 가격 <span th:text="${menu.price}"></span>円</h3>
-        <h3 style="color: black;">메뉴의 원가 <span th:text="${menu.cost}"></span>円</h3>
-        <h3 style="color: black;">이익률: <span th:text="${profitRate}"></span>%</h3>
+        <h3>누적 판매량: <span th:text="${totalQuantity}"></span>個//점유율<span th:text="${quantityPercentage}"></span>%</h3>
+        <h3>누적 판매액: <span th:text="${totalSalesAmount}"></span>円//점유율 <span th:text="${salesPercentage}"></span>%</h3></h3>
+        <h3>누적 원가: <span th:text="${totalQuantity}*${menu.cost}"></span>円// 원가 점유율 <span th:text="${costPercentage}"></span>%</h3>
+        <h3>메뉴의 가격 <span th:text="${menu.price}"></span>円</h3>
+        <h3>메뉴의 원가 <span th:text="${menu.cost}"></span>円</h3>
+        <h3>이익률: <span th:text="${profitRate}"></span>%</h3>
+
+
+
+
+
     </div>
 
     <div>
@@ -50,7 +54,37 @@
         <h3 style="color: black;">今月の売上: <span th:text="${monthSalesAmount}"></span>円 // 今月の売上シェア: <span th:text="${monthSalesPercentage}"></span>%</h3>
         <h3 style="color: black;">今四半期の販売量: <span th:text="${quarterQuantity}"></span>個 // 今四半期の販売量のシェア: <span th:text="${quarterQuantityPercentage}"></span>%</h3>
         <h3 style="color: black;">今四半期の売上: <span th:text="${quarterSalesAmount}"></span>円 // 今四半期の売上シェア: <span th:text="${quarterSalesPercentage}"></span>%</h3>
+        <h3 style="color: black;">今年の販売量: <span th:text="${yearQuantity}"></span>個 // 今年の販売量のシェア: <span th:text="${yearQuantityPercentage}"></span>%</h3>
+        <h3 style="color: black;">今年の売上: <span th:text="${yearSalesAmount}"></span>円 // 今年の売上シェア: <span th:text="${yearSalesPercentage}"></span>%</h3>
     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    아이디<div th:text="${menu.id}"></div>
+    <H2><div th:text="${menu.name}+'メニューの販売データ分析'"></div></H2>
+    메뉴의 카테고리<div th:text="${menu.category}"></div>
+    메뉴의 현재 재고<div th:text="${menu.stock}"></div>
+    메뉴의 가격 <div th:text="${menu.price}"></div>
+    메뉴의 원가 <div th:text="${menu.cost}"></div>
+    메뉴의 이익률 <div th:text="(${menu.price }-${menu.cost})/${menu.price}"></div>
+    메뉴의 이미지
+
+    메뉴의 설명<div th:text="${menu.description}"></div>
+
+    현재까지 매출액/ 점유율
+    최근 매출액 (오늘/어제 대비 증감률, 일주일/전주 대비 증감률, 한달/전월 대비 증감률 )
+    현재까지 판매량/ 점유율
+    최근 판매량(오늘/어제 대비 증감률, 일주일/전주 대비 증감률, 한달/전월 대비 증감률 )
 
     <table>
         <thead>
@@ -65,6 +99,7 @@
             <th scope="col">deviceNum</th>
             <th scope="col">odrderNum</th>
             <th scope="col">process</th>
+
         </tr>
         </thead>
         <tbody>
@@ -79,9 +114,15 @@
             <td th:text="${sale.deviceNum}"></td>
             <td th:text="${sale.orderNum}"></td>
             <td th:text="${sale.process}"></td>
+
         </tr>
         </tbody>
     </table>
+
+
+
+
+
 </th:block>
 </body>
 </html>

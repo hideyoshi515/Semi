@@ -20,7 +20,7 @@ h1 {
     margin: 0 15px;
     font-size: 1.5rem; /* Increase font size */
     transition: background-color 0.3s, font-size 0.3s, transform 0.3s; /* Smooth transition for color and font size */
-    padding: 8px 16px; /* Add padding for better click area */
+    padding: 6px 16px; /* Add padding for better click area */
     display: inline-block;
     position: relative; /* Allow transform without affecting layout */
 }
@@ -45,35 +45,26 @@ h1 {
     justify-content: center; /* Center content horizontally */
     align-items: center; /* Center content vertically */
     background-color: white; /* Set background color to white */
-    padding: 20px;
+    padding: 10px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-height: 600px;
+    overflow-y: auto; /* Enable vertical scroll */
 }
 
 .table-container table {
+
     width: 100%;
     border-collapse: collapse;
     text-align: center;
     font-size: 1.1rem;
     table-layout: fixed; /* Fix the table layout */
-}
 
-.table-container.limited-width table {
-    table-layout: fixed;
-}
-
-.table-container.limited-width th:nth-child(1), .table-container.limited-width td:nth-child(1) {
-    width: 25%; /* 첫번째 칼럼 */
-}
-
-.table-container.limited-width th:nth-child(2), .table-container.limited-width td:nth-child(2),
-.table-container.limited-width th:nth-child(3), .table-container.limited-width td:nth-child(3) {
-    width: 37.5%; /* 두번째와 세번째 칼럼 */
 }
 
 .table-container th, .table-container td {
     border: 1px solid #ddd;
-    padding: 12px;
+    padding: 5px;
 }
 
 .table-container th {
