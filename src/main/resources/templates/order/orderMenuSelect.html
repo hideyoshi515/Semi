@@ -34,7 +34,7 @@
 </head>
 <body>
 <th:block layout:fragment="content">
-    <div id="wrapper" class="mt-0" style="min-height: 2400px">
+    <div id="wrapper" class="mt-0">
         <div id="sidebarMein"></div>
         <div id="sidebar">
             <div class="btn-group-vertical" role="group" aria-label="Category filter">
@@ -92,7 +92,7 @@
                 </div>
             </div>
         </div>
-        <p>어서오세요.>-<</p>
+        <p>어서오세요.>-< <br> 하와와</p>
     </div>
 
     <!-- Modal -->
@@ -135,11 +135,11 @@
     <div id="paymentbuttonContainer">
         <form method="post" action="orderPayment" id="orderForm" onsubmit="return checkoutForm()">
             <input type="hidden" name="orderData" id="orderData">
-            <button type="submit" class="btn btn-success" id="paymentBtn">お支払い</button>
+            <button type="submit" class="btn btn-success rounded-0" id="paymentBtn">お支払い</button>
         </form>
 
         <!-- Cart Modal -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cartModal"
+        <button type="button" class="btn btn-primary rounded-0" data-bs-toggle="modal" data-bs-target="#cartModal"
                 id="paymentCartBtn">
             カーゴ
         </button>
