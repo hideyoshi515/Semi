@@ -46,7 +46,7 @@
                 <div class="fs-2 ms-1" th:text="|合計 : ${#numbers.formatInteger(totalPrice,1,'COMMA')} ₩|"></div>
             </div>
             <div class="d-flex">
-                <button type="button" class="btn btn-lg btn-warning" onclick="showCouponModal()">クーポン</button>
+                <button type="button" class="btn btn-lg btn-warning couponBtn" onclick="couponButtonClick()">クーポン</button>
                 <a href="/order/kiosk/menu" class="btn btn-lg btn-warning mx-3">戻る</a>
                 <button id="payBtn" onclick="payStart()" type="button" class="btn btn-lg btn-warning"
                         data-toggle="modal" data-target="#membershipModal">支払い
@@ -147,7 +147,8 @@
     </div>
 
     <!-- 쿠폰 입력 모달 -->
-    <div class="modal fade" id="couponModal" tabindex="-1" role="dialog" aria-labelledby="couponModalLabel" aria-hidden="true">
+    <div class="modal fade" id="couponModal" tabindex="-1" role="dialog" aria-labelledby="couponModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -164,14 +165,13 @@
                         <span style="margin: 0 10px;">-</span>
                         <input type="text" class="form-control coupon-input" id="couponPart4" maxlength="4" style="width: 70px; text-align: center;" required>
                     </div>
-                    <button type="button" class="btn btn-warning mt-3" onclick="applyCoupon()" style="width: 100%;">
+                    <button type="button" class="btn btn-warning mt-3" id="applyCouponBtn" onclick="applyCoupon()" style="width: 100%;">
                         適用
                     </button>
                 </div>
             </div>
         </div>
     </div>
-
 
     <script>
         let account;
@@ -332,11 +332,25 @@
         let couponApplied = false;
         let originalTotalPrice = 0;
 
-        function showCouponModal() {
+        function valueNull(){
             document.getElementById('couponPart1').value = null;
             document.getElementById('couponPart2').value = null;
             document.getElementById('couponPart3').value = null;
             document.getElementById('couponPart4').value = null;
+        }
+
+        function couponButtonClick() {
+            if (couponApplied) {
+                if (confirm('쿠폰 사용을 취소하시겠습니까?')) {
+                    cancelCoupon();
+                }
+            } else {
+                showCouponModal();
+            }
+        }
+
+        function showCouponModal() {
+            valueNull();
 
             $('#couponModal').modal('show');
         }
@@ -371,21 +385,22 @@
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     const response = JSON.parse(xhr.responseText);
 
-                    if (response.valid) {
+                    if (response.valid === 'not-used') {
                         applyDiscount();
 
                         couponApplied = true;
 
-                        document.querySelector('.btn-warning').textContent = '쿠폰 취소';
+                        document.querySelector('.couponBtn').textContent = 'クーポン取消';
 
                         alert('クーポンが適用されました。');
+                    } else if(response.valid === 'used') {
+                        alert('このクーポンは既に使用済みです。');
+
+                        valueNull();
                     } else {
                         alert('無効なクーポン番号です。');
 
-                        document.getElementById('couponPart1').value = null;
-                        document.getElementById('couponPart2').value = null;
-                        document.getElementById('couponPart3').value = null;
-                        document.getElementById('couponPart4').value = null;
+                        valueNull();
                     }
 
                     $('#couponModal').modal('hide');
@@ -414,7 +429,7 @@
 
             couponApplied = false;
 
-            document.querySelector('.btn-warning').textContent = 'クーポン';
+            document.querySelector('.couponBtn').textContent = 'クーポン';
 
             alert('クーポンが取り消されました。');
         }

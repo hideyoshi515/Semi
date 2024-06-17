@@ -158,10 +158,10 @@
             xhr.send();
         }
 
-        function confirm(pk, menuId, quantity, date) {
+        function confirmOrder(pk, menuId, quantity, date) {
             let xhr = new XMLHttpRequest();
             console.log(pk, menuId, quantity, date);
-            xhr.open("POST", "/pos/orderList/confirm?pk=" + pk + "&menuId=" + menuId + "&quantity=" + quantity, true);
+            xhr.open("POST", "/pos/orderList/confirmOrder?pk=" + pk + "&menuId=" + menuId + "&quantity=" + quantity, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
@@ -293,7 +293,7 @@
                     deleteButton.className = 'btn btn-primary btn-sm user-select-none';
                     deleteButton.id = 'btn_' + order.pk;
                     deleteButton.textContent = '承認確認';
-                    deleteButton.setAttribute('onclick', `confirm(${order.pk}, ${order.itemId}, ${order.quantity}, '${order.date}')`);
+                    deleteButton.setAttribute('onclick', `confirmOrder(${order.pk}, ${order.itemId}, ${order.quantity}, '${order.date}')`);
                 }
                 buttonGroup.appendChild(deleteButton);
 

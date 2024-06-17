@@ -40,15 +40,12 @@ public class OrderWebSocketHandler extends TextWebSocketHandler {
 	}
 
 	public void sendMessageToAllSessions(TextMessage message) throws IOException {
-		System.out.println("웹소켓 1");
-
 		for (WebSocketSession session : sessions) {
 			System.out.println("세션 ID: " + session.getId() + ", 세션 상태: " + session.isOpen());
 
 			if (session.isOpen()) {
 				try {
 					session.sendMessage(message);
-					System.out.println("웹 소켓 2");
 				} catch (IOException e) {
 					System.out.println("메시지 전송 중 예외 발생: " + e.getMessage());
 					e.printStackTrace();

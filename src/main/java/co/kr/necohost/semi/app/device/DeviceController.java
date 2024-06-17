@@ -85,14 +85,14 @@ public class DeviceController {
 
 		int categoryCount = 0;
 		List<List<Menu>> menusList = new ArrayList<>();
-		for(Category category : categories) {
+		for (Category category : categories) {
 			categoryCount++;
 			menusList.add(menuService.getMenuByCategory((int) category.getId()));
 		}
 
 		int index = 0;
-		for(List<Menu> listItems : menusList){
-			model.addAttribute("section"+(index+1)+"Items", listItems.get(index));
+		for (List<Menu> listItems : menusList) {
+			model.addAttribute("section" + (index + 1) + "Items", listItems.get(index));
 		}
 
 		model.addAttribute("menus", menus);
@@ -383,6 +383,10 @@ public class DeviceController {
 		String formattedDateTime = localDate.format(formatter);
 		OrderNum orderNum = orderNumRepository.save(new OrderNum());
 
+		String couponNum = (String) params.get("couponNum");
+
+		Coupon coupon = couponService.findByCouponNum(couponNum);
+
 		for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
 			Menu menu = entry.getKey();
 
@@ -391,19 +395,17 @@ public class DeviceController {
 			SalesRequest sales = new SalesRequest();
 
 			salePrice = menu.getPrice();
-			String couponNum = (String) params.get("couponNum");
 
 			if (couponNum != null && !couponNum.isEmpty()) {
 				System.out.println("쿠폰 사용 준비: " + couponNum);
 
-				Coupon coupon = couponService.findByCouponNum(couponNum);
 				if (coupon != null) {
 					System.out.println("쿠폰 찾음: " + coupon);
+
 					if (coupon.getProcess() == 0) {
 						salePrice *= 0.9;  // 10% 할인 적용
-						coupon.setProcess(1);  // 쿠폰 사용 처리
-						couponService.save(coupon);
 						System.out.println(salePrice);
+
 						System.out.println("쿠폰 사용됨: " + couponNum);
 					} else {
 						System.out.println("쿠폰 이미 사용됨: " + couponNum);
@@ -422,10 +424,29 @@ public class DeviceController {
 			sales.setDeviceNum(1);
 			sales.setOrderNum(orderNum.getOrderNum());
 			sales.setProcess(0);
+
 			salesService.save(sales);
+
 			menu.setStock(menu.getStock() - quantity);
+
 			menuRepository.save(menu);
+
 		}
+
+		if (coupon != null) {
+			System.out.println("쿠폰 찾음: " + coupon);
+			if (coupon.getProcess() == 0) {
+				coupon.setProcess(1);  // 쿠폰 사용 처리
+				couponService.save(coupon);
+
+				System.out.println("쿠폰 사용됨: " + couponNum);
+			} else {
+				System.out.println("쿠폰 이미 사용됨: " + couponNum);
+			}
+		} else {
+			System.out.println("쿠폰을 찾을 수 없음: " + couponNum);
+		}
+
 		orders.clear();
 
 		if (params.get("phone") != null) {

@@ -7,6 +7,9 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -17,5 +20,6 @@ public class Coupon {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	private String couponNum;
+	private LocalDateTime date;
 	private int process;
 }
