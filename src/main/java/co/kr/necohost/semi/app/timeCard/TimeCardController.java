@@ -32,12 +32,12 @@ public class TimeCardController {
         this.discordBotService = discordBotService;
     }
 
-    /*@RequestMapping(value = "/timeCardList", method = RequestMethod.GET)
+    @RequestMapping(value = "/timeCardList", method = RequestMethod.GET)
     public String getTimeCardList(Model model) {
         List<TimeCardRequest> timeCards = timeCardService.getAllTimeCardDesc();
         model.addAttribute("timeCards", timeCards);
         return "timeCard/timeCardList.html";
-    }*/
+    }
 
     @RequestMapping(value = "/timeCardInput", method = RequestMethod.GET)
     public String getTimeCardInput(Model model) {

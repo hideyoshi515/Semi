@@ -7,9 +7,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff List</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .table-responsive {
             overflow-x: hidden; /* 가로 스크롤 숨기기 */
+        }
+
+        .table-header .col {
+            font-weight: bold;
+        }
+
+        .table-body .col-id {
+            width: 50px; /* ID 열의 너비 설정 */
+        }
+        .col {
+            align-content: center;
+        }
+
+        .table-body .row:nth-child(odd) {
+            background-color: #f2f2f2; /* 회색 */
+        }
+
+        .table-body .row:nth-child(even) {
+            background-color: #ffffff; /* 흰색 */
+        }
+
+        .table-body .row {
+            border: 1px solid #ccc; /* 행 테두리 */
+            border-left: none;
+            border-right: none;
+        }
+
+        .table-body .row + .row {
+            border-top: 1px solid #ddd; /* 행과 행 사이의 구분선 */
         }
     </style>
 </head>
@@ -18,10 +48,10 @@
     <div class="container mt-5">
         <h2>Staff List</h2>
         <div class="table-responsive">
-            <div class="table">
+            <div style="border-left: none; border-right: none" class="table">
                 <div class="table-header">
                     <div class="row">
-                        <div class="col"><strong>ID</strong></div>
+                        <div class="col col-id"><strong>ID</strong></div>
                         <div class="col"><strong>Name</strong></div>
                         <div class="col"><strong>Username</strong></div>
                         <div class="col"><strong>Phone</strong></div>
@@ -31,9 +61,9 @@
                 </div>
                 <div class="table-body">
                     <div th:each="staff : ${staffs}" class="row">
-                        <div class="col" th:text="${staff.id}"></div>
+                        <div class="col col-id" th:text="${staff.id}"></div>
                         <div class="col" th:text="${staff.name}"></div>
-                        <div class="col" th:text="${staff.username}"></div>
+                        <div class="col" style="font-size: 1.3rem; color: #2f69ff" th:text="${staff.username}"></div>
                         <div class="col" th:text="${staff.phone}"></div>
                         <div class="col" th:text="${staff.position.position_Name}"></div>
                         <div class="col">

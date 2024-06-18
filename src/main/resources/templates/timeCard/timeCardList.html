@@ -16,7 +16,14 @@
         .time-card-row:nth-child(even) {
             background-color: #ffffff; /* 흰색 */
         }
-
+        .time-card-row {
+            border: 1px solid #ccc; /* 행 테두리 */
+            border-left: none;
+            border-right: none;
+        }
+        .time-card-row + .time-card-row {
+            border-top: 1px solid #ddd; /* 행과 행 사이의 구분선 */
+        }
         .table-body {
             border-top: 1px solid #ddd;
         }
@@ -24,17 +31,34 @@
         .time-card-row {
             border-bottom: 1px solid #ddd;
         }
+        .date-input{
+            width: 8rem;
+        }
+        #searchInput {
+            width: 15rem;
+        }
+        .right-aligned {
+            margin-left: auto; /* 자동으로 오른쪽 정렬 */
+        }
+        .table-responsive {
+            overflow-x: hidden; /* 가로 스크롤 숨기기 */
+        }
     </style>
 </head>
 <body>
 <th:block layout:fragment="content">
     <div class="container mt-5">
         <h2>TimeCard List</h2>
-        <div class="mb-3">
-            <input type="text" id="searchInput" class="form-control" placeholder="Search by Username" oninput="filterTimeCards()">
+        <div class="mb-3 d-flex">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search by Username" oninput="filterTimeCards()" style="margin-right: 10px;">
+            <div class="right-aligned d-flex">
+                <input type="date" id="startDate" class="form-control date-input" style="margin-right: 10px;">
+                <input type="date" id="endDate" class="form-control date-input" style="margin-right: 10px;">
+                <button class="btn btn-primary" onclick="filterByDate()">日付で検索</button>
+            </div>
         </div>
         <div class="table-responsive">
-            <div class="table">
+            <div style="border-left: none; border-right: none" class="table">
                 <div class="table-header">
                     <div class="row">
                         <div class="col"><strong>Username</strong></div>
@@ -72,8 +96,72 @@
                 }
             }
         }
-    </script>
 
+        function filterByDate() {
+            let startDateInput = document.getElementById('startDate').value;
+            let endDateInput = document.getElementById('endDate').value;
+
+            // 날짜가 입력되지 않았을 때 기본값 설정
+            if (!startDateInput || !endDateInput) {
+                alert('Please enter both start and end dates.');
+                return;
+            }
+
+            let startDate = new Date(startDateInput);
+            let endDate = new Date(endDateInput);
+            let rows = document.getElementsByClassName('time-card-row');
+
+            for (let i = 0; i < rows.length; i++) {
+                let inDateStr = rows[i].getElementsByClassName('col')[1].textContent.trim();
+                let outDateStr = rows[i].getElementsByClassName('col')[2].textContent.trim();
+                // 날짜 형식이 올바른지 확인하고, 형식이 올바른 경우에만 Date 객체로 변환
+                let inDate = parseDate(inDateStr);
+                let outDate = parseDate(outDateStr);
+
+                if (isValidDate(inDate) && isValidDate(outDate)) {
+                    // 날짜 비교를 위해 밀리초 단위로 변환하여 비교
+                    if (startDate.getTime() <= inDate.getTime() && endDate.getTime() >= outDate.getTime()) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                } else {
+                    // 날짜 형식이 잘못된 경우 해당 행을 숨김
+                    rows[i].style.display = "none";
+                }
+            }
+        }
+        document.getElementById('startDate').addEventListener('change', function() {
+            let startDateInput = this.value;
+            // YYYY-MM-DD 형식 문자열 얻어냄
+            let endDateInput = document.getElementById('endDate');
+
+            if (startDateInput) {
+                let startDate = new Date(startDateInput);
+                // 연산을 위해서 Date 타입 객체로 만듦
+                startDate.setDate(startDate.getDate() + 1); // 시작 날짜의 다음 날
+
+                // 다시 html의 input type="date"에 세팅해주기 위해 YYYY-MM-DD 형식 문자열로 변환
+                let nextDay = startDate.toISOString().split('T')[0];
+                endDateInput.value = nextDay;
+            }
+        });
+
+        // 문자열을 Date 객체로 변환하는 함수
+        function parseDate(dateStr) {
+            let date = new Date(dateStr);
+            if (isNaN(date.getTime())) {
+                // 날짜 형식이 잘못된 경우 빈 Date 객체 반환
+                return new Date('');
+            }
+            return date;
+        }
+
+        // Date 객체가 유효한지 확인하는 함수
+        function isValidDate(date) {
+            return date instanceof Date && !isNaN(date.getTime());
+        }
+    </script>
 </th:block>
 </body>
 </html>
