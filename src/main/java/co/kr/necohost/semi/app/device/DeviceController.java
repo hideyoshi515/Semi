@@ -127,11 +127,15 @@ public class DeviceController {
 		model.addAttribute("orderedItems", orders);
 		model.addAttribute("totalPrice", totalPrice);
 
+
+
+
+
 		return "order/orderPaymentSelect.html";
 	}
 
 	@RequestMapping(value = "/orderPaymentSelect", method = RequestMethod.POST)
-	public String OrderPaymentSelect(HttpSession session, Model model, @RequestParam String paymentMethod, AccountRequest accountRequest) {
+	public String OrderPaymentSelect(HttpSession session, Model model,@RequestParam String paymentMethod, AccountRequest accountRequest,@RequestParam Map<String, Object> params) {
 		Map<Menu, Integer> orders = getSessionOrders(session);
 		if (orders == null) {
 			System.out.println("오류오류오류");
@@ -145,6 +149,95 @@ public class DeviceController {
 
 		model.addAttribute("orderedItems", orders);
 		model.addAttribute("totalPrice", totalPrice);
+
+
+		int salePrice = 0;
+
+		LocalDateTime localDate = LocalDateTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		String formattedDateTime = localDate.format(formatter);
+		OrderNum orderNum = orderNumRepository.save(new OrderNum());
+
+		String couponNum = (String) params.get("couponNum");
+
+		Coupon coupon = couponService.findByCouponNum(couponNum);
+
+		for (Map.Entry<Menu, Integer> entry : orders.entrySet()) {
+			Menu menu = entry.getKey();
+
+			int quantity = entry.getValue();
+
+			SalesRequest sales = new SalesRequest();
+
+			salePrice = menu.getPrice();
+
+			if (couponNum != null && !couponNum.isEmpty()) {
+				System.out.println("쿠폰 사용 준비: " + couponNum);
+
+				if (coupon != null) {
+					System.out.println("쿠폰 찾음: " + coupon);
+
+					if (coupon.getProcess() == 0) {
+						salePrice *= 0.9;  // 10% 할인 적용
+						System.out.println(salePrice);
+
+						System.out.println("쿠폰 사용됨: " + couponNum);
+					} else {
+						System.out.println("쿠폰 이미 사용됨: " + couponNum);
+					}
+				} else {
+					System.out.println("쿠폰을 찾을 수 없음: " + couponNum);
+				}
+			}
+
+			sales.setDate(LocalDateTime.parse(formattedDateTime, formatter));
+			sales.setCategory(menu.getCategory());
+			sales.setMenu(menu.getId());
+			sales.setPrice(salePrice);
+			sales.setQuantity(quantity);
+			sales.setDevice(2);
+			sales.setDeviceNum(1);
+			sales.setOrderNum(orderNum.getOrderNum());
+			sales.setProcess(0);
+
+			salesService.save(sales);
+
+			menu.setStock(menu.getStock() - quantity);
+
+			menuRepository.save(menu);
+
+		}
+
+		if (coupon != null) {
+			System.out.println("쿠폰 찾음: " + coupon);
+			if (coupon.getProcess() == 0) {
+				coupon.setProcess(1);  // 쿠폰 사용 처리
+				couponService.save(coupon);
+
+				System.out.println("쿠폰 사용됨: " + couponNum);
+			} else {
+				System.out.println("쿠폰 이미 사용됨: " + couponNum);
+			}
+		} else {
+			System.out.println("쿠폰을 찾을 수 없음: " + couponNum);
+		}
+
+		orders.clear();
+
+		if (params.get("phone") != null) {
+			String phoneNum = (String) params.get("phone");
+			Account account = accountService.getAccountByPhone(phoneNum);
+			account.setMsPoint((int) (account.getMsPoint() + (salePrice * 0.01)));
+			accountService.save(account);
+		}
+
+		// WebSocket 메시지 전송
+		try {
+			orderWebSocketHandler.sendMessageToAllSessions(new TextMessage("새로운 주문이 들어왔습니다."));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 
 		// WebSocket을 통해 새로운 주문 알림 전송
 		String message = "New order created: " + deviceRequest.getOrderNum();
