@@ -158,11 +158,11 @@ public class POSController {
 		NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
 
 		String message = "주문 번호 " + orderNum.getOrderNum() + "이/가 승인되었습니다.\n" +
-				"===================================\n" +
-				"            주문번호 " + orderNum.getOrderNum() + "\n" +
-				"===================================\n" +
-				"주문 기기 POS" + "\t수량\t\t" + "가격\n" +
-				"-----------------------------------\n";
+				"===============================================\n" +
+				"                   주문번호 " + orderNum.getOrderNum() + "\n" +
+				"===============================================\n" +
+				String.format("%-21s %7s %11s\n", "주문 기기 POS", "수량", "가격") +
+				"-----------------------------------------------\n";
 
 		LocalDateTime localDateTime = LocalDateTime.now();
 		int sum = 0;
@@ -181,7 +181,7 @@ public class POSController {
 			sum += totalPrice;
 			formatSum = numberFormat.format(sum);
 
-			message += menuName + "\t" + order.getQuantity() + "개\t\t" + formattedPrice + "원\n";
+			message += String.format("%-24s %4d개 %10s원\n", menuName, quantity, formattedPrice);
 
 			sales.setOrderNum(orderNum.getOrderNum());
 			sales.setDate(localDateTime);
@@ -202,10 +202,10 @@ public class POSController {
 			menuRepository.save(menu);
 		}
 
-		message += "-----------------------------------\n" +
-				"주문 시간 \t\t" + localDateTime + "\n" +
-				"총 가격 \t\t\t\t\t" + formatSum + "원\n" +
-				"===================================";
+		message += "-----------------------------------------------\n" +
+				String.format("주문 시간 %38s\n", localDateTime.toString()) +
+				String.format("총 가격 %38s원\n", formatSum) +
+				"===============================================";
 
 		discordBotService.sendOrderNotification(message);
 
