@@ -1,28 +1,24 @@
 <!DOCTYPE html>
-<html
-        xmlns:th="http://www.thymeleaf.org"
-        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{layout/user_layout}">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/plain_layout}">
 <head>
     <style>
         body {
             background-color: #FFF8DC;
-            color: #333333
-            !important;
+            color: #333333 !important;
         }
 
         h1 {
             color: #dc3545;
             text-align: center;
-            margin-top: 20px;
-        !important;
+            margin-top: 20px !important;
         }
 
         form {
             display: flex;
             justify-content: center;
-            margin-top: 20px;
-        !important;
+            margin-top: 20px !important;
         }
 
         button {
@@ -34,33 +30,59 @@
             font-size: 16px;
             cursor: pointer;
             border-radius: 5px;
-            transition: background-color 0.3s ease;
-        !important;
+            transition: background-color 0.3s ease !important;
         }
 
         button:hover {
-            background-color: #FFC107;
-        !important;
+            background-color: #FFC107 !important;
         }
 
         button:active {
-            background-color: #FFB300;
-        !important;
+            background-color: #FFB300 !important;
         }
 
+        .container {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background-color: #ffcc00;
+        }
+
+        .fade-effect {
+            animation: fadeIn 2s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
+<body>
 <th:block layout:fragment="content">
-    <div class="container">
-        <h1>注文方法</h1>
-        <div th:each="device : ${orders}"></div>
-        <div>
-            <form th:object="${deviceRequest}" method="post" action="orderStart">
-                <button id="mobile">モバイルウェブ注文</button>
-                <button id="seat">座席注文</button>
-            </form>
+    <div onclick="orderclick()">
+        <div class="container">
+            <div>
+                <div class="fs-1 fw-bold fade-effect">座席注文</div>
+                <div class="fs-4 fade-effect">注文するなら画面をタッチしてください</div>
+            </div>
         </div>
-        <br>
     </div>
+    <script>
+        function orderclick() {
+            let form = document.createElement('form');
+
+            form.method = "POST"
+            form.action = "/orderStart";
+
+            document.body.appendChild(form);
+
+            form.submit();
+
+        }
+    </script>
 </th:block>
+</body>
 </html>
