@@ -257,6 +257,14 @@ public class DeviceController {
 			}
 		};
 	}
+	@RequestMapping(value = "/orderCall", method = RequestMethod.GET)
+	public String orderCall(Model model) {
+		return "order/orderCall.html";
+	}
+	@RequestMapping(value = "/orderCall", method = RequestMethod.POST)
+	public String orderCall2(Model model) {
+		return "order/orderCall2.html";
+	}
 
 	private DeviceRequest createDefaultDeviceRequest(Map<Menu, Integer> orders) {
 		DeviceRequest deviceRequest = new DeviceRequest();
