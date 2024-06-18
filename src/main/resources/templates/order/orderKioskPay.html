@@ -8,6 +8,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KIOSK</title>
     <link rel="stylesheet" href="/css/kiosk.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/css/index.css">
+    <style>
+        #virtual-keyboard {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 1050;
+            background: white;
+        }
+    </style>
 </head>
 <body>
 <th:block layout:fragment="content">
@@ -46,7 +57,8 @@
                 <div class="fs-2 ms-1" th:text="|合計 : ${#numbers.formatInteger(totalPrice,1,'COMMA')} ₩|"></div>
             </div>
             <div class="d-flex">
-                <button type="button" class="btn btn-lg btn-warning couponBtn" onclick="couponButtonClick()">クーポン</button>
+                <button type="button" class="btn btn-lg btn-warning couponBtn" onclick="couponButtonClick()">クーポン
+                </button>
                 <a href="/order/kiosk/menu" class="btn btn-lg btn-warning mx-3">戻る</a>
                 <button id="payBtn" onclick="payStart()" type="button" class="btn btn-lg btn-warning"
                         data-toggle="modal" data-target="#membershipModal">支払い
@@ -156,23 +168,32 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group mb-0" style="width: 300px; display: flex; justify-content: center; align-items: center;">
-                        <input type="text" class="form-control coupon-input" id="couponPart1" maxlength="4" style="width: 70px; text-align: center;" required>
+                    <div class="form-group mb-0"
+                         style="width: 300px; display: flex; justify-content: center; align-items: center;">
+                        <input type="text" class="form-control coupon-input" id="couponPart1" maxlength="4"
+                               style="width: 70px; text-align: center;" required>
                         <span style="margin: 0 10px;">-</span>
-                        <input type="text" class="form-control coupon-input" id="couponPart2" maxlength="4" style="width: 70px; text-align: center;" required>
+                        <input type="text" class="form-control coupon-input" id="couponPart2" maxlength="4"
+                               style="width: 70px; text-align: center;" required>
                         <span style="margin: 0 10px;">-</span>
-                        <input type="text" class="form-control coupon-input" id="couponPart3" maxlength="4" style="width: 70px; text-align: center;" required>
+                        <input type="text" class="form-control coupon-input" id="couponPart3" maxlength="4"
+                               style="width: 70px; text-align: center;" required>
                         <span style="margin: 0 10px;">-</span>
-                        <input type="text" class="form-control coupon-input" id="couponPart4" maxlength="4" style="width: 70px; text-align: center;" required>
+                        <input type="text" class="form-control coupon-input" id="couponPart4" maxlength="4"
+                               style="width: 70px; text-align: center;" required>
                     </div>
-                    <button type="button" class="btn btn-warning mt-3" id="applyCouponBtn" onclick="applyCoupon()" style="width: 100%;">
+                    <button type="button" class="btn btn-warning mt-3" id="applyCouponBtn" onclick="applyCoupon()"
+                            style="width: 100%;">
                         適用
                     </button>
+                    <!-- 가상 키보드 -->
+                    <div id="virtual-keyboard" class="simple-keyboard"></div>
                 </div>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/index.min.js"></script>
     <script>
         let account;
 
@@ -180,6 +201,16 @@
             $('#skipMembership').click(function () {
                 $('#membershipModal').modal('hide');
                 $('#paymentModal').modal('show');
+            });
+
+            $('#couponModal').on('shown.bs.modal', function () {
+                $('#virtual-keyboard').show();
+                keyboard.setInput('');
+                $('#couponPart1').focus(); // 쿠폰 모달이 열렸을 때 첫 번째 입력창에 포커스
+            });
+
+            $('#couponModal').on('hidden.bs.modal', function () {
+                $('#virtual-keyboard').hide();
             });
         });
 
@@ -332,7 +363,7 @@
         let couponApplied = false;
         let originalTotalPrice = 0;
 
-        function valueNull(){
+        function valueNull() {
             document.getElementById('couponPart1').value = null;
             document.getElementById('couponPart2').value = null;
             document.getElementById('couponPart3').value = null;
@@ -393,7 +424,7 @@
                         document.querySelector('.couponBtn').textContent = 'クーポン取消';
 
                         alert('クーポンが適用されました。');
-                    } else if(response.valid === 'used') {
+                    } else if (response.valid === 'used') {
                         alert('このクーポンは既に使用済みです。');
 
                         valueNull();
@@ -472,8 +503,91 @@
 
             input.addEventListener('focus', function () {
                 this.select();
+                keyboard.setInput(this.value); // 포커스 시 키보드 입력 초기화
             });
         });
+
+        const keyboard = new SimpleKeyboard.default({
+            onChange: input => onChange(input),
+            onKeyPress: button => onKeyPress(button),
+            theme: "hg-theme-default hg-layout-numeric numeric-theme",
+            layout: {
+                default: ["1 2 3", "4 5 6", "7 8 9", "0 {bksp}"],
+            },
+            display: {
+                "{bksp}": "←",
+            },
+        });
+
+        function onChange(input) {
+            let focusedInput = document.querySelector(".coupon-input:focus");
+            let inputs = Array.from(document.querySelectorAll('.coupon-input'));
+
+            if (focusedInput) {
+                if (input.length > 4) {
+                    input = input.slice(0, 4); // 입력 길이 제한
+                }
+
+                focusedInput.value = input;
+
+                let start = focusedInput.selectionStart;
+                let end = focusedInput.selectionEnd;
+
+                setTimeout(() => {
+                    focusedInput.setSelectionRange(start, end);
+                    focusedInput.focus();
+                }, 0);
+
+                if (input.length === 4) {
+                    let currentIndex = inputs.indexOf(focusedInput);
+
+                    if (currentIndex < inputs.length - 1) {
+                        setTimeout(() => {
+                            inputs[currentIndex + 1].focus();
+                        }, 0);
+                    }
+                }
+            }
+        }
+
+        function onKeyPress(button) {
+            let focusedInput = document.querySelector(".coupon-input:focus");
+            let inputs = Array.from(document.querySelectorAll('.coupon-input'));
+
+            if (focusedInput) {
+                let start = focusedInput.selectionStart;
+                let end = focusedInput.selectionEnd;
+
+                if (button === "{bksp}") {
+                    if (start === end) {
+                        start--;
+                    }
+                    focusedInput.value = focusedInput.value.slice(0, start) + focusedInput.value.slice(end);
+                } else {
+                    if (focusedInput.value.length < 4) {
+                        focusedInput.value = focusedInput.value.slice(0, start) + button + focusedInput.value.slice(end);
+
+                        start++;
+                    }
+                }
+
+                setTimeout(() => {
+                    focusedInput.setSelectionRange(start, start);
+
+                    focusedInput.focus();
+                }, 0);
+
+                if (focusedInput.value.length === 4) {
+                    let currentIndex = inputs.indexOf(focusedInput);
+
+                    if (currentIndex < inputs.length - 1) {
+                        setTimeout(() => {
+                            inputs[currentIndex + 1].focus();
+                        }, 0);
+                    }
+                }
+            }
+        }
     </script>
 </th:block>
 </body>

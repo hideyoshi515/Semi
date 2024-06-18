@@ -11,25 +11,34 @@
 
         <main class="main-content">
             <section class="order-summary scrollable">
-                <h2 class="user-select-none">未承認リスト</h2>
+                <h2 class="user-select-none">出欠システム</h2>
                 <div class="order-list" id="order-list" style="overflow-x: hidden">
-                    <!-- Order items will go here -->
+                    <div id="currentDate" class="date-display"></div>
+                    <div id="currentTime" class="time-display"></div>
+                    <div class="button-group">
+                        <form id="clockInForm" class="d-inline">
+                            <button type="submit" class="btn btn-primary">出勤</button>
+                        </form>
+                        <form id="clockOutForm" class="d-inline">
+                            <button type="submit" class="btn btn-secondary">退勤</button>
+                        </form>
+                    </div>
                 </div>
             </section>
 
             <section class="menu scrollable">
-                <h2 class="user-select-none">日付別</h2>
+                <h2 class="user-select-none">スタッフ</h2>
                 <div class="menu-categories">
-                    <div th:each="dates : ${orderDate}">
+                    <div th:each="staff : ${staffList}">
                         <button class="btn btn-outline-primary w-100 mb-2 user-select-none selbtn"
-                                th:text="${dates}" th:attr="data-date=${dates}"
-                                onclick="handleDateClick(this)"></button>
+                                th:text="${staff.name}" th:attr="data-date=${staff}"
+                                onclick="handleStaffClick(this)"></button>
                     </div>
                 </div>
             </section>
 
             <section class="sales-menu scrollable">
-                <h2 class="user-select-none">注文番号</h2>
+                <h2 class="user-select-none">出欠日付</h2>
                 <div class="sales-items" id="sales-items">
 
                 </div>
@@ -75,8 +84,8 @@
             </div>
             <section class="menu" style="width: 314px;">
                 <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos">POS</a>
-                <a class="btn btn-primary w-100 mb-2 user-select-none" href="/pos/orderList">注文リスト</a>
-                <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos/staff">職員管理</a>
+                <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos/orderList">注文リスト</a>
+                <a class="btn btn-primary w-100 mb-2 user-select-none" href="/pos/staff">職員管理</a>
             </section>
             <section class="sales-menu" style="width: 314px;">
                 <button class="btn btn-outline-primary w-100 mb-2 user-select-none selbtn"
@@ -84,30 +93,6 @@
                         th:text="'쿠폰 발급'"></button>
             </section>
         </footer>
-    </div>
-
-    <!-- 결제 확인 모달 -->
-    <div class="modal fade" id="confirmPaymentModal" tabindex="-1" aria-labelledby="confirmPaymentModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title user-select-none" id="confirmPaymentModalLabel">確認</h5>
-                    <button type="button" class="btn-close user-select-none" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                </div>
-                <div class="modal-body user-select-none">
-                    本当に決済しますか？
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary user-select-none" data-bs-dismiss="modal">
-                        キャンセル
-                    </button>
-                    <button type="button" class="btn btn-primary user-select-none" onclick="processPayment()">確認
-                    </button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -118,28 +103,6 @@
         let month = ('0' + (today.getMonth() + 1)).slice(-2);
         let day = ('0' + today.getDate()).slice(-2);
 
-        // WebSocket 설정
-        let socket = new WebSocket("ws://localhost:8080/ws/orders");
-
-        socket.onopen = function () {
-            setInterval(() => socket.send(""), 1000);
-        };
-
-        socket.onmessage = function (event) {
-            // 주문 목록 갱신 로직
-            let dateString = year + '-' + month + '-' + day;
-
-            updateOrderDates();
-            getOrderNums(dateString);
-        };
-
-        socket.onerror = function (error) {
-            console.error("WebSocket 오류가 발생했습니다: ", error);
-        };
-
-        socket.onclose = function () {
-            console.log("WebSocket 연결이 닫혔습니다.");
-        };
 
         function getOrderNums(date) {
             let xhr = new XMLHttpRequest();
@@ -251,7 +214,7 @@
             });
         }
 
-        function handleDateClick(button) {
+        function handleStaffClick(button) {
             var date = button.getAttribute('data-date');
             const buttons = document.querySelectorAll('.selbtn');
             buttons.forEach(button => {
@@ -261,7 +224,7 @@
             const clickedButton = event.currentTarget;
             clickedButton.classList.remove('btn-outline-primary');
             clickedButton.classList.add('btn-primary');
-            getOrderNums(date);
+            getDateList(date);
         }
 
         function addItem(item, price, itemId, quantity, process, pk, date) {
@@ -282,110 +245,69 @@
             }
         }
 
-        function updateOrderList() {
-            const orderListDiv = document.getElementById('order-list');
-            orderListDiv.innerHTML = '';
-            orderList.forEach((order, index) => {
-                const orderItem = document.createElement('div');
-                orderItem.className = 'row mb-2 user-select-none';
+        function updateTime() {
+            const now = new Date();
+            const optionsDate = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' };
+            const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
 
-                const itemName = document.createElement('div');
-                itemName.className = 'col-2 user-select-none';
-                itemName.textContent = order.item;
+            const formattedDate = now.toLocaleDateString('ja-JP', optionsDate).replace('曜日', '');
+            const formattedTime = now.toLocaleTimeString('ja-JP', optionsTime);
 
-                const itemPrice = document.createElement('div');
-                itemPrice.className = 'col-2 user-select-none text-end';
-                itemPrice.textContent = `${order.price.toLocaleString()} ₩`;
-
-                const itemQuantity = document.createElement('div');
-                itemQuantity.className = 'col-2 user-select-none text-end';
-                itemQuantity.textContent = order.quantity + ' 個';
-
-                const itemTotal = document.createElement('div');
-                itemTotal.className = 'col-3 user-select-none text-end';
-                itemTotal.textContent = `${(order.price * order.quantity).toLocaleString()} ₩`;
-
-                const buttonGroup = document.createElement('div');
-                buttonGroup.className = 'col-3 user-select-none d-flex justify-content-end';
-
-                const deleteButton = document.createElement('button');
-
-                if (order.process != 0) {
-                    deleteButton.className = 'btn btn-secondary btn-sm user-select-none';
-                    deleteButton.textContent = '承認済み';
-                    deleteButton.setAttribute('disabled', '');
-                } else {
-                    deleteButton.className = 'btn btn-primary btn-sm user-select-none';
-                    deleteButton.id = 'btn_' + order.pk;
-                    deleteButton.textContent = '承認確認';
-                    deleteButton.setAttribute('onclick', `confirmOrder(${order.pk}, ${order.itemId}, ${order.quantity}, '${order.date}')`);
-                }
-                buttonGroup.appendChild(deleteButton);
-
-                orderItem.appendChild(itemName);
-                orderItem.appendChild(itemPrice);
-                orderItem.appendChild(itemQuantity);
-                orderItem.appendChild(itemTotal);
-                orderItem.appendChild(buttonGroup);
-
-                orderListDiv.appendChild(orderItem);
-            });
+            document.getElementById('currentDate').innerText = formattedDate;
+            document.getElementById('currentTime').innerText = formattedTime;
         }
 
-        function updateTotalAmount() {
-            const totalAmount = orderList.reduce((total, order) => total + order.price * order.quantity, 0);
-            document.getElementById('payment-amount').textContent = `合計 : ${totalAmount.toLocaleString()} ₩`;
-        }
+        document.addEventListener("DOMContentLoaded", () => {
+            updateTime();
+            setInterval(updateTime, 1000);
+        });
 
-        function selectPaymentMethod(method) {
-            paymentMethod = method;
-            document.getElementById('payment-method').textContent = `お支払方法: ${method === 'card' ? 'カード' : '現金'}`;
-        }
+        $(document).ready(function() {
+            $('#clockInForm').on('submit', function (event) {
+                event.preventDefault();
 
-        function appendNumber(number) {
-            console.log(`Number entered: ${number}`);
-        }
+                const username = $('#inputUsername').val();
+                const requestData = {
+                    username: username
+                };
 
-        function payment() {
-            showPaymentConfirmation();
-        }
-
-        function showPaymentConfirmation() {
-            let confirmPaymentModal = new bootstrap.Modal(document.getElementById('confirmPaymentModal'));
-
-            confirmPaymentModal.show();
-        }
-
-        function processPayment() {
-            let confirmPaymentModal = bootstrap.Modal.getInstance(document.getElementById('confirmPaymentModal'));
-            confirmPaymentModal.hide();
-            let xhr = new XMLHttpRequest();
-
-            xhr.open("POST", "/pos/order", true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-
-            const orderData = orderList.map(order => ({
-                id: order.itemId,
-                quantity: order.quantity,
-            }));
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        showToast('注文が成功しました。', 'success');
-                        // POS 내용을 초기화
-                        orderList = [];
-
-                        updateOrderList();
-                        updateTotalAmount();
-                    } else {
-                        showToast('通信エラーが発生しました。', 'error');
+                $.ajax({
+                    url: '/timeCardIn',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(requestData),
+                    success: function (response) {
+                        $('#message').html(`<div class="alert alert-success">${response}</div>`);
+                    },
+                    error: function (xhr, status, error) {
+                        $('#message').html(`<div class="alert alert-danger">Error: ${xhr.responseText}</div>`);
                     }
-                }
-            };
+                });
+            });
 
-            xhr.send(JSON.stringify(orderData));
-        }
+
+            $('#clockOutForm').on('submit', function(event) {
+                event.preventDefault();
+
+                const username = $('#inputUsername').val();
+                const requestData = {
+                    username: username
+                };
+
+                $.ajax({
+                    url: '/timeCardOut',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(requestData),
+                    success: function(response) {
+                        $('#message').html(`<div class="alert alert-success">${response}</div>`);
+                    },
+                    error: function(xhr, status, error) {
+                        $('#message').html(`<div class="alert alert-danger">Error: ${xhr.responseText}</div>`);
+                    }
+                });
+            });
+        });
 
         function showToast(message, type) {
             const toast = document.createElement('div');
@@ -509,6 +431,16 @@
             padding: 10px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .date-display {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .time-display {
+            font-size: 4em;
+            font-weight: bold;
         }
     </style>
 </th:block>
