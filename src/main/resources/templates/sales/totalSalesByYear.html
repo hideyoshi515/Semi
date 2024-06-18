@@ -1,167 +1,183 @@
 <!DOCTYPE html>
 <html
-        xmlns:th="http://www.thymeleaf.org"
+        xmlns:th="http://www.thymeleaf.org/"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{layout/plain_layout}">
 >
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>POSOLDESK 売上管理プログラム</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/metroStyle.css"> <!-- metroStyle.css 파일 경로로 수정 -->
+    <link rel="stylesheet" href="/css/metroStyle.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
 <th:block layout:fragment="content">
-    <div class="navbar">
-        <a onclick="location.href='/adminSalesMainHome'">ホーム</a>
-        <a onclick="location.href='/adminSalesMainMenu'">メニュー</a>
-    </div>
-    <h1 style="color: white;"><img style="width: 38px; height: 38px;" src="/img/storeownerpage/yearlyrevenueicon2.png">年度別総売上高</h1>
+    <div class="container">
+        <header class="header" style="height:42px !important;">
+            <a onclick="location.href='/adminSalesMainHome'">ホーム</a>
+            <a onclick="location.href='/adminSalesMainMenu'">メニュー</a>
+        </header>
+        <main class="main-content">
+            <section class="menu-title">
+                <h1>年度別総売上</h1>
+            </section>
+            <div class="content" style="display: flex; justify-content: space-around">
 
-    <div class="content" style="display: flex; justify-content: space-around">
-        <div class="table-container" style="width: 50%; justify-content: space-around">
-            <table style="justify-content: center">
-                <thead>
-                <tr>
-                    <th>年</th>
-                    <th>総売上高</th>
-                </tr>
-                </thead>
-                <tbody id="salesTableBody">
-                </tbody>
-            </table>
-        </div>
+                <div class="table-container" style="justify-content: space-around">
+                    <table style="justify-content: center">
+                        <thead>
+                        <tr>
+                            <th>年</th>
+                            <th>総売上高</th>
+                            <th>前年比成長率</th> <!-- 새로운 컬럼 추가 -->
+                        </tr>
+                        </thead>
+                        <tbody id="salesTableBody">
+                        </tbody>
+                    </table>
+                </div>
 
-        <div class="chart-wrapper" style="width: 50%;">
-            <div class="chart-container">
-                <canvas id="monthlySalesChart"></canvas>
+                <div class="chart-wrapper">
+                    <div class="chart-container">
+                        <canvas id="monthlySalesChart"></canvas>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    <div class="button-container">
-        <div class="button" id="prevPageBtn" style="background-color: #4CAF50;">
-            <p>前の5年間</p>
-        </div>
-        <div class="button" id="nextPageBtn" style="background-color: #2196F3;">
-            <p>次の5年間</p>
-        </div>
-        <div class="button" onclick="location.href='/totalSalesByYearAndMonthInput'" style="background-color: #FF5722;">
-            <p style="font-size:13pt">年度と月を入力して総売上高を検索</p>
-        </div>
-        <div class="button" onclick="location.href='/adminSalesMainHome'" style="background-color: #FFC107;">
-            <p>管理者メイン画面に復帰</p>
-        </div>
-    </div>
+            <div class="button-container">
+                <div class="button" id="prevPageBtn" >
+                    <p>前の5年間</p>
+                </div>
+                <div class="button" id="nextPageBtn" >
+                    <p>次の5年間</p>
+                </div>
+                <div class="button" onclick="location.href='/adminSalesMainHome'">
+                    <p>管理者メイン画面に復帰</p>
+                </div>
+            </div>
 
-    <!-- ThymeleafをJavaScriptに伝達 -->
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        var yearlySalesData = /*[[${yearlySales}]]*/ {};
-        /*]]>*/
+            <!-- ThymeleafをJavaScriptに伝達 -->
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                var yearlySalesData = /*[[${yearlySales}]]*/ {};
+                /*]]>*/
 
-        var currentPage = 0;
-        var itemsPerPage = 5;
+                var currentPage = 0;
+                var itemsPerPage = 5;
 
-        function renderTableAndChart(page) {
-            var keys = Object.keys(yearlySalesData);
-            var values = Object.values(yearlySalesData);
+                function renderTableAndChart(page) {
+                    var keys = Object.keys(yearlySalesData);
+                    var values = Object.values(yearlySalesData);
 
-            // 페이징 처리
-            var start = page * itemsPerPage;
-            var end = Math.min(start + itemsPerPage, keys.length);
+                    // 페이징 처리
+                    var start = page * itemsPerPage;
+                    var end = Math.min(start + itemsPerPage, keys.length);
 
-            var paginatedKeys = keys.slice(start, end);
-            var paginatedValues = values.slice(start, end);
+                    var paginatedKeys = keys.slice(start, end);
+                    var paginatedValues = values.slice(start, end);
 
-            // 테이블 업데이트
-            var tableBody = document.getElementById('salesTableBody');
-            tableBody.innerHTML = '';
-            for (var i = 0; i < paginatedKeys.length; i++) {
-                var row = document.createElement('tr');
-                var yearCell = document.createElement('td');
-                var salesCell = document.createElement('td');
+                    // 테이블 업데이트
+                    var tableBody = document.getElementById('salesTableBody');
+                    tableBody.innerHTML = '';
+                    for (var i = 0; i < paginatedKeys.length; i++) {
+                        var row = document.createElement('tr');
+                        var yearCell = document.createElement('td');
+                        var salesCell = document.createElement('td');
+                        var growthRateCell = document.createElement('td');
 
-                yearCell.textContent = paginatedKeys[i];
-                salesCell.textContent = new Intl.NumberFormat().format(paginatedValues[i]) + '円';
+                        yearCell.textContent = paginatedKeys[i];
+                        salesCell.textContent = new Intl.NumberFormat().format(paginatedValues[i]) + '円';
 
-                row.appendChild(yearCell);
-                row.appendChild(salesCell);
-                tableBody.appendChild(row);
-            }
+                        if (i === 0 && start === 0) {
+                            growthRateCell.textContent = '前年資料なし';
+                        } else {
+                            var previousValue = (i === 0) ? values[start - 1] : paginatedValues[i - 1];
+                            if (previousValue) {
+                                var growthRate = ((paginatedValues[i] - previousValue) / previousValue) * 100;
+                                growthRateCell.textContent = Math.round(growthRate) + '%';
+                            } else {
+                                growthRateCell.textContent = '前年資料なし';
+                            }
+                        }
 
-            // 차트 업데이트
-            monthlySalesChart.data.labels = paginatedKeys;
-            monthlySalesChart.data.datasets[0].data = paginatedValues;
-            updateBarColors(paginatedValues);
-            monthlySalesChart.update();
-        }
-
-        function updateBarColors(data) {
-            var dataset = monthlySalesChart.data.datasets[0];
-            dataset.backgroundColor = data.map((value, index) => {
-                if (index === 0) return 'rgba(54, 162, 235, 0.8)'; // 첫 번째 막대는 파란색
-                return value >= data[index - 1] ? 'rgba(255, 99, 132, 0.8)' : 'rgba(54, 162, 235, 0.8)';
-            });
-            dataset.borderColor = data.map((value, index) => {
-                if (index === 0) return 'rgba(54, 162, 235, 1)'; // 첫 번째 막대는 파란색
-                return value >= data[index - 1] ? 'rgba(255, 99, 132, 1)' : 'rgba(54, 162, 235, 1)';
-            });
-        }
-
-        // 차트를 그리는 함수
-        var ctx = document.getElementById('monthlySalesChart').getContext('2d');
-        var monthlySalesChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: '総売上高 (棒グラフ)',
-                    data: [],
-                    backgroundColor: [], // 초기 값은 빈 배열
-                    borderColor: [], // 초기 값은 빈 배열
-                    borderWidth: 1,
-                    yAxisID: 'y',
-                    categoryPercentage: 0.6, // 막대 그래프의 너비 조정
-                    barPercentage: 0.8 // 막대 그래프의 너비 조정
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                animation: {
-                    duration: 1000,
-                    easing: 'easeOutQuart'
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
+                        row.appendChild(yearCell);
+                        row.appendChild(salesCell);
+                        row.appendChild(growthRateCell);
+                        tableBody.appendChild(row);
                     }
+
+                    // 차트 업데이트
+                    monthlySalesChart.data.labels = paginatedKeys;
+                    monthlySalesChart.data.datasets[0].data = paginatedValues;
+                    updateBarColors(paginatedValues);
+                    monthlySalesChart.update();
                 }
-            }
-        });
 
-        document.getElementById('prevPageBtn').addEventListener('click', function () {
-            if (currentPage > 0) {
-                currentPage--;
+                function updateBarColors(data) {
+                    var dataset = monthlySalesChart.data.datasets[0];
+                    dataset.backgroundColor = data.map((value, index) => {
+                        if (index === 0) return 'rgba(54, 162, 235, 0.8)'; // 첫 번째 막대는 파란색
+                        return value >= data[index - 1] ? 'rgba(255, 99, 132, 0.8)' : 'rgba(54, 162, 235, 0.8)';
+                    });
+                    dataset.borderColor = data.map((value, index) => {
+                        if (index === 0) return 'rgba(54, 162, 235, 1)'; // 첫 번째 막대는 파란색
+                        return value >= data[index - 1] ? 'rgba(255, 99, 132, 1)' : 'rgba(54, 162, 235, 1)';
+                    });
+                }
+
+                // 차트를 그리는 함수
+                var ctx = document.getElementById('monthlySalesChart').getContext('2d');
+                var monthlySalesChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: '総売上高 (棒グラフ)',
+                            data: [],
+                            backgroundColor: [], // 초기 값은 빈 배열
+                            borderColor: [], // 초기 값은 빈 배열
+                            borderWidth: 1,
+                            yAxisID: 'y',
+                            categoryPercentage: 0.6, // 막대 그래프의 너비 조정
+                            barPercentage: 0.8 // 막대 그래프의 너비 조정
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeOutQuart'
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+
+                document.getElementById('prevPageBtn').addEventListener('click', function () {
+                    if (currentPage > 0) {
+                        currentPage--;
+                        renderTableAndChart(currentPage);
+                    }
+                });
+
+                document.getElementById('nextPageBtn').addEventListener('click', function () {
+                    if ((currentPage + 1) * itemsPerPage < Object.keys(yearlySalesData).length) {
+                        currentPage++;
+                        renderTableAndChart(currentPage);
+                    }
+                });
+
+                // 초기 화면에서는 최신 5개년을 보여줌
+                currentPage = Math.floor((Object.keys(yearlySalesData).length - 1) / itemsPerPage);
                 renderTableAndChart(currentPage);
-            }
-        });
-
-        document.getElementById('nextPageBtn').addEventListener('click', function () {
-            if ((currentPage + 1) * itemsPerPage < Object.keys(yearlySalesData).length) {
-                currentPage++;
-                renderTableAndChart(currentPage);
-            }
-        });
-
-        // 초기 화면에서는 최신 5개년을 보여줌
-        currentPage = Math.floor((Object.keys(yearlySalesData).length - 1) / itemsPerPage);
-        renderTableAndChart(currentPage);
-    </script>
-
+            </script>
+        </main>
+    </div>
 </th:block>
 </body>
 </html>
