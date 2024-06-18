@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h2>カテゴリー別の総売上高</h2>
+<table>
+    <thead>
+    <tr>
+        <th scope="col">カテゴリー</th>
+        <th scope="col">総売上高</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="totalByCategory : ${totalByCategory}">
+        <td th:text="${totalByCategory.categoryId}"></td>
+        <td th:text="${totalByCategory.date}"></td>
+
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
