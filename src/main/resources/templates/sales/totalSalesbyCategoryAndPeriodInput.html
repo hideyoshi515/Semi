@@ -3,7 +3,6 @@
         xmlns:th="http://www.thymeleaf.org/"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{layout/plain_layout}">
->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -67,10 +66,7 @@
                         <input type="date" id="endDate" name="endDate" required>
                     </h1>
 
-
                     <div th:if="${formattedStartDate != null && formattedEndDate != null}">
-
-
                         <div class="content">
                             <div class="table-container" style="display:block">
                                 <div class="date-range">
@@ -110,11 +106,10 @@
                         </div>
                     </div>
 
-                    <div class="button-container"
-                         style="margin-top: 10px; text-align: center">
+                    <div class="button-container" style="margin-top: 10px; text-align: center;width:1296px">
                         <button type="submit" class="button">検索</button>
-                        <button class="button" type="button" onclick="location.href='/adminSalesMainMenu'"><p>
-                            管理者画面に復帰</p>
+                        <button class="button" type="button" onclick="location.href='/adminSalesMainMenu'">
+                            <p>管理者画面に復帰</p>
                         </button>
                     </div>
                 </form>
@@ -127,7 +122,9 @@
 
                     var labels = Object.keys(salesData);
                     var salesValues = Object.values(salesData);
-                    var quantityValues = Object.values(quantityData);
+                    var quantityValues = labels.map(function(label) {
+                        return quantityData[label] || 0;
+                    });
 
                     var ctxSales = document.getElementById('categorySalesChart').getContext('2d');
                     var salesChart = new Chart(ctxSales, {
