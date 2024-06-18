@@ -126,18 +126,6 @@ public class MenuController {
         return "redirect:/menuList";
     }
 
-    // 메뉴 상세 정보를 반환. JSON 형태로 반환받기 위해 ResponseBody 사용
-//    @RequestMapping(value = "/menuDetail", method = RequestMethod.GET)
-//    @ResponseBody
-//    public MenuWithCategoryRequest getDetailMenu(Model model, @RequestParam Map<String, Object> params) {
-//        Menu menu = menuService.getMenuById(Long.parseLong(params.get("id").toString()));
-//        Category category = categoryService.findById((int) menu.getCategory());
-//        MenuWithCategoryRequest MWCR = new MenuWithCategoryRequest();
-//        MWCR.setCategory(category);
-//        MWCR.setMenu(menu);
-//        return MWCR;
-//    }
-
     // ResponseEntity 이용해보기
     @RequestMapping(value = "/menuDetail", method = RequestMethod.GET)
     public ResponseEntity<MenuWithCategoryRequest> getDetailMenu(Model model, @RequestParam Map<String, Object> params) {
@@ -178,46 +166,5 @@ public class MenuController {
         long id = ((Number) payload.get("id")).longValue();
         menuService.cancelUpdateStockAndOrder(id);
         return ResponseEntity.ok().build();
-    }
-
-    // 카테고리 관리 페이지를 반환
-    @RequestMapping(value = "/categoryList", method = RequestMethod.GET)
-    public String getCategoryList(Model model) {
-        List<Category> categories = categoryService.getAllCategories();
-        model.addAttribute("categories", categories);
-        CategoryRequest categoryRequest = new CategoryRequest();
-        model.addAttribute("categoryRequest", categoryRequest);
-        return "/menu/categoryList.html";
-    }
-
-    // 카테고리 추가 페이지 반환
-    @RequestMapping(value = "/categoryCreate", method = RequestMethod.GET)
-    public String getCategoryCreate(Model model) {
-        CategoryRequest categoryRequest = new CategoryRequest();
-        model.addAttribute("categoryRequest", categoryRequest);
-        return "menu/categoryCreate.html";
-    }
-
-    // 카테고리 추가 작업 후 리스트 반환
-    @RequestMapping(value = "/categoryCreate", method = RequestMethod.POST)
-    public String postCategoryCreate(Model model, @ModelAttribute("categoryRequest") CategoryRequest categoryRequest) {
-        categoryService.saveCategory(categoryRequest);
-        return "redirect:/categoryList";
-    }
-
-    // 카테고리 수정을 위해 pk와 새 카테고리명을 받아서 작업 후 리스트 반환
-    @RequestMapping(value = "/categoryUpdate", method = RequestMethod.POST)
-    @ResponseBody
-    public void postCategoryUpdate(Model model, @RequestParam Map<String, Object> params) {
-        CategoryRequest categoryRequest = new CategoryRequest();
-        categoryRequest.setName((String) params.get("name"));
-        categoryRequest.setId(Long.parseLong((String) params.get("id")));
-        categoryService.saveCategory(categoryRequest);
-    }
-
-    @RequestMapping(value = "/CategoryDelete", method = RequestMethod.POST)
-    @ResponseBody
-    public void getCategoryDelete(Model model, @RequestParam Map<String, Object> params) {
-        categoryService.deleteCategory(Integer.parseInt((String) params.get("id")));
     }
 }
