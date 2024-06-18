@@ -8,7 +8,9 @@ import co.kr.necohost.semi.domain.repository.StaffRepository;
 import co.kr.necohost.semi.domain.repository.TimeCardRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,9 +27,7 @@ public class TimeCardService {
 	}
 
 	// 出勤を記録
-	public void clockIn(StaffRequest request) {
-		Staff staff = staffRepository.findByUsername(request.getUsername())
-				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
+	public void clockIn(Staff staff) {
 
 		Optional<TimeCard> recentTimeCard = timeCardRepository.findTopByStaffOrderByStartDesc(staff);
 		LocalDateTime now = LocalDateTime.now();
@@ -47,10 +47,7 @@ public class TimeCardService {
 	}
 
 	// 退勤を記録
-	public void clockOut(StaffRequest request) {
-		Staff staff = staffRepository.findByUsername(request.getUsername())
-				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
-
+	public void clockOut(Staff staff) {
 		Optional<TimeCard> recentTimeCard = timeCardRepository.findTopByStaffOrderByStartDesc(staff);
 		LocalDateTime now = LocalDateTime.now();
 
@@ -81,9 +78,16 @@ public class TimeCardService {
 	}
 
 	// ユーザー名でタイムカードを取得
-	public Optional<TimeCard> getTimeCardByUserName(StaffRequest request){
-		Staff staff = staffRepository.findByUsername(request.getUsername())
-				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
+	public Optional<TimeCard> getTimeCardByUserName(Staff staff){
 		return timeCardRepository.findTopByStaffOrderByStartDesc(staff);
+	}
+
+	public List<TimeCard> getTimeCardByStaff(Staff staff) {
+		return timeCardRepository.findAllById(Collections.singleton(staff.getId()));
+	}
+
+	public TimeCard getTimeCardByStaffAndStart(Staff staff, String date) {
+		LocalDate localDate = LocalDate.parse(date);
+		return timeCardRepository.findByIdAndStart(staff, localDate);
 	}
 }

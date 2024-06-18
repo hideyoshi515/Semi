@@ -76,13 +76,38 @@
             <section class="menu" style="width: 314px;">
                 <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos">POS</a>
                 <a class="btn btn-primary w-100 mb-2 user-select-none" href="/pos/orderList">注文リスト</a>
-            </section>
-            <section class="sales-menu" style="width: 314px;">
+                <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos/staff">職員管理</a>
                 <button class="btn btn-outline-primary w-100 mb-2 user-select-none selbtn"
                         th:onclick="|makeCoupon()|"
-                        th:text="'쿠폰 발급'"></button>
+                        th:text="'クーポン発行'"></button>
+            </section>
+            <section class="sales-menu" style="width: 314px;">
             </section>
         </footer>
+    </div>
+
+    <!-- 결제 확인 모달 -->
+    <div class="modal fade" id="confirmPaymentModal" tabindex="-1" aria-labelledby="confirmPaymentModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title user-select-none" id="confirmPaymentModalLabel">確認</h5>
+                    <button type="button" class="btn-close user-select-none" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body user-select-none">
+                    本当に決済しますか？
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary user-select-none" data-bs-dismiss="modal">
+                        キャンセル
+                    </button>
+                    <button type="button" class="btn btn-primary user-select-none" onclick="processPayment()">確認
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -327,7 +352,39 @@
 
         function showPaymentConfirmation() {
             let confirmPaymentModal = new bootstrap.Modal(document.getElementById('confirmPaymentModal'));
+
             confirmPaymentModal.show();
+        }
+
+        function processPayment() {
+            let confirmPaymentModal = bootstrap.Modal.getInstance(document.getElementById('confirmPaymentModal'));
+            confirmPaymentModal.hide();
+            let xhr = new XMLHttpRequest();
+
+            xhr.open("POST", "/pos/order", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+            const orderData = orderList.map(order => ({
+                id: order.itemId,
+                quantity: order.quantity,
+            }));
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        showToast('注文が成功しました。', 'success');
+                        // POS 내용을 초기화
+                        orderList = [];
+
+                        updateOrderList();
+                        updateTotalAmount();
+                    } else {
+                        showToast('通信エラーが発生しました。', 'error');
+                    }
+                }
+            };
+
+            xhr.send(JSON.stringify(orderData));
         }
 
         function showToast(message, type) {
@@ -410,7 +467,7 @@
             grid-template-columns: 2fr 1fr 1fr;
             gap: 10px;
             padding: 10px;
-            height: 530px;
+            height: 480px;
         }
 
         .order-summary,

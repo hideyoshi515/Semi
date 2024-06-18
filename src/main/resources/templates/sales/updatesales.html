@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html
+        xmlns:th="http://www.thymeleaf.org/"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/plain_layout}">
+>
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -8,11 +12,13 @@
             width: 100%;
             border-collapse: collapse;
         }
+
         th, td {
             border: 1px solid black;
             padding: 8px;
             text-align: left;
         }
+
         th {
             background-color: #f2f2f2;
         }
@@ -31,7 +37,6 @@
     <tr th:each="totalByCategory : ${totalByCategory}">
         <td th:text="${totalByCategory.categoryId}"></td>
         <td th:text="${totalByCategory.date}"></td>
-
     </tr>
     </tbody>
 </table>
