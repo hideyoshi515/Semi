@@ -2,6 +2,7 @@ package co.kr.necohost.semi.domain.service;
 
 import co.kr.necohost.semi.domain.model.dto.CategoryRequest;
 import co.kr.necohost.semi.domain.model.entity.Category;
+import co.kr.necohost.semi.domain.model.entity.Menu;
 import co.kr.necohost.semi.domain.repository.CategoryRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -28,6 +29,10 @@ public class CategoryService {
 	// IDでカテゴリを検索
 	public Category findById(int id) {
 		return categoryRepository.findById(id).get();
+	}
+
+	public Category findByName(String name) {
+		return categoryRepository.findByName(name);
 	}
 
 	// すべてのカテゴリを取得（キャッシュ有効）

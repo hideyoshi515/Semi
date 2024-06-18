@@ -11,4 +11,6 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
 	@Cacheable("categories")
 	@Override
 	public List<Category> findAll();
+
+	Category findByName(String name);
 }

@@ -116,7 +116,7 @@ public class POSController {
 
 		message += "-----------------------------------\n" +
 				"주문 메뉴\n" +
-				order[1] + "\t" + sales.getQuantity() + "개\t\t" + formattedPrice + "원\n" +
+				order[1] + sales.getQuantity() + "개\t\t" + formattedPrice + "원\n" +
 				"-----------------------------------\n" +
 				"주문 시간 " + sales.getDate() + "\n" +
 				"총 가격 " + formattedPrice + "원\n" +
@@ -153,28 +153,59 @@ public class POSController {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		String formattedDateTime = localDate.format(formatter);
 		OrderNum orderNum = orderNumRepository.save(new OrderNum());
+		NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+
+		String message = "주문 번호 " + orderNum.getOrderNum() + "이/가 승인되었습니다.\n" +
+				"===================================\n" +
+				"            주문번호 " + orderNum.getOrderNum() + "\n" +
+				"===================================\n" +
+				"주문 기기 POS" + "\t수량\t\t" + "가격\n" +
+				"-----------------------------------\n";
+
+		LocalDateTime localDateTime = LocalDateTime.now();
+		int sum = 0;
+		String formatSum = "";
 
 		for (POSOrder order : orderItems) {
-			Menu menu = menuService.getMenuById(order.getId());
-			int quantity = order.getQuantity();
 			SalesRequest sales = new SalesRequest();
-			sales.setDate(LocalDateTime.parse(formattedDateTime, formatter));
+
+			Menu menu = menuService.getMenuById(order.getId());
+
+			String menuName = menu.getName();
+			int quantity = order.getQuantity();
+			int totalPrice = menu.getPrice() * order.getQuantity();
+			String formattedPrice = numberFormat.format(menu.getPrice() * order.getQuantity());
+			localDateTime = LocalDateTime.parse(formattedDateTime, formatter);
+			sum += totalPrice;
+			formatSum = numberFormat.format(sum);
+
+			message += menuName + "\t" + order.getQuantity() + "개\t\t" + formattedPrice + "원\n";
+
+			sales.setOrderNum(orderNum.getOrderNum());
+			sales.setDate(localDateTime);
 			sales.setCategory(menu.getCategory());
 			sales.setMenu(menu.getId());
 			sales.setPrice(menu.getPrice());
 			sales.setQuantity(quantity);
 			sales.setDevice(2);
 			sales.setDeviceNum(2);
-			sales.setOrderNum(orderNum.getOrderNum());
 			sales.setProcess(1);
+
+			System.out.println(menuName + " " + order.getQuantity() + "개" + formattedPrice + " " + formatSum + "원");
+
 			salesService.save(sales);
+
 			menu.setStock(menu.getStock() - quantity);
+
 			menuRepository.save(menu);
 		}
 
-		// WebSocketを通じてクライアントに通知を送信
-		String message = "새로운 주문이 들어왔습니다";
-		orderWebSocketHandler.sendMessageToAll(message);
+		message += "-----------------------------------\n" +
+				"주문 시간 \t\t" + localDateTime + "\n" +
+				"총 가격 \t\t\t\t\t" + formatSum + "원\n" +
+				"===================================";
+
+		discordBotService.sendOrderNotification(message);
 
 		return "注文が成功しました";
 	}
@@ -225,7 +256,7 @@ public class POSController {
 
 		return couponCode.toString();
 	}
-  
+
 	@RequestMapping(value = "/pos/applyCoupon", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> applyCoupon(@RequestBody Map<String, String> request) {
@@ -237,9 +268,9 @@ public class POSController {
 
 		if (coupon != null && coupon.getProcess() == 0) {
 			response.put("valid", "not-used");
-		} else if(coupon != null && coupon.getProcess() == 1){
+		} else if (coupon != null && coupon.getProcess() == 1) {
 			response.put("valid", "used");
-		} else{
+		} else {
 			response.put("valid", "none");
 		}
 
