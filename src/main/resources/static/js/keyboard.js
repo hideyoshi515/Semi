@@ -1,6 +1,7 @@
 let currentLanguage = 'default';
 let Keyboard = window.SimpleKeyboard.default;
 let focusedInput = null;
+let korean = [];
 
 document.addEventListener("DOMContentLoaded", function () {
     focusedInput = document.querySelector(".input");
@@ -53,8 +54,15 @@ document.addEventListener("DOMContentLoaded", function () {
     let shift = false;
 
     function onChange(input) {
-        if (focusedInput) {
-            focusedInput.value = input;
+        if (currentLanguage === 'ko') {
+            if (focusedInput) {
+                korean.push(input);
+                focusedInput.value = Hangul.assemble(input);
+            }
+        } else {
+            if (focusedInput) {
+                focusedInput.value = input;
+            }
         }
     }
 

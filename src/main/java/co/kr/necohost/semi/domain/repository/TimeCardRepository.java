@@ -17,6 +17,8 @@ public interface TimeCardRepository extends JpaRepository<TimeCard, Long> {
 
 	List<TimeCard> findAllByOrderByStartDesc();
 
+	@Query(value = "SELECT * FROM TimeCard WHERE staff_id = :staffid",nativeQuery = true)
+	List<TimeCard> findAllByStaffId(@Param("staffid") long staffid);
 
 	@Query("SELECT t FROM TimeCard t WHERE DATE(t.start) = :start AND t.staff = :staff")
 	TimeCard findByIdAndStart(@Param("staff") Staff staff, @Param("start") LocalDate start);

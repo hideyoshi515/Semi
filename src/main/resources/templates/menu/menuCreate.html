@@ -31,7 +31,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div style="text-align: start; margin: 6px 0;">原価</div>
-                                    <input class="form-control" th:field="*{cost}" type="text">
+                                    <input class="form-control" th:field="*{cost}" type="number" min="0">
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -61,7 +61,7 @@
                                 <div style="text-align: start; margin: 6px 0;">在庫</div>
                                 <div class="mb-3 mb-md-0">
                                     <input class="form-control" th:field="*{stock}"
-                                           type="text">
+                                           type="number">
                                 </div>
                             </div>
                             <div class="mt-4 mb-0">

@@ -22,7 +22,7 @@
                 <div class="menu-categories">
                     <div th:each="dates : ${orderDate}">
                         <button class="btn btn-outline-primary w-100 mb-2 user-select-none selbtn"
-                                th:text="${dates}" th:attr="data-date=${dates}"
+                                th:text="${dates}" th:attr="data-date=${dates}" th:id="${dates}"
                                 onclick="handleDateClick(this)"></button>
                     </div>
                 </div>
@@ -37,7 +37,7 @@
         </main>
 
         <footer class="footer">
-            <div class="order-summary d-flex" style="width: 628px">
+            <div class="order-summary d-flex" style="width: 538px">
                 <div style="width: 328px">
                     <div class="payment-amount" id="payment-amount" style="height: 44px;">
                         合計 : 0 ₩
@@ -62,7 +62,7 @@
 
                     <button type="button" class="btn btn-light border border-1 user-select-none"
                             onclick="selectPaymentMethod('card')">
-                        カード
+                        CARD
                     </button>
                     <button type="button" class="btn btn-light border border-1 user-select-none"
                             onclick="selectPaymentMethod('cash')">
@@ -77,6 +77,7 @@
                 <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos">POS</a>
                 <a class="btn btn-primary w-100 mb-2 user-select-none" href="/pos/orderList">注文リスト</a>
                 <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos/staff">出欠管理</a>
+                <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos/staffManage">スタッフ管理</a>
                 <button class="btn btn-outline-primary w-100 mb-2 user-select-none selbtn"
                         th:onclick="|makeCoupon()|"
                         th:text="'クーポン発行'"></button>
@@ -120,17 +121,28 @@
 
         // WebSocket 설정
         let socket = new WebSocket("ws://localhost:8080/ws/orders");
-
         socket.onopen = function () {
-            setInterval(() => socket.send(""), 1000);
+            console.log('WebSocket 연결이 열렸습니다.');
+            setInterval(() => socket.send("ping"), 1000); // 서버에 빈 메시지가 아닌 'ping'을 보냄
         };
 
         socket.onmessage = function (event) {
-            // 주문 목록 갱신 로직
+            let data = event.data; // 서버로부터 수신한 데이터
+            if (data != "ping") {
+                console.log('수신한 메시지:', data);
+            }
+            // 현재 날짜를 가져오기 위한 코드 (예시)
+            let now = new Date();
+            let year = now.getFullYear();
+            let month = ('0' + (now.getMonth() + 1)).slice(-2);
+            let day = ('0' + now.getDate()).slice(-2);
             let dateString = year + '-' + month + '-' + day;
 
-            updateOrderDates();
-            getOrderNums(dateString);
+            if (data === "Order") {
+                updateOrderDates();
+                //handleClick(dateString);
+                getOrderNums(date);
+            }
         };
 
         socket.onerror = function (error) {
@@ -222,9 +234,10 @@
 
                     dates.forEach(function (date) {
                         let button = document.createElement('button');
-                        button.className = 'btn btn-primary w-100 mb-2 user-select-none';
+                        button.className = 'btn btn-outline-primary w-100 mb-2 user-select-none';
                         button.textContent = date;
                         button.setAttribute('data-date', date);
+                        button.setAttribute('id', date);
                         button.setAttribute('onclick', 'handleDateClick(this)');
                         menuCategoriesDiv.appendChild(button);
                     });
@@ -249,6 +262,17 @@
                 };
                 xhr.send();
             });
+        }
+
+        function handleClick(date) {
+            const buttons = document.querySelectorAll('.selbtn');
+            buttons.forEach(button => {
+                button.classList.remove('btn-primary');
+                button.classList.add('btn-outline-primary');
+            });
+            let clickedButton = document.getElementById(date);
+            clickedButton.classList.remove('btn-outline-primary');
+            clickedButton.classList.add('btn-primary');
         }
 
         function handleDateClick(button) {

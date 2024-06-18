@@ -56,11 +56,6 @@ public class SalesController {
         model.addAttribute("session", session);
         model.addAttribute("lang", lang);
 
-        System.out.println("관리자 홈페이지 통합 확인중");
-        System.out.println(todaySales);
-        System.out.println(session);
-        System.out.println(lang);
-
         return "sales/adminSalesMainHome";
     }
 
@@ -161,7 +156,9 @@ public class SalesController {
                     .stream()
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
-                            entry -> decimalFormat.format(entry.getValue())
+                            entry -> decimalFormat.format(entry.getValue()),
+                            (oldValue, newValue) -> oldValue,
+                            LinkedHashMap::new // LinkedHashMap을 사용하여 순서를 유지
                     ));
 
             String formattedTotalWeeklySales = decimalFormat.format(totalWeeklySales);
