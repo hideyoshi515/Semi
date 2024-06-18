@@ -18,6 +18,16 @@
             z-index: 1050;
             background: white;
         }
+
+        .simple-keyboard {
+            max-width: 768px;
+            height: 300px;
+        }
+
+        .simple-keyboard .hg-button {
+            font-size: 20px;
+            height: 60px;
+        }
     </style>
 </head>
 <body>
@@ -535,6 +545,7 @@
 
                 setTimeout(() => {
                     focusedInput.setSelectionRange(start, end);
+
                     focusedInput.focus();
                 }, 0);
 
@@ -562,6 +573,7 @@
                     if (start === end) {
                         start--;
                     }
+
                     focusedInput.value = focusedInput.value.slice(0, start) + focusedInput.value.slice(end);
                 } else {
                     if (focusedInput.value.length < 4) {
