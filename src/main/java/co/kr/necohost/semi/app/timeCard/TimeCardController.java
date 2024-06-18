@@ -50,23 +50,31 @@ public class TimeCardController {
     @RequestMapping(value = "/timeCardIn", method = RequestMethod.GET)
     public String getTimeCardIn(@RequestParam Map<String, Object> params) {
         Staff staff = staffService.getStaff(Long.valueOf(params.get("staffId").toString()));
+        String password = params.get("password").toString();
+        if(!staff.getPassword().equals(password)) {
+            return "password";
+        }
         timeCardService.clockIn(staff);
         Optional<TimeCard> timeCard = timeCardService.getTimeCardByUserName(staff);
         discordBotService.sendOrderNotification(staff.getName() + "が " + timeCard.get().getStart().format(formatter) + "に出勤しました。");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("text", "plain", StandardCharsets.UTF_8));
-        return "出勤処理しました。";
+        return staff.getName() + "が " + timeCard.get().getStart().format(formatter) + "に出勤しました。";
     }
 
     @ResponseBody
     @RequestMapping(value = "/timeCardOut", method = RequestMethod.GET)
     public String getTimeCardOut(@RequestParam Map<String, Object> params) {
         Staff staff = staffService.getStaff(Long.valueOf(params.get("staffId").toString()));
+        String password = params.get("password").toString();
+        if(!staff.getPassword().equals(password)) {
+            return "password";
+        }
         timeCardService.clockOut(staff);
         Optional<TimeCard> timeCard = timeCardService.getTimeCardByUserName(staff);
         discordBotService.sendOrderNotification(staff.getName() + "が " + timeCard.get().getEnd().format(formatter) + "に退社しました。");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("text", "plain", StandardCharsets.UTF_8));
-        return "退勤処理しました。";
+        return staff.getName() + "が " + timeCard.get().getEnd().format(formatter) + "に退社しました。";
     }
 }
