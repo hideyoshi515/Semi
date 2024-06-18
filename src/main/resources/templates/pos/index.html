@@ -86,11 +86,11 @@
                 <a class="btn btn-primary w-100 mb-2 user-select-none" href="/pos">POS</a>
                 <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos/orderList">注文リスト</a>
                 <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos/staff">職員管理</a>
-            </section>
-            <section class="sales-menu" style="width: 314px;">
                 <button class="btn btn-outline-primary w-100 mb-2 user-select-none selbtn"
                         th:onclick="|makeCoupon()|"
-                        th:text="'쿠폰 발급'"></button>
+                        th:text="'クーポン発行'"></button>
+            </section>
+            <section class="sales-menu" style="width: 314px;">
             </section>
         </footer>
     </div>
@@ -458,7 +458,7 @@
             grid-template-columns: 2fr 1fr 1fr;
             gap: 10px;
             padding: 10px;
-            height: 530px;
+            height: 480px;
         }
 
         .order-summary,

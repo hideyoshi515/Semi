@@ -33,8 +33,9 @@ public class POSController {
 	private final CouponService couponService;
 	private final DiscordBotService discordBotService;
 	private final StaffService staffService;
+	private final TimeCardService timeCardService;
 
-	public POSController(MenuService menuService, CategoryService categoryService, SalesService salesService, MenuRepository menuRepository, OrderNumRepository orderNumRepository, OrderRepository orderRepository, OrderService orderService, OrderWebSocketHandler orderWebSocketHandler, CouponService couponService, DiscordBotService discordBotService, StaffService staffService) {
+	public POSController(MenuService menuService, CategoryService categoryService, SalesService salesService, MenuRepository menuRepository, OrderNumRepository orderNumRepository, OrderRepository orderRepository, OrderService orderService, OrderWebSocketHandler orderWebSocketHandler, CouponService couponService, DiscordBotService discordBotService, StaffService staffService, TimeCardService timeCardService) {
 		this.menuService = menuService;
 		this.categoryService = categoryService;
 		this.salesService = salesService;
@@ -46,6 +47,7 @@ public class POSController {
 		this.couponService = couponService;
 		this.discordBotService = discordBotService;
 		this.staffService = staffService;
+		this.timeCardService = timeCardService;
 	}
 
 	// POS 페이지のGETリクエストを処理するメソッド
@@ -215,6 +217,22 @@ public class POSController {
 		List<Staff> staffList = staffService.getAllStaff();
 		model.addAttribute("staffList", staffList);
 		return "pos/staff.html";
+	}
+
+	@RequestMapping(value = "/pos/staffTimeCard", method = RequestMethod.GET)
+	@ResponseBody
+	public List<TimeCard> getStaffTimecard(Model model, HttpSession session, @RequestParam Map<String, Object> params){
+		Staff staff = staffService.getStaff(Long.valueOf(params.get("staffId").toString()));
+		List<TimeCard> timeCards = timeCardService.getTimeCardByStaff(staff);
+		return timeCards;
+	}
+
+	@RequestMapping(value = "/pos/staffTimeCheck", method = RequestMethod.GET)
+	@ResponseBody
+	public TimeCard getStaffTimeCheck(Model model, HttpSession session, @RequestParam Map<String, Object> params){
+		Staff staff = staffService.getStaff(Long.valueOf(params.get("staffId").toString()));
+		TimeCard timeCard = timeCardService.getTimeCardByStaffAndStart(staff, params.get("date").toString());
+		return timeCard;
 	}
 
 	// クーポンを作成するメソッド

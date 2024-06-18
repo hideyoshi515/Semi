@@ -13,16 +13,34 @@
             <section class="order-summary scrollable">
                 <h2 class="user-select-none">出欠システム</h2>
                 <div class="order-list" id="order-list" style="overflow-x: hidden">
-                    <div id="currentDate" class="date-display"></div>
-                    <div id="currentTime" class="time-display"></div>
-                    <div class="button-group">
-                        <form id="clockInForm" class="d-inline">
-                            <button type="submit" class="btn btn-primary">出勤</button>
-                        </form>
-                        <form id="clockOutForm" class="d-inline">
-                            <button type="submit" class="btn btn-secondary">退勤</button>
-                        </form>
+                    <div class="d-flex">
+                        <div id="currentDate" class="date-display me-2"></div>
+                        <div id="currentTime" class="date-display"></div>
+                        <div id="targetDate" class="date-display"></div>
                     </div>
+                    <div class="mt-2 d-flex">
+                        <div class="input-group w-50">
+                            <label for="inTime" class="input-group-text">出勤時間</label>
+                            <input id="inTime" class="form-control border-end-0 rounded-0" readonly>
+                        </div>
+                        <div class="input-group w-50">
+                            <label for="outTime" class="input-group-text rounded-0">退社時間</label>
+                            <input id="outTime" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div id="btn-group" class="button-group mt-3 align-items-center d-flex" style="display: none !important;">
+                        <div class="input-group w-50">
+                            <label for="password" class="input-group-text">認証番号</label>
+                            <input id="password" class="form-control rounded-0 rounded-end-0" readonly>
+                        </div>
+                        <div id="clockInForm" class="w-25">
+                            <button type="submit" class="btn btn-primary rounded-0 w-100" th:onclick="timeIn()">出勤</button>
+                        </div>
+                        <div id="clockOutForm" class="w-25">
+                            <button type="submit" class="btn btn-secondary rounded-0 rounded-end w-100">退社</button>
+                        </div>
+                    </div>
+
                 </div>
             </section>
 
@@ -32,7 +50,7 @@
                     <div th:each="staff : ${staffList}">
                         <button class="btn btn-outline-primary w-100 mb-2 user-select-none selbtn"
                                 th:text="${staff.name}" th:attr="data-date=${staff}"
-                                onclick="handleStaffClick(this)"></button>
+                                th:onclick="|handleStaffClick(${staff.id}, this)|"></button>
                     </div>
                 </div>
             </section>
@@ -86,135 +104,155 @@
                 <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos">POS</a>
                 <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos/orderList">注文リスト</a>
                 <a class="btn btn-primary w-100 mb-2 user-select-none" href="/pos/staff">職員管理</a>
-            </section>
-            <section class="sales-menu" style="width: 314px;">
                 <button class="btn btn-outline-primary w-100 mb-2 user-select-none selbtn"
                         th:onclick="|makeCoupon()|"
-                        th:text="'쿠폰 발급'"></button>
+                        th:text="'クーポン発行'"></button>
+            </section>
+            <section class="sales-menu" style="width: 314px;">
             </section>
         </footer>
     </div>
 
     <script>
-        let orderList = [];
+        let p_staffId;
         let today = new Date();
 
         let year = today.getFullYear();
         let month = ('0' + (today.getMonth() + 1)).slice(-2);
         let day = ('0' + today.getDate()).slice(-2);
 
-
-        function getOrderNums(date) {
+        function getTimecard(staffId, date, today) {
+            p_staffId = staffId;
             let xhr = new XMLHttpRequest();
-            xhr.open("GET", "/pos/orderList/getOrderNum?date=" + date, true);
+            xhr.open("GET", "/pos/staffTimeCheck?staffId=" + staffId + "&date=" + date, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    let orderNums = JSON.parse(xhr.responseText);
-                    let salesItemsDiv = document.getElementById('sales-items');
-                    salesItemsDiv.innerHTML = ''; // 기존 내용 삭제
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        $("#inTime").val(null);
+                        $("#outTime").val(null);
+                        if (xhr.responseText != "") {
+                            let response = JSON.parse(xhr.responseText);
 
-                    orderNums.forEach(function (orderNum) {
-                        let itemButton = document.createElement('button');
-                        itemButton.className = 'btn btn-outline-primary w-100 mb-2 user-select-none';
-                        itemButton.textContent = '注文番号 : ' + orderNum; // 버튼에 표시할 텍스트
-                        itemButton.setAttribute('onclick', `getOrders(${orderNum}, '` + date + `')`); // 버튼 클릭 시 실행할 함수
-                        salesItemsDiv.appendChild(itemButton);
-                    });
-                }
-            };
-            xhr.send();
-        }
+                            let start = response.start;
+                            let dateObj = new Date(start[0], start[1] - 1, start[2]);
+                            let inTime;
+                            if (start != null) {
+                                inTime =
+                                    ('0' + start[3]).slice(-2) + ':' +
+                                    ('0' + start[4]).slice(-2) + ':' +
+                                    ('0' + start[5]).slice(-2);
+                            }
+                            let end = response.end;
+                            let outTime;
+                            if (end != null) {
+                                outTime =
+                                    ('0' + end[3]).slice(-2) + ':' +
+                                    ('0' + end[4]).slice(-2) + ':' +
+                                    ('0' + end[5]).slice(-2);
+                            }
 
-        function getOrders(orderNum, date) {
-            let xhr = new XMLHttpRequest();
-            xhr.open("GET", "/pos/orderList/getOrder?orderNum=" + orderNum + "&date=" + date, true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    let orders = JSON.parse(xhr.responseText);
-                    clearNumber();
-                    orders.forEach(function (order) {
-                        getName(order.menu).then(function (name) {
-                            addItem(name, order.price, order.menu, order.quantity, order.process, order.id, date);
-                        }).catch(function (error) {
-                            console.error("Error fetching name:", error);
-                        });
-                    });
-                }
-            };
-            xhr.send();
-        }
+                            console.log("inTime:"+inTime);
+                            console.log("outTime:"+outTime);
+                            const optionsDate = {year: 'numeric', month: 'long', day: 'numeric', weekday: 'short'};
+                            const formattedDate = dateObj.toLocaleDateString('ja-JP', optionsDate).replace('曜日', '');
 
-        function confirmOrder(pk, menuId, quantity, date) {
-            let xhr = new XMLHttpRequest();
-            console.log(pk, menuId, quantity, date);
-            xhr.open("POST", "/pos/orderList/confirmOrder?pk=" + pk + "&menuId=" + menuId + "&quantity=" + quantity, true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    const btn = document.getElementById('btn_' + pk);
-                    btn.classList.remove("btn-primary");
-                    btn.classList.add("btn-secondary");
-                    btn.textContent = '承認済み';
-                    btn.setAttribute('disabled', '');
-                    const index = orderList.findIndex(order => order.pk === pk);
-                    orderList[index].process = 1;
-
-                    const allClear = orderList.every(order => order.process !== 0);
-                    if (allClear) {
-                        clearNumber();
-                    }
-
-                    updateOrderDates();
-                    getOrderNums(date);
-                }
-            };
-            xhr.send();
-        }
-
-        function updateOrderDates() {
-            let xhr = new XMLHttpRequest();
-            xhr.open("GET", "/pos/orderList/getOrderDates", true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    let dates = JSON.parse(xhr.responseText);
-                    let menuCategoriesDiv = document.querySelector('.menu-categories');
-                    menuCategoriesDiv.innerHTML = ''; // 기존 내용 삭제
-
-                    dates.forEach(function (date) {
-                        let button = document.createElement('button');
-                        button.className = 'btn btn-primary w-100 mb-2 user-select-none';
-                        button.textContent = date;
-                        button.setAttribute('data-date', date);
-                        button.setAttribute('onclick', 'handleDateClick(this)');
-                        menuCategoriesDiv.appendChild(button);
-                    });
-                }
-            };
-            xhr.send();
-        }
-
-        function getName(menuId) {
-            return new Promise(function (resolve, reject) {
-                let xhr = new XMLHttpRequest();
-                xhr.open("GET", "/menu/getName?id=" + menuId, true);
-                xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4) {
-                        if (xhr.status === 200) {
-                            resolve(xhr.responseText);
+                            $("#inTime").val(inTime);
+                            $("#outTime").val(outTime);
+                            $("#targetDate").text(formattedDate);
+                        }
+                        if (!today) {
+                            $("#targetDate").css('display', 'block');
+                            $("#currentDate").css('display', 'none');
+                            $("#currentTime").css('display', 'none');
+                            $("#btn-group").css('display', 'none');
+                            $("#btn-group").removeClass('d-flex');
                         } else {
-                            reject("Failed to fetch name");
+                            $("#btn-group").css('display', 'block');
+                            $("#targetDate").css('display', 'none');
+                            $("#currentDate").css('display', 'block');
+                            $("#currentTime").css('display', 'block');
+                            $("#btn-group").addClass('d-flex');
+                        }
+
+
+                        const buttons = document.querySelectorAll('.date-sel');
+                        buttons.forEach(button => {
+                            button.classList.remove('btn-primary');
+                            button.classList.add('btn-outline-primary');
+                        });
+                        const clickedButton = event.currentTarget;
+                        clickedButton.classList.remove('btn-outline-primary');
+                        clickedButton.classList.add('btn-primary');
+                        getDateList(staffId);
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+        function getDateList(staffId) {
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", "/pos/staffTimeCard?staffId=" + staffId, true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        let date = JSON.parse(xhr.responseText);
+                        let salesItemsDiv = document.getElementById('sales-items');
+                        salesItemsDiv.innerHTML = '';
+
+                        // 현재 날짜를 YYYY-MM-DD 형식으로 생성
+                        let today = new Date();
+                        let todayFormatted = today.getFullYear() + '-' +
+                            ('0' + (today.getMonth() + 1)).slice(-2) + '-' +
+                            ('0' + today.getDate()).slice(-2);
+
+                        let todayExists = false;
+
+                        // 날짜를 최신순으로 정렬
+                        date.sort((a, b) => {
+                            let dateA = new Date(a.start[0], a.start[1] - 1, a.start[2]);
+                            let dateB = new Date(b.start[0], b.start[1] - 1, b.start[2]);
+                            return dateB - dateA;
+                        });
+
+                        date.forEach(function (dateItem) {
+                            let itemButton = document.createElement('button');
+                            itemButton.className = 'btn btn-outline-primary w-100 mb-2 user-select-none date-sel';
+
+                            // dateItem.start 배열에서 년, 월, 일을 추출하여 YYYY-MM-DD 형식으로 변환
+                            let year = dateItem.start[0];
+                            let month = ('0' + dateItem.start[1]).slice(-2); // Add leading zero if needed
+                            let day = ('0' + dateItem.start[2]).slice(-2); // Add leading zero if needed
+
+                            let formattedDate = year + '-' + month + '-' + day;
+
+                            itemButton.textContent = formattedDate;
+                            itemButton.setAttribute('onclick', `getTimecard(${staffId},'${formattedDate}',false)`);
+                            salesItemsDiv.appendChild(itemButton);
+
+                            // 현재 날짜와 비교하여 오늘 날짜가 있는지 확인
+                            if (formattedDate === todayFormatted) {
+                                todayExists = true;
+                            }
+                        });
+
+                        // 오늘 날짜가 없는 경우 버튼 추가
+                        if (!todayExists) {
+                            let todayButton = document.createElement('button');
+                            todayButton.className = 'btn btn-outline-primary w-100 mb-2 user-select-none date-sel';
+                            todayButton.textContent = todayFormatted + '（今日）';
+                            todayButton.setAttribute('onclick', `getTimecard(${staffId},'${todayFormatted}',true)`);
+                            salesItemsDiv.prepend(todayButton); // 오늘 날짜 버튼을 맨 위에 추가
                         }
                     }
-                };
-                xhr.send();
-            });
+                }
+            };
+            xhr.send();
         }
 
-        function handleStaffClick(button) {
+        function handleStaffClick(staffId, button) {
             var date = button.getAttribute('data-date');
             const buttons = document.querySelectorAll('.selbtn');
             buttons.forEach(button => {
@@ -224,31 +262,13 @@
             const clickedButton = event.currentTarget;
             clickedButton.classList.remove('btn-outline-primary');
             clickedButton.classList.add('btn-primary');
-            getDateList(date);
-        }
-
-        function addItem(item, price, itemId, quantity, process, pk, date) {
-            orderList.push({item, price, itemId: itemId, quantity: quantity, process, pk, date});
-            updateOrderList();
-            updateTotalAmount();
-        }
-
-        function deleteItem(index) {
-            orderList.splice(index, 1);
-            updateOrderList();
-            updateTotalAmount();
-        }
-
-        function clearNumber() {
-            for (let i = orderList.length; i >= 0; i--) {
-                deleteItem(i);
-            }
+            getDateList(staffId);
         }
 
         function updateTime() {
             const now = new Date();
-            const optionsDate = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' };
-            const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const optionsDate = {year: 'numeric', month: 'long', day: 'numeric', weekday: 'short'};
+            const optionsTime = {hour: '2-digit', minute: '2-digit', second: '2-digit'};
 
             const formattedDate = now.toLocaleDateString('ja-JP', optionsDate).replace('曜日', '');
             const formattedTime = now.toLocaleTimeString('ja-JP', optionsTime);
@@ -257,56 +277,27 @@
             document.getElementById('currentTime').innerText = formattedTime;
         }
 
+        function timeIn(){
+            let today = new Date();
+            let todayFormatted = today.getFullYear() + '-' +
+                ('0' + (today.getMonth() + 1)).slice(-2) + '-' +
+                ('0' + today.getDate()).slice(-2);
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", "/timeCardIn?staffId=" + p_staffId, true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        getTimecard(p_staffId, todayFormatted,true);
+                    }
+                }
+            };
+            xhr.send();
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             updateTime();
             setInterval(updateTime, 1000);
-        });
-
-        $(document).ready(function() {
-            $('#clockInForm').on('submit', function (event) {
-                event.preventDefault();
-
-                const username = $('#inputUsername').val();
-                const requestData = {
-                    username: username
-                };
-
-                $.ajax({
-                    url: '/timeCardIn',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(requestData),
-                    success: function (response) {
-                        $('#message').html(`<div class="alert alert-success">${response}</div>`);
-                    },
-                    error: function (xhr, status, error) {
-                        $('#message').html(`<div class="alert alert-danger">Error: ${xhr.responseText}</div>`);
-                    }
-                });
-            });
-
-
-            $('#clockOutForm').on('submit', function(event) {
-                event.preventDefault();
-
-                const username = $('#inputUsername').val();
-                const requestData = {
-                    username: username
-                };
-
-                $.ajax({
-                    url: '/timeCardOut',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(requestData),
-                    success: function(response) {
-                        $('#message').html(`<div class="alert alert-success">${response}</div>`);
-                    },
-                    error: function(xhr, status, error) {
-                        $('#message').html(`<div class="alert alert-danger">Error: ${xhr.responseText}</div>`);
-                    }
-                });
-            });
         });
 
         function showToast(message, type) {
@@ -334,6 +325,28 @@
                 toast.remove();
             }, 3000);
         }
+
+        function appendNumber(number) {
+            const quantityInput = document.getElementById('password');
+            let newQuantity = quantityInput.value + number;
+
+            if (newQuantity.length > 4) {
+                newQuantity = newQuantity.slice(0, -2) + number;
+            }
+
+            quantityInput.value = newQuantity;
+        }
+
+
+        function clearNumber() {
+            document.getElementById('password').value = '';
+        }
+
+        function deleteNumber() {
+            const quantityInput = document.getElementById('password');
+            quantityInput.value = quantityInput.value.slice(0, -1) || '';
+        }
+
 
         function makeCoupon() {
             if (confirm("쿠폰을 발급하시겠습니까?")) {
@@ -389,7 +402,7 @@
             grid-template-columns: 2fr 1fr 1fr;
             gap: 10px;
             padding: 10px;
-            height: 530px;
+            height: 480px;
         }
 
         .order-summary,
