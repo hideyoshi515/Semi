@@ -47,4 +47,9 @@ public class IndexController {
 		String name = menuRepository.findById(Long.valueOf(params.get("id").toString())).orElse(null).getName();
 		return name;
 	}
+
+	@RequestMapping(value = "/test",method = RequestMethod.GET)
+	public String getTest(){
+		return "test.html";
+	}
 }

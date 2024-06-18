@@ -11,7 +11,7 @@
 
         <main class="main-content">
             <section class="order-summary scrollable">
-                <h2 class="user-select-none">出欠システム</h2>
+                <h2 class="user-select-none" id="systemTitle">出欠システム</h2>
                 <div class="order-list" id="order-list" style="overflow-x: hidden">
                     <div class="d-flex">
                         <div id="currentDate" class="date-display me-2"></div>
@@ -28,20 +28,24 @@
                             <input id="outTime" class="form-control" readonly>
                         </div>
                     </div>
-                    <div id="btn-group" class="button-group mt-3 align-items-center d-flex" style="display: none !important;">
+                    <div id="btn-group" class="button-group mt-3 align-items-center d-flex"
+                         style="display: none !important;">
                         <div class="input-group w-50">
                             <label for="password" class="input-group-text">認証番号</label>
                             <input id="password" class="form-control rounded-0 rounded-end-0" readonly>
                         </div>
                         <div id="clockInForm" class="w-25">
-                            <button type="submit" class="btn btn-primary rounded-0 w-100" th:onclick="timeIn()">出勤</button>
+                            <button type="submit" class="btn btn-primary rounded-0 w-100" th:onclick="timeIn()">出勤
+                            </button>
                         </div>
                         <div id="clockOutForm" class="w-25">
-                            <button type="submit" class="btn btn-secondary rounded-0 rounded-end w-100">退社</button>
+                            <button type="submit" class="btn btn-secondary rounded-0 rounded-end w-100"
+                                    th:onclick="timeOut()">退社
+                            </button>
                         </div>
                     </div>
-
                 </div>
+                <h2 id="passCheck" class="mt-2 text-danger"></h2>
             </section>
 
             <section class="menu scrollable">
@@ -49,7 +53,7 @@
                 <div class="menu-categories">
                     <div th:each="staff : ${staffList}">
                         <button class="btn btn-outline-primary w-100 mb-2 user-select-none selbtn"
-                                th:text="${staff.name}" th:attr="data-date=${staff}"
+                                th:text="${staff.name}" th:attr="data-date=${staff}, data-name=${staff.name}"
                                 th:onclick="|handleStaffClick(${staff.id}, this)|"></button>
                     </div>
                 </div>
@@ -103,7 +107,7 @@
             <section class="menu" style="width: 314px;">
                 <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos">POS</a>
                 <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos/orderList">注文リスト</a>
-                <a class="btn btn-primary w-100 mb-2 user-select-none" href="/pos/staff">職員管理</a>
+                <a class="btn btn-primary w-100 mb-2 user-select-none" href="/pos/staff">出欠管理</a>
                 <button class="btn btn-outline-primary w-100 mb-2 user-select-none selbtn"
                         th:onclick="|makeCoupon()|"
                         th:text="'クーポン発行'"></button>
@@ -131,6 +135,7 @@
                     if (xhr.status === 200) {
                         $("#inTime").val(null);
                         $("#outTime").val(null);
+                        $("#passCheck").text(null);
                         if (xhr.responseText != "") {
                             let response = JSON.parse(xhr.responseText);
 
@@ -152,8 +157,6 @@
                                     ('0' + end[5]).slice(-2);
                             }
 
-                            console.log("inTime:"+inTime);
-                            console.log("outTime:"+outTime);
                             const optionsDate = {year: 'numeric', month: 'long', day: 'numeric', weekday: 'short'};
                             const formattedDate = dateObj.toLocaleDateString('ja-JP', optionsDate).replace('曜日', '');
 
@@ -166,12 +169,14 @@
                             $("#currentDate").css('display', 'none');
                             $("#currentTime").css('display', 'none');
                             $("#btn-group").css('display', 'none');
+                            $("#passCheck").css('display', 'none');
                             $("#btn-group").removeClass('d-flex');
                         } else {
                             $("#btn-group").css('display', 'block');
                             $("#targetDate").css('display', 'none');
                             $("#currentDate").css('display', 'block');
                             $("#currentTime").css('display', 'block');
+                            $("#passCheck").css('display', 'block');
                             $("#btn-group").addClass('d-flex');
                         }
 
@@ -254,6 +259,7 @@
 
         function handleStaffClick(staffId, button) {
             var date = button.getAttribute('data-date');
+            $("#systemTitle").text("出欠システム - " + button.getAttribute('data-name'));
             const buttons = document.querySelectorAll('.selbtn');
             buttons.forEach(button => {
                 button.classList.remove('btn-primary');
@@ -277,18 +283,50 @@
             document.getElementById('currentTime').innerText = formattedTime;
         }
 
-        function timeIn(){
+        function timeIn() {
             let today = new Date();
             let todayFormatted = today.getFullYear() + '-' +
                 ('0' + (today.getMonth() + 1)).slice(-2) + '-' +
                 ('0' + today.getDate()).slice(-2);
             let xhr = new XMLHttpRequest();
-            xhr.open("GET", "/timeCardIn?staffId=" + p_staffId, true);
+            let password = $("#password").val();
+            xhr.open("GET", "/timeCardIn?staffId=" + p_staffId + '&password=' + password, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        getTimecard(p_staffId, todayFormatted,true);
+                        if (xhr.responseText != "password") {
+                            getTimecard(p_staffId, todayFormatted, true);
+                            $("#passCheck").text(null);
+
+                        } else {
+                            $("#passCheck").text("認証番号を確認してください");
+                        }
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+        function timeOut() {
+            let today = new Date();
+            let todayFormatted = today.getFullYear() + '-' +
+                ('0' + (today.getMonth() + 1)).slice(-2) + '-' +
+                ('0' + today.getDate()).slice(-2);
+            let xhr = new XMLHttpRequest();
+            let password = $("#password").val();
+            xhr.open("GET", "/timeCardOut?staffId=" + p_staffId + '&password=' + password, true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        if (xhr.responseText != "password") {
+                            getTimecard(p_staffId, todayFormatted, true);
+                            $("#passCheck").text(null);
+
+                        } else {
+                            $("#passCheck").text("認証番号を確認してください");
+                        }
                     }
                 }
             };
@@ -339,6 +377,7 @@
 
 
         function clearNumber() {
+            $("#passCheck").text(null);
             document.getElementById('password').value = '';
         }
 
