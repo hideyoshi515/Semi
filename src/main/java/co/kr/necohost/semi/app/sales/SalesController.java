@@ -161,7 +161,9 @@ public class SalesController {
                     .stream()
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
-                            entry -> decimalFormat.format(entry.getValue())
+                            entry -> decimalFormat.format(entry.getValue()),
+                            (oldValue, newValue) -> oldValue,
+                            LinkedHashMap::new // LinkedHashMap을 사용하여 순서를 유지
                     ));
 
             String formattedTotalWeeklySales = decimalFormat.format(totalWeeklySales);
