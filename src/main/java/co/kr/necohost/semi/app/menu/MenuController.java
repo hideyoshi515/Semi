@@ -126,18 +126,6 @@ public class MenuController {
         return "redirect:/menuList";
     }
 
-    // 메뉴 상세 정보를 반환. JSON 형태로 반환받기 위해 ResponseBody 사용
-//    @RequestMapping(value = "/menuDetail", method = RequestMethod.GET)
-//    @ResponseBody
-//    public MenuWithCategoryRequest getDetailMenu(Model model, @RequestParam Map<String, Object> params) {
-//        Menu menu = menuService.getMenuById(Long.parseLong(params.get("id").toString()));
-//        Category category = categoryService.findById((int) menu.getCategory());
-//        MenuWithCategoryRequest MWCR = new MenuWithCategoryRequest();
-//        MWCR.setCategory(category);
-//        MWCR.setMenu(menu);
-//        return MWCR;
-//    }
-
     // ResponseEntity 이용해보기
     @RequestMapping(value = "/menuDetail", method = RequestMethod.GET)
     public ResponseEntity<MenuWithCategoryRequest> getDetailMenu(Model model, @RequestParam Map<String, Object> params) {
@@ -205,7 +193,7 @@ public class MenuController {
         return "redirect:/categoryList";
     }
 
-    // 카테고리 수정을 위해 pk와 새 카테고리명을 받아서 작업 후 리스트 반환
+    // 카테고리 수정을 위해 pk와 새 카테고리명을 받아서 작업 후 ajax 응답 보냄
     @RequestMapping(value = "/categoryUpdate", method = RequestMethod.POST)
     @ResponseBody
     public void postCategoryUpdate(Model model, @RequestParam Map<String, Object> params) {
