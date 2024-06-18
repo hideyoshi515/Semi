@@ -1,26 +1,45 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/default_layout}">
+<html
+        xmlns:th="http://www.thymeleaf.org/"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/plain_layout}">
+>
 <head>
-    <title>Total Sales by Year and Category</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POSOLDESK 売上管理プログラム</title>
+    <link rel="stylesheet" href="/css/metroStyle.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-<div layout:fragment="content">
-    <h1>年度別およびカテゴリ別の総売上高</h1>
-    <form action="/totalSalesByYearAndCategoryInput" method="get">
-        <label for="year">年度を入力:</label>
-        <input type="number" id="year" name="year">
-        <label for="category">カテゴリーを入力:</label>
-        <input type="number" id="category" name="category">
-        <button type="submit">総売上高閲覧</button>
-    </form>
+<th:block layout:fragment="content">
+    <div class="container">
+        <header class="header" style="height:42px !important;">
+            <a onclick="location.href='/adminSalesMainHome'">ホーム</a>
+            <a onclick="location.href='/adminSalesMainMenu'">メニュー</a>
+        </header>
+        <main class="main-content">
+            <section class="menu-title">
+                <h1>年度別およびカテゴリ別の総売上高</h1>
+            </section>
+            <div class="content" style="display: flex; justify-content: space-around">
 
-    <div th:if="${year != null && category != null}">
-        <h2>年度: <span th:text="${year}"></span> カテゴリー: <span th:text="${category}"></span></h2>
-        <p>総売上高: <span th:text="${totalSales}"></span></p>
+                <form action="/totalSalesByYearAndCategoryInput" method="get">
+                    <label for="year">年度を入力:</label>
+                    <input type="number" id="year" name="year">
+                    <label for="category">カテゴリーを入力:</label>
+                    <input type="number" id="category" name="category">
+                    <button type="submit">総売上高閲覧</button>
+                </form>
+
+                <div th:if="${year != null && category != null}">
+                    <h2>年度: <span th:text="${year}"></span> カテゴリー: <span th:text="${category}"></span></h2>
+                    <p>総売上高: <span th:text="${totalSales}"></span></p>
+                </div>
+                <button onclick="location.href='/adminSalesMenu'">管理者画面に復帰</button>
+            </div>
+        </main>
     </div>
-    <button onclick="location.href='/adminSalesMenu'">管理者画面に復帰</button>
-</div>
+</th:block>
 </body>
 </html>

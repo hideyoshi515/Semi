@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html
-        xmlns:th="http://www.thymeleaf.org"
+        xmlns:th="http://www.thymeleaf.org/"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{layout/plain_layout}">
 >
@@ -8,7 +8,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>POSOLDESK 売上管理プログラム</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/metroStyle.css"> <!-- metroStyle.css 파일 경로로 수정 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -49,206 +48,214 @@
 </head>
 <body>
 <th:block layout:fragment="content">
-    <div class="navbar">
-        <a href="/adminSalesMainHome">ホーム</a>
-        <a href="/adminSalesMainMenu">メニュー</a>
-    </div>
+    <div class="container">
+        <header class="header" style="height:42px !important;">
+            <a onclick="location.href='/adminSalesMainHome'">ホーム</a>
+            <a onclick="location.href='/adminSalesMainMenu'">メニュー</a>
+        </header>
+        <main class="main-content">
+            <section class="menu-title">
+                <h1 style="font-size: 22pt">カテゴリ別売上販売の現状</h1>
+            </section>
+            <div class="content" style="display: flex; justify-content: space-around">
 
-    <h1><img style="width: 38px;height: 38px;" src="/img/storeownerpage/menurevenueicon.png">カテゴリ別売上販売の現状
-    </h1>
-
-    <form action="/totalSalesbyCategoryAndPeriodInput" method="post">
-        <h3>
-            <label for="startDate">開始日:</label>
-            <input type="date" id="startDate" name="startDate" required>
-            <label for="endDate">終了日:</label>
-            <input type="date" id="endDate" name="endDate" required>
-        </h3>
+                <form action="/totalSalesbyCategoryAndPeriodInput" method="post">
+                    <h1>
+                        <label for="startDate">開始日:</label>
+                        <input type="date" id="startDate" name="startDate" required>
+                        <label for="endDate">終了日:</label>
+                        <input type="date" id="endDate" name="endDate" required>
+                    </h1>
 
 
-        <div th:if="${formattedStartDate != null && formattedEndDate != null}">
+                    <div th:if="${formattedStartDate != null && formattedEndDate != null}">
 
 
-            <div class="content">
-                <div class="table-container" style="display:block">
-                    <div class="date-range">
-                        <h2>
-                            <p>検索期間: <span th:text="${formattedStartDate}"></span> ~ <span
-                                    th:text="${formattedEndDate}"></span></p>
-                        </h2>
+                        <div class="content">
+                            <div class="table-container" style="display:block">
+                                <div class="date-range">
+                                    <h2>
+                                        <p>検索期間: <span th:text="${formattedStartDate}"></span> ~ <span
+                                                th:text="${formattedEndDate}"></span></p>
+                                    </h2>
+                                </div>
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        <th>カテゴリ</th>
+                                        <th>総売上高</th>
+                                        <th>販売量</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="entry : ${salesByCategory}">
+                                        <td th:text="${entry.key}"></td>
+                                        <td th:text="${#numbers.formatInteger(entry.value, 1, 'COMMA')} + '円'"></td>
+                                        <td th:text="${#numbers.formatInteger(quantityByCategory[entry.key], 1, 'COMMA')}+ '個'"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="chart-wrapper">
+                                <div class="chart-container">
+                                    <canvas id="categorySalesChart"></canvas>
+                                    <div class="chart-label">カテゴリ別総売上高</div>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="categoryQuantityChart"></canvas>
+                                    <div class="chart-label">カテゴリ別販売量</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>カテゴリ</th>
-                            <th>総売上高</th>
-                            <th>販売量</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="entry : ${salesByCategory}">
-                            <td th:text="${entry.key}"></td>
-                            <td th:text="${#numbers.formatInteger(entry.value, 1, 'COMMA')} + '円'"></td>
-                            <td th:text="${#numbers.formatInteger(quantityByCategory[entry.key], 1, 'COMMA')}+ '個'"></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
 
-                <div class="chart-wrapper">
-                    <div class="chart-container">
-                        <canvas id="categorySalesChart"></canvas>
-                        <div class="chart-label">カテゴリ別総売上高</div>
+                    <div class="button-container"
+                         style="margin-top: 10px; text-align: center">
+                        <button type="submit" class="button">検索</button>
+                        <button class="button" type="button" onclick="location.href='/adminSalesMainMenu'"><p>
+                            管理者画面に復帰</p>
+                        </button>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="categoryQuantityChart"></canvas>
-                        <div class="chart-label">カテゴリ別販売量</div>
-                    </div>
-                </div>
+                </form>
+
+                <script th:inline="javascript">
+                    /*<![CDATA[*/
+                    var salesData = /*[[${salesByCategory}]]*/ {};
+                    var quantityData = /*[[${quantityByCategory}]]*/ {};
+                    /*]]>*/
+
+                    var labels = Object.keys(salesData);
+                    var salesValues = Object.values(salesData);
+                    var quantityValues = Object.values(quantityData);
+
+                    var ctxSales = document.getElementById('categorySalesChart').getContext('2d');
+                    var salesChart = new Chart(ctxSales, {
+                        type: 'pie',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: '',
+                                data: salesValues,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.8)',
+                                    'rgba(54, 162, 235, 0.8)',
+                                    'rgba(255, 206, 86, 0.8)',
+                                    'rgba(75, 192, 192, 0.8)',
+                                    'rgba(153, 102, 255, 0.8)',
+                                    'rgba(255, 159, 64, 0.8)'
+                                ],
+                                borderColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true, // 비율을 유지하도록 설정
+                            animation: {
+                                duration: 1000,
+                                easing: 'easeOutQuart'
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        font: {
+                                            size: 14 // 라벨 글씨 크기 설정
+                                        },
+                                        padding: 20 // 라벨 간격 설정
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'カテゴリ別総売上高',
+                                    font: {
+                                        size: 18 // 제목 글씨 크기 설정
+                                    }
+                                },
+                                tooltip: {
+                                    bodyFont: {
+                                        size: 16 // Tooltip 글씨 크기 설정
+                                    },
+                                    titleFont: {
+                                        size: 16 // Tooltip 제목 글씨 크기 설정
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    var ctxQuantity = document.getElementById('categoryQuantityChart').getContext('2d');
+                    var quantityChart = new Chart(ctxQuantity, {
+                        type: 'pie',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: '',
+                                data: quantityValues,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.8)',
+                                    'rgba(54, 162, 235, 0.8)',
+                                    'rgba(255, 206, 86, 0.8)',
+                                    'rgba(75, 192, 192, 0.8)',
+                                    'rgba(153, 102, 255, 0.8)',
+                                    'rgba(255, 159, 64, 0.8)'
+                                ],
+                                borderColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true, // 비율을 유지하도록 설정
+                            animation: {
+                                duration: 1000,
+                                easing: 'easeOutQuart'
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        font: {
+                                            size: 14 // 라벨 글씨 크기 설정
+                                        },
+                                        padding: 20 // 라벨 간격 설정
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'カテゴリ別販売量',
+                                    font: {
+                                        size: 18 // 제목 글씨 크기 설정
+                                    }
+                                },
+                                tooltip: {
+                                    bodyFont: {
+                                        size: 16 // Tooltip 글씨 크기 설정
+                                    },
+                                    titleFont: {
+                                        size: 16 // Tooltip 제목 글씨 크기 설정
+                                    }
+                                }
+                            }
+                        }
+                    });
+                </script>
             </div>
-        </div>
-
-        <div class="button-container" style="margin-top: 10px; text-align: center; justify-content: space-around">
-            <button type="submit" class="button">検索</button>
-            <button class="button" type="button" onclick="location.href='/adminSalesMainMenu'"><p>管理者画面に復帰</p>
-            </button>
-        </div>
-    </form>
-
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        var salesData = /*[[${salesByCategory}]]*/ {};
-        var quantityData = /*[[${quantityByCategory}]]*/ {};
-        /*]]>*/
-
-        var labels = Object.keys(salesData);
-        var salesValues = Object.values(salesData);
-        var quantityValues = Object.values(quantityData);
-
-        var ctxSales = document.getElementById('categorySalesChart').getContext('2d');
-        var salesChart = new Chart(ctxSales, {
-            type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: '',
-                    data: salesValues,
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.8)',
-                        'rgba(54, 162, 235, 0.8)',
-                        'rgba(255, 206, 86, 0.8)',
-                        'rgba(75, 192, 192, 0.8)',
-                        'rgba(153, 102, 255, 0.8)',
-                        'rgba(255, 159, 64, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true, // 비율을 유지하도록 설정
-                animation: {
-                    duration: 1000,
-                    easing: 'easeOutQuart'
-                },
-                plugins: {
-                    legend: {
-                        labels: {
-                            font: {
-                                size: 14 // 라벨 글씨 크기 설정
-                            },
-                            padding: 20 // 라벨 간격 설정
-                        }
-                    },
-                    title: {
-                        display: true,
-                        text: 'カテゴリ別総売上高',
-                        font: {
-                            size: 18 // 제목 글씨 크기 설정
-                        }
-                    },
-                    tooltip: {
-                        bodyFont: {
-                            size: 16 // Tooltip 글씨 크기 설정
-                        },
-                        titleFont: {
-                            size: 16 // Tooltip 제목 글씨 크기 설정
-                        }
-                    }
-                }
-            }
-        });
-
-        var ctxQuantity = document.getElementById('categoryQuantityChart').getContext('2d');
-        var quantityChart = new Chart(ctxQuantity, {
-            type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: '',
-                    data: quantityValues,
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.8)',
-                        'rgba(54, 162, 235, 0.8)',
-                        'rgba(255, 206, 86, 0.8)',
-                        'rgba(75, 192, 192, 0.8)',
-                        'rgba(153, 102, 255, 0.8)',
-                        'rgba(255, 159, 64, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true, // 비율을 유지하도록 설정
-                animation: {
-                    duration: 1000,
-                    easing: 'easeOutQuart'
-                },
-                plugins: {
-                    legend: {
-                        labels: {
-                            font: {
-                                size: 14 // 라벨 글씨 크기 설정
-                            },
-                            padding: 20 // 라벨 간격 설정
-                        }
-                    },
-                    title: {
-                        display: true,
-                        text: 'カテゴリ別販売量',
-                        font: {
-                            size: 18 // 제목 글씨 크기 설정
-                        }
-                    },
-                    tooltip: {
-                        bodyFont: {
-                            size: 16 // Tooltip 글씨 크기 설정
-                        },
-                        titleFont: {
-                            size: 16 // Tooltip 제목 글씨 크기 설정
-                        }
-                    }
-                }
-            }
-        });
-    </script>
+        </main>
+    </div>
 </th:block>
 </body>
 </html>

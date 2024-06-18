@@ -20,6 +20,8 @@ h1 {
 }
 
 .menu-title {
+    margin-top: 15px;
+    margin-left: 5px;
     background-color: white;
     padding: 5px;
     border-radius: 5px;
@@ -44,7 +46,7 @@ h1 {
     cursor: pointer;
     background-color: #f0f0f0; /* Light Blue */
     color: black;
-    transform: scale(1.05); /* Increase size on hover */
+
 }
 
 .content {
@@ -84,7 +86,7 @@ h1 {
 }
 
 .table-container th {
-    background-color: #673AB7; /* Change column header background color */
+    background-color: #0057AD; /* Change column header background color */
     color: white; /* Ensure text color is readable */
 }
 
