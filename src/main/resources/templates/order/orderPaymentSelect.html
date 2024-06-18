@@ -26,17 +26,23 @@
             color: #333;
         }
 
-        #img{
-            width: 150px;
-            height: 150px;
+        #img {
+            width: 100px;
+            height: 100px;
             object-fit: cover;
         }
 
-        #menuContainer2{
+        #menuContainer2 {
             display: flex;
             align-items: center;
             justify-content: space-around;
             transform: translateX(-180px);
+            font-size: 25px;
+        }
+
+        .tablet-container {
+            max-height: 350px;
+            overflow-y: auto;
         }
 
         .tablet-container > div {
@@ -66,6 +72,12 @@
             margin: 20px 0;
         }
 
+        .paymentSelect button {
+            border-radius: 4px;
+            background-color: greenyellow;
+            padding: 20px 30px;
+        }
+
         .paymentSelect button:hover {
             background-color: #45a049;
         }
@@ -87,19 +99,20 @@
         .cancel button:hover {
             background-color: #da190b;
         }
+
         @media only screen and (min-width: 768px) and (max-width: 1366px) {
-            #menuContainer2{
+            #menuContainer2 {
                 display: flex;
                 align-items: center;
                 justify-content: space-around;
-                transform: translateX(-115px);
+                transform: translateX(-90px);
             }
         }
 
 
-
     </style>
 </head>
+<body>
 <th:block layout:fragment="content">
     <div class="h1">
         <h1>お支払い</h1>
@@ -117,7 +130,8 @@
                         數量 : <span th:text="${entry.value}"></span>
                     </div>
                     <div>
-                        總收量 : <span th:text="${#numbers.formatInteger(entry.key.price * entry.value,1,'COMMA')}"></span>
+                        總收量 : <span
+                            th:text="${#numbers.formatInteger(entry.key.price * entry.value,1,'COMMA')}"></span>
                         <input type="hidden" th:field="*{quantities[__${entry.key.id}__]}" th:value="${entry.value}">
                     </div>
                 </div>
@@ -140,9 +154,9 @@
         </div>
         <br>
         <div class="paymentSelect">
-            <button type="submit" name="paymentMethod" value="CASH">現金</button>
-            <button type="submit" name="paymentMethod" value="CARD">カード</button>
-            <button type="submit" name="paymentMethod" value="PAY">PAY</button>
+            <button type="button" onclick="payStart()" data-toggle="modal" data-target="#membershipModal">支払い
+            </button>
+            <button type="button" onclick="couponButtonClick()">クーポン</button>
         </div>
     </form>
     <div class="cancel" style="display: flex; justify-content: center">
@@ -151,204 +165,445 @@
             <button>戻る</button>
         </form>
     </div>
-</th:block>
-<!--멤버십 모달-->
-<div class="modal fade" id="membershipModal" tabindex="-1" role="dialog" aria-labelledby="membershipModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="membershipModalLabel">ポイント貯める</h5>
-            </div>
-            <div class="modal-body">
-                <p>メンバーシップポイントを貯めますか?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="skipMembership">いいえ</button>
-                <button type="button" onclick="msYes()" class="btn btn-primary" data-toggle="modal"
-                        data-target="#phoneNumberModal"
-                        data-dismiss="modal">はい
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- 전화번호 입력 모달-->
-<div class="modal fade" id="phoneNumberModal" tabindex="-1" role="dialog" aria-labelledby="phoneNumberModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <div class="form-group mb-0" style="width: 300px;">
-                    <label class="fs-5" for="phoneNumber">電話番号:</label>
-                    <input type="text" class="form-control membershipInput" id="phoneNumber" pattern="\d*"
-                           inputmode="numeric"
-                           value="010" maxlength="13" required readonly>
-                </div>
-                <div class="form-group mb-0" style="width: 300px;">
-                    <label class="fs-5" for="userName">名前:</label>
-                    <input type="text" class="form-control membershipInput" id="userName" readonly>
-                </div>
-                <div class="form-group" style="width: 300px;">
-                    <label class="fs-5" for="membershipPoints">持ちポイント:</label>
-                    <input type="text" class="form-control membershipInput" id="membershipPoints" readonly>
-                </div>
-                <div class="numeric-keypad" style="width: 300px;">
-                    <button type="button" class="btn btn-light border border-1"
-                            th:each="number : ${#numbers.sequence(1,9)}" th:onclick="|appendNumber('${number}')|"
-                            th:text="${number}"></button>
-                    <button type="button" class="btn btn-light border border-1" onclick="clearNumber()">削除
-                    </button>
-                    <button type="button" class="btn btn-light border border-1" onclick="appendNumber('0')">0
-                    </button>
-                    <button type="button" class="btn btn-light border border-1" onclick="deleteNumber()">←</button>
-                </div>
-                <button type="button" class="btn btn-warning mt-3" onclick="checkMembership()"
-                        style="width: 300px;">照会
-                </button>
-                <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#paymentModal"
-                        data-dismiss="modal" id="saveMembership" disabled style="width: 300px;" onclick="msNext()">貯める
-                </button>
 
-            </div>
-            <div class="modal-footer">
-                <button onclick="msNext()" type="button" class="btn btn-secondary" data-toggle="modal"
-                        data-target="#paymentModal"
-                        data-dismiss="modal" id="skipBtn">スキップ
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- 결제방법 모달-->
-<div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="paymentModalLabel">お支払方法</h5>
-            </div>
-            <div class="modal-body d-flex justify-content-center flex-row">
-                <button type="button" class="btn btn-success btn-lg mx-2 fs-4" style="width: 145px; height: 72.5px;"
-                        onclick="payEnd()"><i class="bi bi-credit-card me-1"></i>カード
-                </button>
-                <button type="button" class="btn btn-warning btn-lg mx-2 fs-4" style="width: 145px; height: 72.5px;"
-                        onclick="payEnd()"><i class="bi bi-cash me-1"></i>現金
-                </button>
+    <!--멤버십 모달-->
+    <div class="modal fade" id="membershipModal" tabindex="-1" role="dialog" aria-labelledby="membershipModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="membershipModalLabel">ポイント貯める</h5>
+                </div>
+                <div class="modal-body">
+                    <p>メンバーシップポイントを貯めますか?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="skipMembership">いいえ</button>
+                    <button type="button" onclick="msYes()" class="btn btn-primary" data-toggle="modal"
+                            data-target="#phoneNumberModal"
+                            data-dismiss="modal">はい
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<script>
-    let account;
+    <!-- 전화번호 입력 모달-->
+    <div class="modal fade" id="phoneNumberModal" tabindex="-1" role="dialog" aria-labelledby="phoneNumberModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="form-group mb-0" style="width: 300px;">
+                        <label class="fs-5" for="phoneNumber">電話番号:</label>
+                        <input type="text" class="form-control membershipInput" id="phoneNumber" pattern="\d*"
+                               inputmode="numeric"
+                               value="010" maxlength="13" required readonly>
+                    </div>
+                    <div class="form-group mb-0" style="width: 300px;">
+                        <label class="fs-5" for="userName">名前:</label>
+                        <input type="text" class="form-control membershipInput" id="userName" readonly>
+                    </div>
+                    <div class="form-group" style="width: 300px;">
+                        <label class="fs-5" for="membershipPoints">持ちポイント:</label>
+                        <input type="text" class="form-control membershipInput" id="membershipPoints" readonly>
+                    </div>
+                    <div class="numeric-keypad" style="width: 300px;">
+                        <button type="button" class="btn btn-light border border-1"
+                                th:each="number : ${#numbers.sequence(1,9)}" th:onclick="|appendNumber('${number}')|"
+                                th:text="${number}"></button>
+                        <button type="button" class="btn btn-light border border-1" onclick="clearNumber()">削除
+                        </button>
+                        <button type="button" class="btn btn-light border border-1" onclick="appendNumber('0')">0
+                        </button>
+                        <button type="button" class="btn btn-light border border-1" onclick="deleteNumber()">←</button>
+                    </div>
+                    <button type="button" class="btn btn-warning mt-3" onclick="checkMembership()"
+                            style="width: 300px;">照会
+                    </button>
+                    <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#paymentModal"
+                            data-dismiss="modal" id="saveMembership" disabled style="width: 300px;" onclick="msNext()">
+                        貯める
+                    </button>
 
-    $(document).ready(function () {
-        $('#skipMembership').click(function () {
-            $('#membershipModal').modal('hide');
-            $('#paymentModal').modal('show');
+                </div>
+                <div class="modal-footer">
+                    <button onclick="msNext()" type="button" class="btn btn-secondary" data-toggle="modal"
+                            data-target="#paymentModal"
+                            data-dismiss="modal" id="skipBtn">スキップ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 결제방법 모달-->
+    <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paymentModalLabel">お支払方法</h5>
+                </div>
+                <div class="modal-body d-flex justify-content-center flex-row">
+                    <form th:object="${deviceRequest}" method="post" action="orderPaymentSelect">
+                        <button type="button" class="btn btn-success btn-lg mx-2 fs-4"
+                                style="width: 145px; height: 72.5px;"
+                                onclick="payEnd('CARD')"><i class="bi bi-credit-card me-1" name="paymentMethod"
+                                                            value="CARD"></i>カード
+                        </button>
+                        <button type="button" class="btn btn-warning btn-lg mx-2 fs-4"
+                                style="width: 145px; height: 72.5px;"
+                                onclick="payEnd('CASH')"><i class="bi bi-cash me-1" name="paymentMethod"
+                                                            value="CASH"></i>現金
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  쿠폰입력 모달  -->
+    <div class="modal fade" id="couponModal" tabindex="-1" role="dialog" aria-labelledby="couponModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="couponModalLabel">クーポン適用</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-0" style="display: flex; justify-content: center; align-items: center;">
+                        <input type="text" class="form-control coupon-input" id="couponPart1" maxlength="4"
+                               style="width: 70px; text-align: center;" required>
+                        <span style="margin: 0 10px;">-</span>
+                        <input type="text" class="form-control coupon-input" id="couponPart2" maxlength="4"
+                               style="width: 70px; text-align: center;" required>
+                        <span style="margin: 0 10px;">-</span>
+                        <input type="text" class="form-control coupon-input" id="couponPart3" maxlength="4"
+                               style="width: 70px; text-align: center;" required>
+                        <span style="margin: 0 10px;">-</span>
+                        <input type="text" class="form-control coupon-input" id="couponPart4" maxlength="4"
+                               style="width: 70px; text-align: center;" required>
+                    </div>
+                    <button type="button" class="btn btn-warning mt-3" id="applyCouponBtn" onclick="applyCoupon()"
+                            style="width: 100%;">
+                        適用
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let account;
+
+        $(document).ready(function () {
+            $('#skipMembership').click(function () {
+                $('#membershipModal').modal('hide');
+                $('#paymentModal').modal('show');
+            });
         });
-    });
 
-    function msYes() {
-        $('#membershipModal').modal('hide');
-        $('#phoneNumberModal').modal('show');
-        const phoneNumberInput = document.getElementById('phoneNumber');
-        phoneNumberInput.value = '010';
-    }
+        function msYes() {
+            $('#membershipModal').modal('hide');
+            $('#phoneNumberModal').modal('show');
 
-    function msNext() {
-        $('#phoneNumberModal').modal('hide');
-        $('#paymentModal').modal('show');
-    }
+            const phoneNumberInput = document.getElementById('phoneNumber');
 
-    function payStart() {
-        $('#membershipModal').modal('show');
-    }
-
-    function appendNumber(number) {
-        const phoneNumberInput = document.getElementById('phoneNumber');
-        if (phoneNumberInput.value.length < 13) {
-            if (phoneNumberInput.value.length == 3 || phoneNumberInput.value.length == 8) {
-                phoneNumberInput.value += "-";
-            }
-            phoneNumberInput.value += number;
-        } else {
-            phoneNumberInput.value = phoneNumberInput.value.slice(0, -1);
-            phoneNumberInput.value += number;
+            phoneNumberInput.value = '010';
         }
-    }
 
-    function deleteNumber() {
-        const phoneNumberInput = document.getElementById('phoneNumber');
-        if (phoneNumberInput.value.length > 3) {
-            if (phoneNumberInput.value.length == 5 || phoneNumberInput.value.length == 10) {
+        function msNext() {
+            $('#phoneNumberModal').modal('hide');
+            $('#paymentModal').modal('show');
+        }
+
+        function payStart() {
+            $('#membershipModal').modal('show');
+        }
+
+        function appendNumber(number) {
+            const phoneNumberInput = document.getElementById('phoneNumber');
+
+            if (phoneNumberInput.value.length < 13) {
+                if (phoneNumberInput.value.length == 3 || phoneNumberInput.value.length == 8) {
+                    phoneNumberInput.value += "-";
+                }
+
+                phoneNumberInput.value += number;
+            } else {
+                phoneNumberInput.value = phoneNumberInput.value.slice(0, -1);
+
+                phoneNumberInput.value += number;
+            }
+        }
+
+        function deleteNumber() {
+            const phoneNumberInput = document.getElementById('phoneNumber');
+
+            if (phoneNumberInput.value.length > 3) {
+                if (phoneNumberInput.value.length == 5 || phoneNumberInput.value.length == 10) {
+                    phoneNumberInput.value = phoneNumberInput.value.slice(0, -1);
+                }
+
                 phoneNumberInput.value = phoneNumberInput.value.slice(0, -1);
             }
-            phoneNumberInput.value = phoneNumberInput.value.slice(0, -1);
         }
-    }
 
-    function clearNumber() {
-        const phoneNumberInput = document.getElementById('phoneNumber');
-        phoneNumberInput.value = '010';
-    }
+        function clearNumber() {
+            const phoneNumberInput = document.getElementById('phoneNumber');
 
-    function checkMembership() {
-        const phoneNumberInput = document.getElementById('phoneNumber');
-        const savePoint = document.getElementById('saveMembership');
-        const skipBtn = document.getElementById('skipBtn');
-        const userNameInput = document.getElementById('userName');
-        const membershipPointsInput = document.getElementById('membershipPoints');
-        const phone = phoneNumberInput.value.replaceAll("-", "");
+            phoneNumberInput.value = '010';
+        }
 
-        // AJAX 요청을 통해 서버로 데이터 전송
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/user/memberCheck?phoneNum=" + phone, true);
-        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                account = xhr.responseText ? JSON.parse(xhr.responseText) : null;
-                if (account) {
-                    // 반환된 데이터가 null이 아닌 경우
-                    userNameInput.value = maskName(account.name);
-                    membershipPointsInput.value = account.msPoint;
-                    savePoint.disabled = false;
-                    skipBtn.disabled = true;
-                } else {
-                    userNameInput.value = "メンバーが存在しません";
-                    savePoint.disabled = true;
+        function checkMembership() {
+            const phoneNumberInput = document.getElementById('phoneNumber');
+            const savePoint = document.getElementById('saveMembership');
+            const skipBtn = document.getElementById('skipBtn');
+            const userNameInput = document.getElementById('userName');
+            const membershipPointsInput = document.getElementById('membershipPoints');
+            const phone = phoneNumberInput.value.replaceAll("-", "");
+
+            // AJAX 요청을 통해 서버로 데이터 전송
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "/user/memberCheck?phoneNum=" + phone, true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    account = xhr.responseText ? JSON.parse(xhr.responseText) : null;
+                    if (account) {
+                        // 반환된 데이터가 null이 아닌 경우
+                        userNameInput.value = maskName(account.name);
+                        membershipPointsInput.value = account.msPoint;
+
+                        savePoint.disabled = false;
+                        skipBtn.disabled = true;
+                    } else {
+                        userNameInput.value = "メンバーが存在しません";
+
+                        savePoint.disabled = true;
+                    }
                 }
-            }
-        };
-        xhr.send();
-    }
-
-    function maskName(name) {
-        if (name.length <= 2) {
-            return name; // 이름 길이가 2 이하인 경우 마스킹하지 않음
+            };
+            xhr.send();
         }
-        const firstChar = name.charAt(0);
-        const lastChar = name.charAt(name.length - 1);
-        const maskedChars = '*'.repeat(name.length - 2);
-        return firstChar + maskedChars + lastChar;
-    }
 
-    /*뒤로가는 스크립트*/
-    document.getElementById('orderButton').onclick = function () {
-        var form = document.createElement('form');
-        form.method = 'POST';
-        form.action = 'orderStart';
+        function maskName(name) {
+            if (name.length <= 2) {
+                return name; // 이름 길이가 2 이하인 경우 마스킹하지 않음
+            }
 
-        document.body.append(form);
-        form.submit();
-    };
+            const firstChar = name.charAt(0);
+            const lastChar = name.charAt(name.length - 1);
+            const maskedChars = '*'.repeat(name.length - 2);
 
-    function back() {
-        let back = document.createElement('form');
-        back.setAttribute('method', 'post');
-        back.setAttribute('action', 'orderStart');
-        document.body.appendChild(back);
-        back.submit();
-    }
-</script>
+            return firstChar + maskedChars + lastChar;
+        }
+
+        function payEnd(payment) {
+            let form = document.createElement("form");
+
+            form.method = "POST";
+            form.action = "/orderPaymentSelect";
+
+
+            // 주문 항목 데이터를 폼에 추가 (예시)
+            let paymentMethod = document.createElement("input");
+
+            paymentMethod.type = "hidden";
+            paymentMethod.name = "paymentMethod";
+            paymentMethod.value = payment;
+            form.appendChild(paymentMethod);
+
+            let orderedItemsInput = document.createElement("input");
+
+            orderedItemsInput.type = "hidden";
+            orderedItemsInput.name = "orderedItems";
+            orderedItemsInput.value = JSON.stringify([
+                // 예시: 주문 항목 리스트
+                // { "name": "Americano", "price": 3000, "quantity": 1 }
+            ]);
+            form.appendChild(orderedItemsInput);
+
+            // 쿠폰 번호를 폼에 추가
+            const part1 = document.getElementById('couponPart1').value;
+            const part2 = document.getElementById('couponPart2').value;
+            const part3 = document.getElementById('couponPart3').value;
+            const part4 = document.getElementById('couponPart4').value;
+
+            if (part1 && part2 && part3 && part4) {
+                let couponNum = `${part1}-${part2}-${part3}-${part4}`;
+                let couponInput = document.createElement("input");
+
+                couponInput.type = "hidden";
+                couponInput.name = "couponNum";
+                couponInput.value = couponNum;
+
+                form.appendChild(couponInput);
+            }
+
+            // 회원 정보가 있을 경우 폼에 추가
+            if (account) {
+                let phoneInput = document.createElement("input");
+
+                phoneInput.type = "hidden";
+                phoneInput.name = "phone";
+                phoneInput.value = account.phone;
+
+                form.appendChild(phoneInput);
+            }
+
+            document.body.appendChild(form);
+
+            form.submit();
+        }
+
+        let couponApplied = false;
+        let originalTotalPrice = 0;
+
+        function valueNull() {
+            document.getElementById('couponPart1').value = null;
+            document.getElementById('couponPart2').value = null;
+            document.getElementById('couponPart3').value = null;
+            document.getElementById('couponPart4').value = null;
+        }
+
+        function couponButtonClick() {
+            if (couponApplied) {
+                if (confirm('쿠폰 사용을 취소하시겠습니까?')) {
+                    cancelCoupon();
+                }
+            } else {
+                showCouponModal();
+            }
+        }
+
+        function showCouponModal() {
+            valueNull();
+
+            $('#couponModal').modal('show');
+        }
+
+        function applyCoupon() {
+            if (couponApplied) {
+                cancelCoupon();
+
+                return;
+            }
+
+            const part1 = document.getElementById('couponPart1').value;
+            const part2 = document.getElementById('couponPart2').value;
+            const part3 = document.getElementById('couponPart3').value;
+            const part4 = document.getElementById('couponPart4').value;
+
+            if (part1.length !== 4 || part2.length !== 4 || part3.length !== 4 || part4.length !== 4) {
+                alert('クーポン番号は4桁の数字を4つ入力してください。');
+
+                return;
+            }
+
+            const couponNumber = `${part1}-${part2}-${part3}-${part4}`;
+
+            // AJAX 요청을 통해 서버로 쿠폰 번호 전송
+            let xhr = new XMLHttpRequest();
+
+            xhr.open("POST", "/pos/applyCoupon", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+
+                    if (response.valid === 'not-used') {
+                        applyDiscount();
+
+                        couponApplied = true;
+
+                        document.querySelector('.couponBtn').textContent = 'クーポン取消';
+
+                        alert('クーポンが適用されました。');
+                    } else if (response.valid === 'used') {
+                        alert('このクーポンは既に使用済みです。');
+
+                        valueNull();
+                    } else {
+                        alert('無効なクーポン番号です。');
+
+                        valueNull();
+                    }
+
+                    $('#couponModal').modal('hide');
+                }
+            };
+
+            xhr.send(JSON.stringify({couponNum: couponNumber}));
+        }
+
+        function applyDiscount() {
+            // 현재 총 금액에서 10% 할인 적용
+            let totalPriceElement = document.querySelector('.order-summary .fs-2');
+
+            originalTotalPrice = parseInt(totalPriceElement.textContent.replace(/[^\d]/g, ''), 10);
+
+            let discountedPrice = originalTotalPrice * 0.9;
+
+            totalPriceElement.textContent = `合計 : ${discountedPrice.toLocaleString()} ₩`;
+        }
+
+        function cancelCoupon() {
+            // 총 금액을 원래대로 복원
+            let totalPriceElement = document.querySelector('.order-summary .fs-2');
+
+            totalPriceElement.textContent = `合計 : ${originalTotalPrice.toLocaleString()} ₩`;
+
+            couponApplied = false;
+
+            document.querySelector('.couponBtn').textContent = 'クーポン';
+
+            alert('クーポンが取り消されました。');
+        }
+
+        // 입력 필드에 숫자만 입력되도록 제한하고, 자동으로 다음 필드로 이동
+        document.querySelectorAll('.coupon-input').forEach((input, index, inputs) => {
+            input.addEventListener('input', function () {
+                this.value = this.value.replace(/\D/g, '');
+
+                if (this.value.length === 4) {
+                    if (index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                }
+            });
+
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+
+            input.addEventListener('paste', function (e) {
+                e.preventDefault();
+
+                const paste = (e.clipboardData || window.clipboardData).getData('text');
+                const cleanedPaste = paste.replace(/\D/g, '');
+                const parts = [cleanedPaste.slice(0, 4), cleanedPaste.slice(4, 8), cleanedPaste.slice(8, 12), cleanedPaste.slice(12, 16)];
+
+                for (let i = 0; i < parts.length; i++) {
+                    if (parts[i]) {
+                        inputs[i].value = parts[i];
+                    }
+                }
+
+                if (parts[0].length === 4) inputs[1].focus();
+                if (parts[1].length === 4) inputs[2].focus();
+                if (parts[2].length === 4) inputs[3].focus();
+            });
+
+            input.addEventListener('focus', function () {
+                this.select();
+            });
+        });
+
+
+    </script>
+</th:block>
+</body>
 </html>
