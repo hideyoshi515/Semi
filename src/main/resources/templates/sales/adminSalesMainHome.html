@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/plain_layout}">
+>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+<th:block layout:fragment="content">
 <div class="container">
     <header class="header" style="height:42px !important;">
         <a onclick="location.href='/adminSalesMainHome'">ホーム</a>
@@ -159,5 +164,6 @@
         </script>
     </main>
 </div>
+</th:block>
 </body>
 </html>
