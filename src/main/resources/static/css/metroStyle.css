@@ -1,21 +1,35 @@
 body {
-    background: linear-gradient(to right, #4CA1AF, #C4E0E5); /* Aqua to Light Blue */
+    background-color: #f0f0f0;
 }
 
 h1 {
-    color: white;
+    color: rgb(0, 64, 128);
+    font-size: 32px;
 }
 
-.navbar {
-    background-color: whitesmoke; /* Light Slate Gray */
-    padding: 10px;
+.header {
     display: flex;
-    align-items: center; /* Vertically center the items */
-    justify-content: flex-start; /* Align items to the left */
+    justify-content: space-between;
+    align-items: center;
+    background-color: #004080;
+    color: white;
+    padding: 10px;
+
+
+
 }
 
-.navbar a {
-    color: black;
+.menu-title {
+    background-color: white;
+    padding: 5px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 30%;
+}
+
+
+.header a {
+    color: white;
     text-decoration: none;
     margin: 0 15px;
     font-size: 1.5rem; /* Increase font size */
@@ -25,10 +39,11 @@ h1 {
     position: relative; /* Allow transform without affecting layout */
 }
 
-.navbar a:hover {
+.header a:hover {
+    border-radius: 5px;
     cursor: pointer;
-    background-color: #ADD8E6; /* Light Blue */
-    color: white;
+    background-color: #f0f0f0; /* Light Blue */
+    color: black;
     transform: scale(1.05); /* Increase size on hover */
 }
 
@@ -39,7 +54,7 @@ h1 {
 }
 
 .table-container, .chart-wrapper {
-    width: 50%;
+    width: 49%;
     box-sizing: border-box;
     display: flex;
     justify-content: center; /* Center content horizontally */
@@ -59,6 +74,7 @@ h1 {
     text-align: center;
     font-size: 1.1rem;
     table-layout: fixed; /* Fix the table layout */
+    padding: 10px;
 
 }
 
@@ -87,28 +103,33 @@ h1 {
     flex-wrap: wrap;
     justify-content: center;
     margin-top: 20px;
+    border-color: rgb(13, 110, 253);
 }
 
 .button {
+    color: rgb(0, 64, 128);
+    background-color: white;
     width: 23%;
     margin: 1%;
     padding: 20px;
     text-align: center;
     cursor: pointer;
     transition: background-color 0.3s, box-shadow 0.3s; /* Add box-shadow transition */
-    color: white;
+    border-radius: 8px;
     font-size: 1.2rem; /* Increase font size */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border: none; /* Initial border state */
+    border: 2px solid rgb(13, 110, 253); /* Specify border color, width, and style */
     position: relative; /* Allow transform without affecting layout */
 }
 
 .button:hover {
+    background-color: rgb(13, 110, 253);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
     transition: box-shadow 0.3s; /* Smooth transition for shadow */
+    color: white;
 }
 
 .button p {
@@ -144,82 +165,3 @@ h1 {
     color: #333;
 }
 
-.button:nth-child(1) {
-    background-color: #4CAF50;
-    color: black;
-}
-
-.button:nth-child(2) {
-    background-color: #2196F3;
-    color: white;
-}
-
-.button:nth-child(3) {
-    background-color: #FF5722;
-    color: white;
-}
-
-.button:nth-child(4) {
-    background-color: #FFC107;
-    color: black;
-}
-
-.button:nth-child(5) {
-    background-color: #9C27B0;
-    color: white;
-}
-
-.button:nth-child(6) {
-    background-color: #3F51B5;
-    color: white;
-}
-
-.button:nth-child(7) {
-    background-color: #00BCD4;
-    color: black;
-}
-
-.button:nth-child(8) {
-    background-color: #E91E63;
-    color: white;
-}
-
-.button:nth-child(9) {
-    background-color: #FF9800;
-    color: black;
-}
-
-.button:nth-child(10) {
-    background-color: #8BC34A;
-    color: black;
-}
-
-.button:nth-child(11) {
-    background-color: #673AB7;
-    color: white;
-}
-
-.button:nth-child(12) {
-    background-color: #03A9F4;
-    color: black;
-}
-
-.button:nth-child(13) {
-    background-color: #CDDC39;
-    color: black;
-}
-
-.button:nth-child(14) {
-    background-color: #FFEB3B;
-    color: black;
-}
-
-.button:nth-child(15) {
-    background-color: #795548;
-    color: white;
-}
-
-.button:nth-child(16) {
-    background-color: #607D8B;
-    color: white;
-}
