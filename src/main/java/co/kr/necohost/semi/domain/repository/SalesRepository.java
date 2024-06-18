@@ -19,6 +19,8 @@ public interface SalesRepository extends JpaRepository<Sales, Long> {
     @Transactional
     void deleteById(Long id);
 
+    List<Sales> findAllByMenu(Long menuId);
+
     // 프로세스 상태로 판매 기록을 조회
     List<Sales> findByProcess(int process);
 

@@ -7,28 +7,28 @@ import co.kr.necohost.semi.domain.model.entity.Sales;
 import co.kr.necohost.semi.domain.repository.CategoryRepository;
 import co.kr.necohost.semi.domain.repository.MenuRepository;
 import co.kr.necohost.semi.domain.repository.SalesRepository;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.Date;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
-import java.time.temporal.WeekFields;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
+@EnableAsync
 public class SalesService {
 	private final SalesRepository salesRepository;
 	private final CategoryRepository categoryRepository;
-	MenuRepository menuRepository;
+	private final MenuRepository menuRepository;
 
 	public SalesService(SalesRepository salesRepository, MenuRepository menuRepository, CategoryRepository categoryRepository) {
 		this.salesRepository = salesRepository;
@@ -62,6 +62,11 @@ public class SalesService {
 		salesRepository.deleteById(salesRequest.getId());
 	}
 
+	public List<Sales> getAllSalesForMenu(Long menuId) {
+		return salesRepository.findAllByMenu(menuId);
+	}
+
+
 	// 時間別の販売額を計算（管理者ページ - ホームページ）
 	public Map<LocalDateTime, Double> getHourlySalesByDay(LocalDateTime startOfDay, LocalDateTime endOfDay) {
 		List<Sales> salesList = salesRepository.findSalesByDateRangeAndProcess(startOfDay, endOfDay);
@@ -69,9 +74,8 @@ public class SalesService {
 
 		for (Sales sales : salesList) {
 			LocalDateTime hour = sales.getDate().withMinute(0).withSecond(0).withNano(0);
-			hour = hour.withHour(hour.getHour());
 			double salesAmount = sales.getPrice() * sales.getQuantity();
-			hourlySales.put(hour, hourlySales.getOrDefault(hour, 0.0) + salesAmount);
+			hourlySales.merge(hour, salesAmount, Double::sum);
 		}
 
 		return hourlySales;
@@ -135,7 +139,6 @@ public class SalesService {
 		List<Sales> salesList = salesRepository.findMonthlySalesByProcess();
 		Map<String, Double> monthlySales = new TreeMap<>();
 
-		// 初期値設定
 		LocalDate currentDate = LocalDate.now();
 		for (int year = salesList.get(0).getDate().getYear(); year <= currentDate.getYear(); year++) {
 			for (int month = 1; month <= 12; month++) {
@@ -144,7 +147,6 @@ public class SalesService {
 			}
 		}
 
-		// 売上データの更新
 		for (Sales sales : salesList) {
 			String key = String.format("%d-%02d", sales.getDate().getYear(), sales.getDate().getMonthValue());
 			monthlySales.put(key, monthlySales.get(key) + sales.getPrice() * sales.getQuantity());
@@ -167,7 +169,6 @@ public class SalesService {
 		LocalDate startOfWeek = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
 		LocalDate endOfWeek = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
 
-		// クエリのためにLocalDateTimeに調整
 		LocalDateTime startOfWeekDateTime = startOfWeek.atStartOfDay();
 		LocalDateTime endOfWeekDateTime = endOfWeek.atTime(23, 59, 59);
 
@@ -175,7 +176,7 @@ public class SalesService {
 		Map<LocalDate, Double> weeklySales = new TreeMap<>();
 
 		for (Sales sales : salesList) {
-			LocalDate salesDate = sales.getDate().toLocalDate(); // LocalDateTimeをLocalDateに変換
+			LocalDate salesDate = sales.getDate().toLocalDate();
 			double salesAmount = sales.getPrice() * sales.getQuantity();
 			weeklySales.put(salesDate, weeklySales.getOrDefault(salesDate, 0.0) + salesAmount);
 		}
@@ -208,12 +209,11 @@ public class SalesService {
 		List<Menu> menuList = menuRepository.findAll();
 		Map<Long, String> menuMap = menuList.stream()
 				.collect(Collectors.toMap(Menu::getId, Menu::getName));
-		Map<String, Long> result = salesList.stream()
+		return salesList.stream()
 				.collect(Collectors.groupingBy(
 						sales -> menuMap.get(Long.parseLong(String.valueOf(sales.getMenu()))),
 						Collectors.counting()
 				));
-		return result;
 	}
 
 	// カテゴリ別の販売額を計算
@@ -221,11 +221,9 @@ public class SalesService {
 		List<Sales> salesList = salesRepository.findAllSales();
 		List<Category> categoryList = categoryRepository.findAll();
 
-		// カテゴリIDと名前をマッピング
 		Map<Integer, String> categoryMap = categoryList.stream()
 				.collect(Collectors.toMap(category -> Math.toIntExact(category.getId()), Category::getName));
 
-		// 販売データをカテゴリ名でグループ化
 		return salesList.stream()
 				.collect(Collectors.groupingBy(
 						sales -> categoryMap.get(sales.getCategory()),
@@ -238,11 +236,9 @@ public class SalesService {
 		List<Sales> salesList = salesRepository.findAllSales();
 		List<Menu> menuList = menuRepository.findAll();
 
-		// メニューIDと名前をマッピング
 		Map<Integer, String> menuMap = menuList.stream()
 				.collect(Collectors.toMap(menu -> Math.toIntExact(menu.getId()), Menu::getName));
 
-		// menuMapに存在しないキーを持つ販売項目をフィルタリング
 		return salesList.stream()
 				.filter(sales -> menuMap.containsKey(sales.getMenu()))
 				.collect(Collectors.groupingBy(
@@ -274,17 +270,14 @@ public class SalesService {
 
 	// 現在の月と前月の売上を計算し、前月比の売上成長率を計算
 	public double getMonthlySalesGrowthRate(int year, int month) {
-		// 現在の月の売上
 		double currentMonthSales = getTotalSalesByYearAndMonth(year, month);
 
-		// 前月の売上を計算（年と月を考慮して処理）
 		int previousYear = month == 1 ? year - 1 : year;
 		int previousMonth = month == 1 ? 12 : month - 1;
 		double previousMonthSales = getTotalSalesByYearAndMonth(previousYear, previousMonth);
 
-		// 前月比の売上成長率を計算
 		if (previousMonthSales == 0) {
-			return 0; // 前月の売上が0の場合、成長率を計算できない
+			return 0;
 		}
 		return ((currentMonthSales - previousMonthSales) / previousMonthSales) * 100;
 	}
@@ -365,6 +358,37 @@ public class SalesService {
 	public List<Sales> findSalesByMenuId(Long menuId) {
 		return salesRepository.findByMenu(menuId);
 	}
+
+	public Map<String, Double> getTimePeriodSalesAndQuantity() {
+		LocalDateTime now = LocalDateTime.now();
+
+		Map<String, Double> result = new HashMap<>();
+		result.put("totalSalesAmountToday", getTotalSalesAndQuantityToday().get("totalSalesAmount"));
+		result.put("totalQuantityToday", getTotalSalesAndQuantityToday().get("totalQuantity"));
+
+		LocalDateTime startOfWeek = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)).toLocalDate().atStartOfDay();
+		LocalDateTime endOfWeek = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY)).toLocalDate().atTime(23, 59, 59);
+		result.put("totalSalesAmountWeek", getTotalSalesAndQuantityByDateRange(startOfWeek, endOfWeek).get("totalSalesAmount"));
+		result.put("totalQuantityWeek", getTotalSalesAndQuantityByDateRange(startOfWeek, endOfWeek).get("totalQuantity"));
+
+		LocalDateTime startOfMonth = now.withDayOfMonth(1).toLocalDate().atStartOfDay();
+		LocalDateTime endOfMonth = now.with(TemporalAdjusters.lastDayOfMonth()).toLocalDate().atTime(23, 59, 59);
+		result.put("totalSalesAmountMonth", getTotalSalesAndQuantityByDateRange(startOfMonth, endOfMonth).get("totalSalesAmount"));
+		result.put("totalQuantityMonth", getTotalSalesAndQuantityByDateRange(startOfMonth, endOfMonth).get("totalQuantity"));
+
+		LocalDateTime startOfQuarter = now.with(now.getMonth().firstMonthOfQuarter()).withDayOfMonth(1).toLocalDate().atStartOfDay();
+		LocalDateTime endOfQuarter = now.with(now.getMonth().firstMonthOfQuarter().plus(2)).with(TemporalAdjusters.lastDayOfMonth()).toLocalDate().atTime(23, 59, 59);
+		result.put("totalSalesAmountQuarter", getTotalSalesAndQuantityByDateRange(startOfQuarter, endOfQuarter).get("totalSalesAmount"));
+		result.put("totalQuantityQuarter", getTotalSalesAndQuantityByDateRange(startOfQuarter, endOfQuarter).get("totalQuantity"));
+
+		LocalDateTime startOfYear = now.withDayOfYear(1).toLocalDate().atStartOfDay();
+		LocalDateTime endOfYear = now.with(TemporalAdjusters.lastDayOfYear()).toLocalDate().atTime(23, 59, 59);
+		result.put("totalSalesAmountYear", getTotalSalesAndQuantityByDateRange(startOfYear, endOfYear).get("totalSalesAmount"));
+		result.put("totalQuantityYear", getTotalSalesAndQuantityByDateRange(startOfYear, endOfYear).get("totalQuantity"));
+
+		return result;
+	}
+
 
 	// プロセスが1の（販売完了）売上量と売上額を計算
 	public Map<String, Double> getTotalSalesAndQuantityByProcess(int process) {

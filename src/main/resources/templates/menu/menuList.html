@@ -134,9 +134,15 @@
                     発注したメニューを受領しましたか？
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-warning" id="cancelOrderButton">発注取消</button>
-                    <button type="button" class="btn btn-primary" id="confirmReceiveButton">受領確認</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                    <button type="button" class="btn d-flex align-items-center btn-warning" id="cancelOrderButton">
+                        発注取消
+                    </button>
+                    <button type="button" class="btn d-flex align-items-center btn-primary" id="confirmReceiveButton">
+                        受領確認
+                    </button>
+                    <button type="button" class="btn d-flex align-items-center btn-secondary" data-bs-dismiss="modal">
+                        キャンセル
+                    </button>
                 </div>
             </div>
         </div>
@@ -144,6 +150,28 @@
     <script>
         /*<![CDATA[*/
         window.onload = function () {
+            updateMarquee();
+
+            let successAlert = document.querySelector('.alert-success');
+            let errorAlert = document.querySelector('.alert-danger');
+
+            if (successAlert) {
+                setTimeout(function () {
+                    successAlert.style.display = 'none';
+                }, 3000); // 업데이트 성공 안내 메세지를 3초 후에 숨깁니다.
+            }
+
+            if (errorAlert) {
+                setTimeout(function () {
+                    errorAlert.style.display = 'none';
+                }, 3000); // 업데이트 실패 안내 메세지를 3초 후에 숨깁니다.
+            }
+        }
+        /*]]>*/
+
+        window.onresize = updateMarquee;
+
+        function updateMarquee() {
             let marqueeElements = document.querySelectorAll('.menu-name-container');
 
             marqueeElements.forEach(function (container) {
@@ -162,23 +190,8 @@
                     menuName.classList.remove('marquee');
                 }
             });
-
-            let successAlert = document.querySelector('.alert-success');
-            let errorAlert = document.querySelector('.alert-danger');
-
-            if (successAlert) {
-                setTimeout(function () {
-                    successAlert.style.display = 'none';
-                }, 3000); // 업데이트 성공 안내 메세지를 3초 후에 숨깁니다.
-            }
-
-            if (errorAlert) {
-                setTimeout(function () {
-                    errorAlert.style.display = 'none';
-                }, 3000); // 업데이트 실패 안내 메세지를 3초 후에 숨깁니다.
-            }
         }
-        /*]]>*/
+
         let currentMenu;
 
         function detail(pk) {
@@ -196,6 +209,7 @@
                     if (result.menu.stockorder > 0) {
                         $('#modalStock').text('ストック : ' + result.menu.stock + ' + ' + result.menu.stockorder);
                         $('#modalStock').off('click').on('click', updateStockAndOrder);
+                        $('#modalStock').css('color', 'blue');
                     } else {
                         $('#modalStock').text('ストック : ' + result.menu.stock);
                         $('#modalStock').off('click');
