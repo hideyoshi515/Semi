@@ -32,8 +32,9 @@ public class POSController {
 	private final OrderWebSocketHandler orderWebSocketHandler;
 	private final CouponService couponService;
 	private final DiscordBotService discordBotService;
+	private final StaffService staffService;
 
-	public POSController(MenuService menuService, CategoryService categoryService, SalesService salesService, MenuRepository menuRepository, OrderNumRepository orderNumRepository, OrderRepository orderRepository, OrderService orderService, OrderWebSocketHandler orderWebSocketHandler, CouponService couponService, DiscordBotService discordBotService) {
+	public POSController(MenuService menuService, CategoryService categoryService, SalesService salesService, MenuRepository menuRepository, OrderNumRepository orderNumRepository, OrderRepository orderRepository, OrderService orderService, OrderWebSocketHandler orderWebSocketHandler, CouponService couponService, DiscordBotService discordBotService, StaffService staffService) {
 		this.menuService = menuService;
 		this.categoryService = categoryService;
 		this.salesService = salesService;
@@ -44,6 +45,7 @@ public class POSController {
 		this.orderWebSocketHandler = orderWebSocketHandler;
 		this.couponService = couponService;
 		this.discordBotService = discordBotService;
+		this.staffService = staffService;
 	}
 
 	// POS 페이지のGETリクエストを処理するメソッド
@@ -175,6 +177,13 @@ public class POSController {
 		orderWebSocketHandler.sendMessageToAll(message);
 
 		return "注文が成功しました";
+	}
+
+	@RequestMapping(value = "/pos/staff",method = RequestMethod.GET)
+	public String getStaff(Model model, HttpSession session){
+		List<Staff> staffList = staffService.getAllStaff();
+		model.addAttribute("staffList", staffList);
+		return "pos/staff.html";
 	}
 
 	// クーポンを作成するメソッド
