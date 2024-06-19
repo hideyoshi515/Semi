@@ -124,12 +124,13 @@ public class SalesController {
     }
 
     @RequestMapping(value = "/totalSalesByDayInput", method = RequestMethod.GET)
-    public String getTotalSalesByDay(@RequestParam(value = "year", required = false) Integer year,
-                                     @RequestParam(value = "month", required = false) Integer month,
-                                     @RequestParam(value = "day", required = false) Integer day,
+    public String getTotalSalesByDay(@RequestParam(value = "date", required = false) LocalDate date,
                                      Model model) {
 
-        if (year != null && month != null && day != null) {
+        if (date != null) {
+            int year = date.getYear();
+            int month = date.getMonthValue();
+            int day = date.getDayOfMonth();
             double totalSales = salesService.getTotalSalesByDay(year, month, day);
             DecimalFormat decimalFormat = new DecimalFormat("#,##0");
             String formattedTotalSales = decimalFormat.format(totalSales);
@@ -143,12 +144,14 @@ public class SalesController {
     }
 
     @RequestMapping(value = "/totalWeeklySalesByDayInput", method = RequestMethod.GET)
-    public String getTotalWeeklySalesByDay(@RequestParam(value = "year", required = false) Integer year,
-                                           @RequestParam(value = "month", required = false) Integer month,
-                                           @RequestParam(value = "day", required = false) Integer day,
+    public String getTotalWeeklySalesByDay(@RequestParam(value = "date", required = false) LocalDate date,
                                            Model model) {
 
-        if (year != null && month != null && day != null) {
+        if (date != null) {
+            int year = date.getYear();
+            int month = date.getMonthValue();
+            int day = date.getDayOfMonth();
+
             Map<LocalDate, Double> weeklySales = salesService.getWeeklySalesByDay(year, month, day);
             double totalWeeklySales = weeklySales.values().stream().mapToDouble(Double::doubleValue).sum();
 

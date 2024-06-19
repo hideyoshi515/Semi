@@ -1,13 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/plain_layout}">
+      layout:decorate="~{layout/pos_layout}">
 <th:block layout:fragment="content">
-    <div class="container">
-        <header class="header" style="height:42px !important;">
-            <div>
-                POS
-            </div>
-        </header>
 
         <main class="main-content">
             <section class="order-summary scrollable" style="overflow-y: scroll;">
@@ -440,80 +434,5 @@
             }
         }
     </script>
-
-    <style>
-        .numeric-keypad {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-
-        body {
-            background-color: #f0f0f0;
-        }
-
-        .scrollable {
-            max-height: 530px;
-            overflow-y: auto;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #004080;
-            color: white;
-            padding: 10px;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 10px;
-            padding: 10px;
-            height: 480px;
-        }
-
-        .order-summary,
-        .menu,
-        .sales-menu {
-            background-color: white;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .modal-dialog-centered {
-            display: flex;
-            align-items: center;
-            min-height: calc(100% - 5rem);
-        }
-
-        .modal-dialog-centered::before {
-            display: block;
-            height: calc(100vh - 5rem);
-            content: "";
-        }
-
-        .order-summary h2,
-        .menu h2,
-        .sales-menu h2 {
-            margin-bottom: 10px;
-            color: #004080;
-        }
-
-        .footer {
-            display: flex;
-            gap: 10px;
-            padding: 10px;
-        }
-
-        .footer div {
-            background-color: white;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-    </style>
 </th:block>
 </html>

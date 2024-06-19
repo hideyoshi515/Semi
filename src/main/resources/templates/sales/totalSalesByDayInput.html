@@ -2,12 +2,10 @@
 <html
         xmlns:th="http://www.thymeleaf.org/"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{layout/plain_layout}">
+        layout:decorate="~{layout/pos_layout}">
 >
 <head>
-    <title>POSOLDESK 売上管理プログラム</title>
     <link rel="stylesheet" href="/css/metroStyle.css">
-    <meta charset="UTF-8">
     <script>
         function submitForm() {
             document.querySelector('form').submit();
@@ -22,14 +20,12 @@
         }
 
         function redirectToWeeklySales() {
-            const year = document.getElementById('year').value;
-            const month = document.getElementById('month').value;
-            const day = document.getElementById('day').value;
-            if (year && month && day) {
-                const url = '/totalWeeklySalesByDayInput?year=' + year + '&month=' + month + '&day=' + day;
+            const date = document.getElementById('date').value;
+            if (date) {
+                const url = '/totalWeeklySalesByDayInput?date=' + date;
                 window.location.href = url;
             } else {
-                alert('年度、月、日をすべて入力してください。');
+                alert('日付を指定してください');
             }
         }
 
@@ -39,50 +35,35 @@
 </head>
 <body>
 <th:block layout:fragment="content">
-    <div class="container">
-
-        <main class="main-content">
+    <div class="pos-content">
+        <div class="posDiv outDiv">
             <section class="menu-title">
                 <h1>日商/週間売上</h1>
             </section>
             <div class="content">
                 <form action="/totalSalesByDayInput" method="get">
                     <h1>
-                        <label for="year">年度:</label>
-                        <input style="font-size:1.17em;" type="number" id="year" name="year" th:value="${year}"
-                               min="2000"
-                               max="2099">
-                        <label for="month">月:</label>
-                        <input style="font-size:1.17em;" type="number" id="month" name="month" th:value="${month}"
-                               min="1" max="12">
-                        <label for="day">日:</label>
-                        <input style="font-size:1.17em;" type="number" id="day" name="day" th:value="${day}" min="1"
-                               max="31">
-                    </h1>
-
-                    <div th:if="${year != null && month != null && day != null}" class="result-container">
-                        <h3><span th:text="${year}"></span>年
+                        <div class="d-flex">
+                            <span class="me-2">日付:</span>
+                            <input type="date" id="date" name="date" required th:value="${param.date}"
+                                   onchange="location.href='/totalSalesByDayInput?date='+this.value" style="height: 48px">
+                            <div class="button my-0" onclick="redirectToWeeklySales() "style="height: 48px">
+                                <p style="font-size:11pt">属している一週間の総売上高</p>
+                            </div>
+                        </div>
+                        <h3 th:if="${year != null && month != null && day != null && param.date != null}" class="mt-2">
+                            <span th:text="${year}"></span>年
                             <span th:text="${month}"></span>月
-                            <span th:text="${day}"></span>日の売上は
-                            <span th:text="${totalSales}"></span>円です。
+                            <span th:text="${day}"></span>日 総売上高 =
+                            <span th:text="|${totalSales} ₩|"></span>
                         </h3>
-                    </div>
-
-                    <div class="button-container" style="margin-top: 10px; text-align: center;width:1296px">
-                        <div class="button" onclick="submitForm()">
-                            <p>日商閲覧</p>
-                        </div>
-                        <div class="button" onclick="redirectToWeeklySales()">
-                            <p style="font-size:11pt">その日が属している一週間の総売上高</p>
-                        </div>
-                        <div class="button" onclick="location.href='/adminSalesMainMenu'">
-                            <p>管理者メイン画面に復帰</p>
-                        </div>
-                    </div>
-
+                        <h3 th:if="${param.date == null && year == null}" class="mt-2">
+                            日付を指定してください
+                        </h3>
+                    </h1>
                 </form>
             </div>
-        </main>
+        </div>
     </div>
 </th:block>
 </body>

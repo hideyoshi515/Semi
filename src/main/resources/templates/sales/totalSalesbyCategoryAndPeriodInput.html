@@ -2,7 +2,7 @@
 <html
         xmlns:th="http://www.thymeleaf.org/"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{layout/plain_layout}">
+        layout:decorate="~{layout/pos_layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,8 +12,8 @@
     <style>
         .chart-container {
             position: relative;
-            height: 400px; /* 차트 높이를 설정 */
-            width: 100%; /* 차트 너비를 설정 */
+            height: 230px; /* 차트 높이를 설정 */
+            width: 480px; /* 차트 너비를 설정 */
             margin-bottom: 20px; /* 차트 간격을 설정 */
         }
 
@@ -47,30 +47,29 @@
 </head>
 <body>
 <th:block layout:fragment="content">
-    <div class="container">
-
-        <main class="main-content">
-            <section class="menu-title">
-                <h1 style="font-size: 22pt">カテゴリ別売上販売の現状</h1>
+    <div class="pos-content">
+        <div class="posDiv outDiv">
+            <section class="menu-title" style="width: 380px !important;">
+                <h1 style="font-size: 22pt;">カテゴリ別売上販売の現状</h1>
             </section>
-            <div class="content" style="display: flex; justify-content: space-around">
-
+            <div class="content">
                 <form action="/totalSalesbyCategoryAndPeriodInput" method="post">
-                    <h1>
+                    <h1 class="d-flex justify-content-start">
                         <label for="startDate">開始日:</label>
-                        <input type="date" id="startDate" name="startDate" required>
-                        <label for="endDate">終了日:</label>
-                        <input type="date" id="endDate" name="endDate" required>
+                        <input type="date" id="startDate" name="startDate" required style="height: 48px">
+                        <label for="endDate" class="ms-2">終了日:</label>
+                        <input type="date" id="endDate" name="endDate" required style="height: 48px">
+                        <button type="submit" class="button my-0" style="width: 100px; height: 48px">検索</button>
                     </h1>
 
                     <div th:if="${formattedStartDate != null && formattedEndDate != null}">
-                        <div class="content">
+                        <div class="content d-flex">
                             <div class="table-container" style="display:block">
                                 <div class="date-range">
-                                    <h2>
+                                    <h3>
                                         <p>検索期間: <span th:text="${formattedStartDate}"></span> ~ <span
                                                 th:text="${formattedEndDate}"></span></p>
-                                    </h2>
+                                    </h3>
                                 </div>
                                 <table>
                                     <thead>
@@ -83,31 +82,26 @@
                                     <tbody>
                                     <tr th:each="entry : ${salesByCategory}">
                                         <td th:text="${entry.key}"></td>
-                                        <td th:text="${#numbers.formatInteger(entry.value, 1, 'COMMA')} + '円'"></td>
+                                        <td th:text="${#numbers.formatInteger(entry.value, 1, 'COMMA')} + ' ₩'"></td>
                                         <td th:text="${#numbers.formatInteger(quantityByCategory[entry.key], 1, 'COMMA')}+ '個'"></td>
                                     </tr>
                                     </tbody>
                                 </table>
                             </div>
 
-                            <div class="chart-wrapper">
-                                <div class="chart-container">
-                                    <canvas id="categorySalesChart"></canvas>
-                                    <div class="chart-label">カテゴリ別総売上高</div>
+                            <div class="chart-wrapper d-block">
+                                <div>
+                                    <div class="chart-container">
+                                        <canvas id="categorySalesChart"></canvas>
+                                    </div>
                                 </div>
-                                <div class="chart-container">
-                                    <canvas id="categoryQuantityChart"></canvas>
-                                    <div class="chart-label">カテゴリ別販売量</div>
+                                <div>
+                                    <div class="chart-container">
+                                        <canvas id="categoryQuantityChart"></canvas>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="button-container" style="margin-top: 10px; text-align: center;width:1296px">
-                        <button type="submit" class="button">検索</button>
-                        <button class="button" type="button" onclick="location.href='/adminSalesMainMenu'">
-                            <p>管理者メイン画面に復帰</p>
-                        </button>
                     </div>
                 </form>
 
@@ -119,7 +113,7 @@
 
                     var labels = Object.keys(salesData);
                     var salesValues = Object.values(salesData);
-                    var quantityValues = labels.map(function(label) {
+                    var quantityValues = labels.map(function (label) {
                         return quantityData[label] || 0;
                     });
 
@@ -152,13 +146,14 @@
                         },
                         options: {
                             responsive: true,
-                            maintainAspectRatio: true, // 비율을 유지하도록 설정
+                            maintainAspectRatio: false, // 비율을 유지하도록 설정
                             animation: {
                                 duration: 1000,
                                 easing: 'easeOutQuart'
                             },
                             plugins: {
                                 legend: {
+                                    position: 'right',
                                     labels: {
                                         font: {
                                             size: 14 // 라벨 글씨 크기 설정
@@ -214,13 +209,14 @@
                         },
                         options: {
                             responsive: true,
-                            maintainAspectRatio: true, // 비율을 유지하도록 설정
+                            maintainAspectRatio: false, // 비율을 유지하도록 설정
                             animation: {
                                 duration: 1000,
                                 easing: 'easeOutQuart'
                             },
                             plugins: {
                                 legend: {
+                                    position: 'right',
                                     labels: {
                                         font: {
                                             size: 14 // 라벨 글씨 크기 설정
@@ -248,7 +244,7 @@
                     });
                 </script>
             </div>
-        </main>
+        </div>
     </div>
 </th:block>
 </body>

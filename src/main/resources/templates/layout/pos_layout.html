@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<th:block th:replace="~{fragments/head :: headFragment}"></th:block>
+<link href="/css/pos.css" rel="stylesheet">
+<body>
+<div id="layoutSidenav_content">
+    <main>
+        <div class="container">
+            <header class="header" style="height:42px !important;">
+                    <a class="btn rounded-0 text-light align-items-center fs-5" href="/pos" th:text="POS"></a>
+                    <a class="btn rounded-0 text-light align-items-center fs-5" href="/adminSalesMainMenu" th:text="メニュー"></a>
+            </header>
+        <th:block layout:fragment="content"></th:block>
+    </main>
+</div>
+</div>
+</body>
+</html>

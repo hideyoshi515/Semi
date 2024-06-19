@@ -2,7 +2,7 @@
 <html
         xmlns:th="http://www.thymeleaf.org/"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{layout/plain_layout}">
+        layout:decorate="~{layout/pos_layout}">
 >
 
 <head>
@@ -14,9 +14,8 @@
 </head>
 <body>
 <th:block layout:fragment="content">
-    <div class="container">
-
-        <main class="main-content">
+        <div class="pos-content">
+            <div class="posDiv outDiv">
             <section class="menu-title">
                 <h1>年度別総売上</h1>
             </section>
@@ -43,14 +42,11 @@
                 </div>
             </div>
             <div class="button-container">
-                <div class="button" id="prevPageBtn" >
+                <div class="btn btn-lg btn-outline-primary rounded-0 rounded-start border-end-0 mt-3" id="prevPageBtn" >
                     <p>前の5年間</p>
                 </div>
-                <div class="button" id="nextPageBtn" >
+                <div class="btn btn-lg btn-outline-primary rounded-0 rounded-end mt-3" id="nextPageBtn" >
                     <p>次の5年間</p>
-                </div>
-                <div class="button" onclick="location.href='/adminSalesMainHome'">
-                    <p>管理者メイン画面に復帰</p>
                 </div>
             </div>
 
@@ -84,7 +80,7 @@
                         var growthRateCell = document.createElement('td');
 
                         yearCell.textContent = paginatedKeys[i];
-                        salesCell.textContent = new Intl.NumberFormat().format(paginatedValues[i]) + '円';
+                        salesCell.textContent = new Intl.NumberFormat().format(paginatedValues[i]) + ' ₩';
 
                         if (i === 0 && start === 0) {
                             growthRateCell.textContent = '前年資料なし';

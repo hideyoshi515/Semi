@@ -2,7 +2,7 @@
 <html
         xmlns:th="http://www.thymeleaf.org/"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{layout/plain_layout}">
+        layout:decorate="~{layout/pos_layout}">
 >
 <head>
     <meta charset="UTF-8">
@@ -13,8 +13,8 @@
     <style>
         .chart-container {
             position: relative;
-            height: 400px; /* 차트 높이를 설정 */
-            width: 100%; /* 차트 너비를 설정 */
+            height: 230px; /* 차트 높이를 설정 */
+            width: 480px; /* 차트 너비를 설정 */
             margin-bottom: 20px; /* 차트 간격을 설정 */
         }
 
@@ -48,31 +48,31 @@
 </head>
 <body>
 <th:block layout:fragment="content">
-    <div class="container">
-
-        <main class="main-content">
-            <section class="menu-title">
+    <div class="pos-content">
+        <div class="posDiv outDiv">
+            <section class="menu-title" style="width: 420px !important;">
                 <h1>メニュー別売上販売の現状</h1>
             </section>
-            <div class="content" style="display: flex; justify-content: space-around">
+            <div class="content">
                 <form action="/totalSalesbyMenuAndPeriodInput" method="post">
-                    <h3>
+                    <h1 class="d-flex justify-content-start">
                         <label for="startDate">開始日:</label>
                         <input type="date" id="startDate" name="startDate" required lang="ja">
-                        <label for="endDate">終了日:</label>
+                        <label for="endDate" class="ms-2">終了日:</label>
                         <input type="date" id="endDate" name="endDate" required lang="ja">
-                    </h3>
+                        <button type="submit" class="button my-0" style="width: 100px; height: 48px">検索</button>
+                    </h1>
 
                     <div th:if="${formattedStartDate != null && formattedEndDate != null}">
 
 
-                        <div class="content">
-                            <div class="table-container limited-width" style="display:block">
+                        <div class="content d-flex">
+                            <div class="table-container" style="display:block; max-height: 540px;">
                                 <div class="date-range">
-                                    <h2>
+                                    <h3>
                                         <p>検索期間: <span th:text="${formattedStartDate}"></span> ~ <span
                                                 th:text="${formattedEndDate}"></span></p>
-                                    </h2>
+                                    </h3>
                                 </div>
                                 <table>
                                     <thead>
@@ -85,31 +85,30 @@
                                     <tbody>
                                     <tr th:each="entry : ${salesByMenu}">
                                         <td th:text="${entry.key}"></td>
-                                        <td th:text="${#numbers.formatInteger(entry.value, 1, 'COMMA')} + '円'"></td>
+                                        <td th:text="${#numbers.formatInteger(entry.value, 1, 'COMMA')} + ' ₩'"></td>
                                         <td th:text="${#numbers.formatInteger(quantityByMenu[entry.key], 1, 'COMMA')} + '個'"></td>
                                     </tr>
                                     </tbody>
                                 </table>
                             </div>
 
-                            <div class="chart-wrapper">
-                                <div class="chart-container">
-                                    <canvas id="salesChart"></canvas>
-                                    <div class="chart-label">メニュー別総売上高</div>
+                            <div class="chart-wrapper d-block">
+                                <div>
+                                    <div class="chart-container">
+                                        <canvas id="salesChart"></canvas>
+                                        <div class="chart-label">メニュー別総売上高</div>
+                                    </div>
                                 </div>
-                                <div class="chart-container">
-                                    <canvas id="quantityChart"></canvas>
-                                    <div class="chart-label">メニュー別販売量</div>
+                                <div>
+                                    <div class="chart-container">
+                                        <canvas id="quantityChart"></canvas>
+                                        <div class="chart-label">メニュー別販売量</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="button-container" style="margin-top: 10px; text-align: center; width:1296px">
-                        <button type="submit" class="button">検索</button>
-                        <button class="button" type="button" onclick="location.href='/adminSalesMainMenu'"><p>
-                            管理者メイン画面に復帰</p></button>
-                    </div>
                 </form>
 
                 <script th:inline="javascript">
@@ -151,13 +150,14 @@
                         },
                         options: {
                             responsive: true,
-                            maintainAspectRatio: true,
+                            maintainAspectRatio: false,
                             animation: {
                                 duration: 1000,
                                 easing: 'easeOutQuart'
                             },
                             plugins: {
                                 legend: {
+                                    position:'right',
                                     labels: {
                                         font: {
                                             size: 14
@@ -166,7 +166,7 @@
                                     }
                                 },
                                 title: {
-                                    display: true,
+                                    display: false,
                                     text: 'メニュー別総売上高',
                                     font: {
                                         size: 18
@@ -213,13 +213,14 @@
                         },
                         options: {
                             responsive: true,
-                            maintainAspectRatio: true,
+                            maintainAspectRatio: false,
                             animation: {
                                 duration: 1000,
                                 easing: 'easeOutQuart'
                             },
                             plugins: {
                                 legend: {
+                                    position:'right',
                                     labels: {
                                         font: {
                                             size: 14
@@ -228,7 +229,7 @@
                                     }
                                 },
                                 title: {
-                                    display: true,
+                                    display: false,
                                     text: 'メニュー別総販売量',
                                     font: {
                                         size: 18
@@ -248,7 +249,7 @@
                 </script>
             </div>
 
-        </main>
+        </div>
     </div>
 </th:block>
 </body>

@@ -2,7 +2,7 @@
 <html
         xmlns:th="http://www.thymeleaf.org/"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{layout/plain_layout}">
+        layout:decorate="~{layout/pos_layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,17 +12,17 @@
 </head>
 <body>
 <th:block layout:fragment="content">
-    <div class="container">
-        <main class="main-content">
-            <section class="menu-title">
+    <div class="pos-content">
+        <div class="posDiv outDiv">
+            <section class="menu-title" style="width: 240px;">
                 <h1>今日の売上高</h1>
             </section>
             <div class="content" style="display: flex; justify-content: space-around">
 
-                <div class="chart-wrapper" style="display:block">
+                <div class="chart-wrapper" style="display:block; height: 564px !important;">
                     <h1 style="color:rgb(11, 94, 215)" id="clock">clock</h1>
-                    <h1 style="font-size: 24pt;color:rgb(11, 94, 215)">今までの売上高：<span th:text="${totalSalesToday}"></span>円</h1>
-                    <div class="chart-container" style="height:430px;margin-top:40pt">
+                    <h1 style="font-size: 24pt;color:rgb(11, 94, 215)">今までの売上高：<span th:text="${totalSalesToday}"></span>₩</h1>
+                    <div class="chart-container" style="height: 400px;">
                         <canvas id="salesChart"  ></canvas>
                     </div>
                 </div>
@@ -31,20 +31,15 @@
 
                         <div class="outerDiv" >
                             <div class="m-center" style="margin-top:30pt; margin-left:10pt">
-                                <div class="ms-3 mt-3 text-center" style="width: 500px; height: auto; text-align: center">
-                                    <div style="margin-left:45pt">本日の販売状況</div>
-                                    <div class="chart-container" style="width: 550px; height: 470px;">
+                                <div class="ms-3 mt-3 text-center" style="width: 460px; height: auto; text-align: center">
+                                    <div class="chart-container" style="width: 480px; height: 480px;">
                                         <canvas id="todaySalesChart"></canvas>
                                     </div>
+                                    <div style="margin-left:45pt">本日の販売状況</div>
                                 </div>
                             </div>
                         </div>
 
-                </div>
-            </div>
-            <div class="button-container">
-                <div class="button" onclick="location.href='/adminSalesMainMenu'">
-                    <p>제목뭘로하지</p>
                 </div>
             </div>
 
@@ -118,6 +113,7 @@
                         }]
                     },
                     options: {
+                        maintainAspectRatio: false,
                         scales: {
                             x: {
                                 type: 'category',
@@ -135,7 +131,7 @@
                                 beginAtZero: true,
                                 title: {
                                     display: true,
-                                    text: '累積売上高 (円)'
+                                    text: '累積売上高 (₩)'
                                 }
                             }
                         }
@@ -165,7 +161,7 @@
                 clock();
                 setInterval(clock, 1000); // 1초마다 실행
             </script>
-        </main>
+        </div>
     </div>
 </th:block>
 </body>

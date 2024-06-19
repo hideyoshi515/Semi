@@ -2,20 +2,11 @@ body {
     background-color: #f0f0f0;
 }
 
-h1 {
+.menu-title h1 {
     color: rgb(0, 64, 128);
     font-size: 32px;
 }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #004080;
-    color: white;
-    padding: 10px;
-
-}
 
 .menu-title {
     margin-top: 15px;
@@ -27,29 +18,7 @@ h1 {
     width: 30%;
 }
 
-
-.header a {
-    color: white;
-    text-decoration: none;
-    margin: 0 15px;
-    font-size: 1.5rem; /* Increase font size */
-    transition: background-color 0.3s, font-size 0.3s, transform 0.3s; /* Smooth transition for color and font size */
-    padding: 6px 16px; /* Add padding for better click area */
-    display: inline-block;
-    position: relative; /* Allow transform without affecting layout */
-}
-
-.header a:hover {
-    border-radius: 5px;
-    cursor: pointer;
-    background-color: #f0f0f0; /* Light Blue */
-    color: black;
-
-}
-
 .content {
-    display: flex;
-    justify-content: space-around;
     margin-top: 20px;
 }
 
@@ -100,7 +69,7 @@ h1 {
 }
 
 .chart-wrapper {
-    height: 600px; /* Increase chart height */
+    height: 540px; /* Increase chart height */
     padding: 20px;
 }
 
@@ -153,26 +122,5 @@ h1 {
     width: 50px;
     height: 50px;
     margin-bottom: 10px;
-}
-
-.result-container {
-    width: 100%;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center; /* Center content horizontally */
-    align-items: center; /* Center content vertically */
-    background-color: white; /* Set background color to white */
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-    flex-direction: column;
-    text-align: center;
-}
-
-.result-container h3 {
-    margin: 0;
-    font-size: 1.5rem;
-    color: #333;
 }
 

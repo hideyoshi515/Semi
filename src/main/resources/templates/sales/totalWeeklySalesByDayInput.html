@@ -2,7 +2,7 @@
 <html
         xmlns:th="http://www.thymeleaf.org/"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{layout/plain_layout}">
+        layout:decorate="~{layout/pos_layout}">
 >
 <head>
     <title>POSOLDESK 売上管理プログラム</title>
@@ -33,56 +33,40 @@
         window.onload = formatGrowthRate;
     </script>
 </head>
-<body>
-<th:block layout:fragment="content">
-    <div class="container">
-        <header class="header" style="height:42px !important;">
-            <a onclick="location.href='/adminSalesMainHome'">ホーム</a>
-            <a onclick="location.href='/adminSalesMainMenu'">メニュー</a>
-        </header>
-        <main class="main-content">
+<body><th:block layout:fragment="content">
+    <div class="pos-content">
+        <div class="posDiv outDiv">
             <section class="menu-title">
                 <h1>日商/週間売上</h1>
             </section>
             <div class="content">
-
                 <form action="/totalSalesByDayInput" method="get">
                     <h1>
-                        <label for="year">年度:</label>
-                        <input style="font-size:1.17em;" type="number" id="year" name="year" th:value="${year}"
-                               min="2000" max="2099">
-                        <label for="month">月:</label>
-                        <input style="font-size:1.17em;" type="number" id="month" name="month" th:value="${month}"
-                               min="1" max="12">
-                        <label for="day">日:</label>
-                        <input style="font-size:1.17em;" type="number" id="day" name="day" th:value="${day}" min="1"
-                               max="31">
+                        <span>日付:</span>
+                        <input type="date" id="date" name="date" required th:value="${param.date}" onchange="location.href='/totalWeeklySalesByDayInput?date='+this.value">
                     </h1>
 
 
                     <div th:if="${weeklySales != null}">
-                        <div class="content">
+                        <div class="content d-flex justify-content-around">
 
                             <div class="table-container" style="display:block">
-                                <div th:if="${year != null && month != null && day != null}" class="result-container">
-                                    <h3>
-                                        <span th:text="${year}"></span>年
-                                        <span th:text="${month}"></span>月
-                                        <span th:text="${day}"></span>日が属している一週間の総売上高は<br>
-                                        <span th:text="${totalWeeklySales}"></span>円です。
+                                <div th:if="${year != null && month != null && day != null}">
+                                    <h3>指定した日が属している週間の総売上高 =
+                                        <span th:text="${totalWeeklySales}"></span> ₩
                                     </h3>
                                 </div>
                                 <table>
                                     <thead>
                                     <tr>
                                         <th>日付</th>
-                                        <th>総売上高 (円)</th>
+                                        <th>総売上高 (₩)</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <tr th:each="entry : ${weeklySales}">
                                         <td th:text="${#temporals.format(entry.key, 'yyyy-MM-dd')}"></td>
-                                        <td th:text="${entry.value} + '円'"></td>
+                                        <td th:text="${entry.value} + ' ₩'"></td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -92,18 +76,6 @@
                                 <div class="chart-container">
                                     <canvas id="weeklySalesChart"></canvas>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="button-container" style="margin-top: 10px;">
-                            <div class="button" onclick="document.forms[0].submit()">
-                                <p>日商閲覧</p>
-                            </div>
-                            <div class="button" onclick="redirectToWeeklySales()">
-                                <p style="font-size:11pt">その日が属している一週間の総売上高</p>
-                            </div>
-                            <div class="button" onclick="location.href='/adminSalesMainMenu'">
-                                <p>管理者メイン画面に復帰</p>
                             </div>
                         </div>
 
@@ -187,7 +159,7 @@
                     </div>
                 </form>
             </div>
-        </main>
+        </div>
     </div>
 </th:block>
 </body>

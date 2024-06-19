@@ -43,7 +43,7 @@ public class MenuController {
 	}
 
 	// 메뉴 리스트를 가져와서 보여줌
-	@RequestMapping(value = "/menuList", method = RequestMethod.GET)
+	@RequestMapping(value = "/menuList2", method = RequestMethod.GET)
 	public String getMenuList(Model model, @RequestParam Map<String, String> params, @ModelAttribute("successMessage") String successMessage, @ModelAttribute("errorMessage") String errorMessage) {
 		List<Menu> menus;
 		List<Category> categories = categoryService.getAllCategories();
@@ -71,7 +71,7 @@ public class MenuController {
 		return "/menu/menuList.html";
 	}
 	//css작업시 참고용으로 원래 메뉴리스트 css 보는중
-	@RequestMapping(value = "/menuList2", method = RequestMethod.GET)
+	@RequestMapping(value = "/menuList", method = RequestMethod.GET)
 	public String getMenuList2(Model model, @RequestParam Map<String, String> params, @ModelAttribute("successMessage") String successMessage, @ModelAttribute("errorMessage") String errorMessage) {
 		List<Menu> menus;
 		List<Category> categories = categoryService.getAllCategories();

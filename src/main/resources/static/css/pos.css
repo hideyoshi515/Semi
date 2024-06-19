@@ -1,0 +1,135 @@
+
+.numeric-keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+body {
+    background-color: #f0f0f0;
+}
+
+.scrollable {
+    max-height: 530px;
+    overflow-y: auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #004080;
+    color: white;
+    padding: 10px;
+}
+
+.header a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.5rem; /* Increase font size */
+    transition: background-color 0.3s, font-size 0.3s, transform 0.3s; /* Smooth transition for color and font size */
+    padding: 6px 16px; /* Add padding for better click area */
+    display: inline-block;
+    position: relative; /* Allow transform without affecting layout */
+}
+
+.header a:hover {
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #f0f0f0; /* Light Blue */
+    color: black;
+
+}
+
+
+.main-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 10px;
+    padding: 10px;
+    height: 480px;
+}
+
+.pos-content{
+    gap: 10px;
+    padding: 10px;
+    height: 480px;
+}
+
+.outDiv{
+    height : 749px;
+}
+
+.posDiv,
+.order-summary,
+.menu,
+.sales-menu {
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 5rem);
+}
+
+.modal-dialog-centered::before {
+    display: block;
+    height: calc(100vh - 5rem);
+    content: "";
+}
+
+.order-summary h2,
+.menu h2,
+.sales-menu h2 {
+    margin-bottom: 10px;
+    color: #004080;
+}
+
+.footer {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+}
+
+.footer div {
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.date-display {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.time-display {
+    font-size: 4em;
+    font-weight: bold;
+}
+
+
+
+.result-container {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+    background-color: white; /* Set background color to white */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    flex-direction: column;
+    text-align: center;
+}
+
+.result-container h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+}

@@ -2,7 +2,7 @@
 <html
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{layout/plain_layout}">
+        layout:decorate="~{layout/pos_layout}">
 >
 <head>
     <meta charset="UTF-8">
@@ -11,142 +11,118 @@
     <link rel="stylesheet" href="/css/metroStyle.css">
 </head>
 <th:block layout:fragment="content">
-    <div class="container">
-
-        <main class="main-content">
+    <div class="pos-content">
+        <div class="posDiv outDiv">
             <section class="menu-title">
                 <h1>メニュー別商品管理</h1>
             </section>
 
-        <div class="search-container">
-            <input class="search-input form-control rounded-2 ps-1 me-1" type="text" id="search-input"
-                   placeholder="カテゴリー名で検索" oninput="filterCategoryByName()">
-            <!--        <button class="search-button btn btn-primary d-flex align-items-center me-2" onclick="location.href='/categoryCreate'">-->
-            <!--            カテゴリー登録-->
-            <!--        </button>-->
-        </div>
-        <div id="category-items" class="row row-cols-1 row-cols-md-3 g-4">
-            <div class="category-item" th:each="category, iterStat : ${categories}">
+            <div class="search-container">
+                <input class="search-input form-control rounded-2 ps-1 me-1" type="text" id="search-input"
+                       placeholder="カテゴリー名で検索" oninput="filterCategoryByName()">
+                <!--        <button class="search-button btn btn-primary d-flex align-items-center me-2" onclick="location.href='/categoryCreate'">-->
+                <!--            カテゴリー登録-->
+                <!--        </button>-->
+            </div>
+            <div id="category-items" class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="category-item" th:each="category, iterStat : ${categories}">
+                    <div class="col">
+                        <div class="card border-primary text-center w-100" style="background-color: white;">
+                            <div class="card-body">
+                                <h5 class="card-title" style="font-size: 2rem" th:text="|${category.name}|"></h5>
+                                <div class="category-buttons d-flex flex-column align-items-center">
+                                    <a th:onclick="|toMenuList(${category.id})|"
+                                       class="btn btn-outline-secondary mb-1 fw-bold">メニューリスト</a>
+                                    <a th:onclick="|updateCategory(${category.id})|"
+                                       class="btn btn-outline-primary mb-1 fw-bold">カテゴリー名変更</a>
+                                    <a th:onclick="|deleteCategory(${category.id})|"
+                                       class="btn btn-outline-danger fw-bold">削除</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="col">
                     <div class="card border-primary text-center w-100" style="background-color: white;">
                         <div class="card-body">
-                            <h5 class="card-title" style="font-size: 2rem" th:text="|${category.name}|"></h5>
+                            <h5 class="card-title" style="font-size: 2rem">カテゴリー登録</h5>
                             <div class="category-buttons d-flex flex-column align-items-center">
-                                <a th:onclick="|toMenuList(${category.id})|"
-                                   class="btn btn-secondary" style="color:black;border-color: rgb(13, 110, 253); background-color: white">メニューリストへ</a>
-                                <a th:onclick="|updateCategory(${category.id})|"
-                                   class="btn btn-primary" style="color:black;border-color: rgb(13, 110, 253); background-color: white">カテゴリー名変更</a>
-                                <a th:onclick="|deleteCategory(${category.id})|" class="btn btn-danger" style="color:black;border-color: rgb(13, 110, 253); background-color: white">削除</a>
+                                <a onclick="location.href='/categoryCreate'"
+                                   class="btn btn-outline-success fw-bold">登録する</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col">
-                <div class="card border-primary text-center w-100" style="background-color: white;">
-                    <div class="card-body">
-                        <h5 class="card-title" style="font-size: 2rem">カテゴリー登録</h5>
-                        <div class="category-buttons d-flex flex-column align-items-center">
-                            <a onclick="location.href='/categoryCreate'" class="btn btn-success" style="color:black;border-color: rgb(13, 110, 253); background-color: white">登録する</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <script>
-            function deleteCategory(pk) {
-                let ok = confirm("本当にカテゴリーを削除しますか?")
-                if (ok) {
-                    $.ajax({
-                        url: '/CategoryDelete',
-                        type: 'POST',
-                        data: {
-                            id: pk
-                        },
-                        success: function (response) {
-                            alert('カテゴリーの削除が成功しました。')
-                            location.href = '/categoryList';
-                        },
-                        error: function () {
-                            alert('カテゴリーの削除が失敗しました。')
-                        }
-                    })
-                }
-            }
-
-            function updateCategory(pk) {
-                let currentName = $("#" + pk + "_name").val();
-                let newName = prompt("新しいカテゴリー名を入力してください。", currentName)
-                if (newName != null && newName !== "" && newName !== currentName) {
-                    $.ajax({
-                        url: '/categoryUpdate',
-                        type: 'POST',
-                        data: {
-                            id: pk,
-                            name: newName
-                        },
-                        success: function (response) {
-                            alert('カテゴリー名の変更が成功しました。')
-                            location.href = '/categoryList';
-                        },
-                        error: function () {
-                            alert('カテゴリー名の変更が失敗しました。')
-                        }
-                    })
-                } else {
-                    alert('入力間違い又は元カテゴリー名と一致しています。')
-                }
-            }
-
-            function toMenuList(pk) {
-                location.href = "/menuList?category=" + pk;
-            }
-
-            function filterCategoryByName() {
-                const searchInput = document.getElementById('search-input').value.toLowerCase();
-                const categoryItems = document.getElementsByClassName('category-item');
-                for (let i = 0; i < categoryItems.length; i++) {
-                    const categoryItem = categoryItems[i];
-                    const categoryName = categoryItem.querySelector('.card-title').innerText.toLowerCase();
-                    if (categoryName.includes(searchInput)) {
-                        categoryItem.style.display = '';
-                    } else {
-                        categoryItem.style.display = 'none';
+            <script>
+                function deleteCategory(pk) {
+                    let ok = confirm("本当にカテゴリーを削除しますか?")
+                    if (ok) {
+                        $.ajax({
+                            url: '/CategoryDelete',
+                            type: 'POST',
+                            data: {
+                                id: pk
+                            },
+                            success: function (response) {
+                                alert('カテゴリーの削除が成功しました。')
+                                location.href = '/categoryList';
+                            },
+                            error: function () {
+                                alert('カテゴリーの削除が失敗しました。')
+                            }
+                        })
                     }
                 }
-            }
-        </script>
-        </main>
+
+                function updateCategory(pk) {
+                    let currentName = $("#" + pk + "_name").val();
+                    let newName = prompt("新しいカテゴリー名を入力してください。", currentName)
+                    if (newName != null && newName !== "" && newName !== currentName) {
+                        $.ajax({
+                            url: '/categoryUpdate',
+                            type: 'POST',
+                            data: {
+                                id: pk,
+                                name: newName
+                            },
+                            success: function (response) {
+                                alert('カテゴリー名の変更が成功しました。')
+                                location.href = '/categoryList';
+                            },
+                            error: function () {
+                                alert('カテゴリー名の変更が失敗しました。')
+                            }
+                        })
+                    } else {
+                        alert('入力間違い又は元カテゴリー名と一致しています。')
+                    }
+                }
+
+                function toMenuList(pk) {
+                    location.href = "/menuList?category=" + pk;
+                }
+
+                function filterCategoryByName() {
+                    const searchInput = document.getElementById('search-input').value.toLowerCase();
+                    const categoryItems = document.getElementsByClassName('category-item');
+                    for (let i = 0; i < categoryItems.length; i++) {
+                        const categoryItem = categoryItems[i];
+                        const categoryName = categoryItem.querySelector('.card-title').innerText.toLowerCase();
+                        if (categoryName.includes(searchInput)) {
+                            categoryItem.style.display = '';
+                        } else {
+                            categoryItem.style.display = 'none';
+                        }
+                    }
+                }
+            </script>
+        </div>
     </div>
 </th:block>
 </html>
 <style>
-    .btn {
-        width: 10em;
-        margin-bottom: 0.25em;
-    }
-
-    .btn btn-secondary :hover {
-        background-color: rgb(13, 110, 253);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
-        transition: box-shadow 0.3s; /* Smooth transition for shadow */
-        color: white;
-    }
-
-    .btn btn-primary :hover {
-        background-color: rgb(13, 110, 253);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
-        transition: box-shadow 0.3s; /* Smooth transition for shadow */
-        color: white;
-    }
-
-
-
-    .btn-danger {
-        width: 5em;
-    }
-
     #category-items {
         padding-left: 1em;
         padding-right: 1em;

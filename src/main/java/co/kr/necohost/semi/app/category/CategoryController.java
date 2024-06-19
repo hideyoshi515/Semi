@@ -19,7 +19,7 @@ public class CategoryController {
     }
 
     // 카테고리 관리 페이지를 반환
-    @RequestMapping(value = "/categoryList", method = RequestMethod.GET)
+    @RequestMapping(value = "/categoryList2", method = RequestMethod.GET)
     public String getCategoryList(Model model) {
         List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories);
@@ -28,7 +28,7 @@ public class CategoryController {
         return "/category/categoryList.html";
     }
     // 통합된 css 적용중
-    @RequestMapping(value = "/categoryList2", method = RequestMethod.GET)
+    @RequestMapping(value = "/categoryList", method = RequestMethod.GET)
     public String getCategoryList2(Model model) {
         List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories);
