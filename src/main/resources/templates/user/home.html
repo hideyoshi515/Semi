@@ -5,10 +5,67 @@
         layout:decorate="~{layout/user_layout}">
 >
 <th:block layout:fragment="content">
+    <style>
+        
+        @media screen and (min-width: 769px) {
+            #wrapper {
+                align-items: center;
+            }
+
+            .image-container {
+                margin-left: 220px !important;
+            }
+        }
+        
+        #wrapper {
+            display: flex;
+            justify-content: center;
+            background-color: #f8f9fa;
+        }
+
+        .outerDiv {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .image-container {
+            width: 360px;
+            height: 360px;
+            overflow: hidden;
+            margin-left: 169.09px;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .menu-info {
+            padding: 20px;
+        }
+
+        .menu-info h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .menu-info p {
+            color: #666;
+        }
+    </style>
     <div id="wrapper">
-        <div class="outerDiv" style="min-height: 680px !important;">
-            <div class="m-center border border-end h-100">
-                유저페이지 사용예정
+        <div class="outerDiv" style="width: 800px;">
+            <h2 class="my-4">このメニューはいかがでしょうか</h2>
+            <div class="image-container">
+                <img th:src="|/${randomMenu.image}|">
+            </div>
+            <div class="menu-info">
+                <h2 th:text="|${randomMenu.name}|"></h2>
+                <p th:text="|${randomMenu.description}|"></p>
             </div>
         </div>
     </div>
