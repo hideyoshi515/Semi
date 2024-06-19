@@ -10,7 +10,7 @@
         </header>
 
         <main class="main-content">
-            <section class="order-summary scrollable">
+            <section class="order-summary scrollable" style="overflow-y: scroll;">
                 <h2 class="user-select-none" id="systemTitle">出欠システム</h2>
                 <div class="order-list" id="order-list" style="overflow-x: hidden">
                     <div class="d-flex">
@@ -19,13 +19,8 @@
                         <div id="targetDate" class="date-display"></div>
                     </div>
                     <div class="mt-2 d-flex">
-                        <div class="input-group w-50">
-                            <label for="inTime" class="input-group-text">出勤時間</label>
-                            <input id="inTime" class="form-control border-end-0 rounded-0" readonly>
-                        </div>
-                        <div class="input-group w-50">
-                            <label for="outTime" class="input-group-text rounded-0">退社時間</label>
-                            <input id="outTime" class="form-control" readonly>
+                        <div id="timetable" class="w-100">
+
                         </div>
                     </div>
                     <div id="btn-group" class="button-group mt-3 align-items-center d-flex"
@@ -56,11 +51,12 @@
                                 th:text="${staff.name}" th:attr="data-date=${staff}, data-name=${staff.name}"
                                 th:onclick="|handleStaffClick(${staff.id}, this)|"></button>
                     </div>
+                    <button class="btn btn-outline-success w-100 mb-2 user-select-none fw-bold" onclick="addStaff()">スタッフ登録</button>
                 </div>
             </section>
 
             <section class="sales-menu scrollable">
-                <h2 class="user-select-none">出欠日付</h2>
+                <h2 class="user-select-none" id="manageTitle">管理</h2>
                 <div class="sales-items" id="sales-items">
 
                 </div>
@@ -114,7 +110,7 @@
                         th:text="'クーポン発行'"></button>
             </section>
             <section class="sales-menu" style="width: 314px;">
-                <button class="btn btn-outline-primary w-100 mb-2 user-select-none" onclick="addStaff()">スタッフ登録</button>
+
             </section>
         </footer>
     </div>
@@ -123,6 +119,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addStaffModalLabel">スタッフ登録</h5>
+                    <h5 class="modal-title mx-2" id="err1" style="display: none">-</h5>
+                    <h5 class="modal-title text-danger" id="err2" style="display: none">すべてを入力してください</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -133,16 +131,17 @@
                         </div>
                         <div class="mb-3">
                             <label for="staffPassword" class="form-label">認証番号（数字４文字）</label>
-                            <input type="text" class="form-control input" id="staffPassword" required>
+                            <input type="text" class="form-control input" id="staffPassword" maxlength='4' required>
                         </div>
                         <div class="mb-3">
                             <label for="staffPhone" class="form-label">電話番号（ハイフンなし）</label>
-                            <input type="tel" class="form-control input" id="staffPhone" required>
+                            <input type="tel" class="form-control input" id="staffPhone" maxlength='11' required>
                         </div>
                         <div class="mb-3">
                             <label for="staffPosition" class="form-label">ポジション</label>
                             <select class="form-select" id="staffPosition" required>
-                                <option th:each="position : ${positionList}" th:value="${position.id}" th:text="${position.position_Name}"></option>
+                                <option th:each="position : ${positionList}" th:value="${position.id}"
+                                        th:text="${position.position_Name}"></option>
                             </select>
                         </div>
                     </form>
@@ -153,10 +152,59 @@
                 </div>
             </div>
         </div>
-    <div class="simple-keyboard" id="keyboard"></div>
+        <div class="simple-keyboard" id="keyboard"></div>
+    </div>
+    <div class="modal fade" id="manageStaffModal" tabindex="-1" aria-labelledby="manageStaffModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="manageStaffModalLabel">スタッフ管理</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="manageStaffForm">
+                        <div class="mb-3">
+                            <label for="manageStaffName" class="form-label">名前</label>
+                            <input type="text" class="form-control" id="manageStaffName" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="manageStaffPosition" class="form-label">ポジション</label>
+                            <select class="form-select" id="manageStaffPosition" required>
+                                <option th:id="|opt${positionStat.count}|" th:each="position : ${positionList}"
+                                        th:value="${position.id}" th:text="${position.position_Name}"></option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+                    <button type="button" class="btn btn-primary" onclick="submitManageStaffForm()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal modal-sm fade" id="deleteStaffModal" tabindex="-1" aria-labelledby="deleteStaffModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteStaffModalLabel">スタッフ削除確認</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    本当に削除しますか？
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmDeleteStaff()">削除</button>
+                </div>
+            </div>
+        </div>
     </div>
     <script>
         let p_staffId;
+        let selectedStaffId = null;
         let today = new Date();
 
         let year = today.getFullYear();
@@ -167,160 +215,164 @@
             var addStaffModal = new bootstrap.Modal(document.getElementById('addStaffModal'), {
                 keyboard: false
             });
+            document.getElementById('addStaffForm').reset();
+            $("#err1").hide();
+            $("#err2").hide();
             addStaffModal.show();
         }
 
-        function submitStaffForm() {
-            var staffName = document.getElementById('staffName').value;
-            var staffPassword = document.getElementById('staffPassword').value;
-            var staffPhone = document.getElementById('staffPhone').value;
-            var staffPosition = document.getElementById('staffPosition').value;
-
-            if(staffName && staffPassword && staffPhone && staffPosition) {
-                // 여기에 서버로 데이터를 전송하는 코드를 작성하세요.
-                // 예: Ajax 요청을 사용하여 폼 데이터를 서버로 전송
-                console.log("Staff Data:", staffName, staffPassword, staffPhone, staffPosition);
-
-                // 폼 초기화
-                document.getElementById('addStaffForm').reset();
-
-                // 모달 닫기
-                var addStaffModal = bootstrap.Modal.getInstance(document.getElementById('addStaffModal'));
-                addStaffModal.hide();
-            } else {
-                alert("모든 필드를 채워주세요.");
-            }
-        }
-
-        function getTimecard(staffId, date, today) {
-            p_staffId = staffId;
+        function modStaff(staffId) {
+            selectedManageStaffId = staffId;
             let xhr = new XMLHttpRequest();
-            xhr.open("GET", "/pos/staffTimeCheck?staffId=" + staffId + "&date=" + date, true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        $("#inTime").val(null);
-                        $("#outTime").val(null);
-                        $("#passCheck").text(null);
-                        if (xhr.responseText != "") {
-                            let response = JSON.parse(xhr.responseText);
+            xhr.open('GET', '/pos/getStaff/' + staffId, true);
+            xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
 
-                            let start = response.start;
-                            let dateObj = new Date(start[0], start[1] - 1, start[2]);
-                            let inTime;
-                            if (start != null) {
-                                inTime =
-                                    ('0' + start[3]).slice(-2) + ':' +
-                                    ('0' + start[4]).slice(-2) + ':' +
-                                    ('0' + start[5]).slice(-2);
-                            }
-                            let end = response.end;
-                            let outTime;
-                            if (end != null) {
-                                outTime =
-                                    ('0' + end[3]).slice(-2) + ':' +
-                                    ('0' + end[4]).slice(-2) + ':' +
-                                    ('0' + end[5]).slice(-2);
-                            }
+            xhr.onload = function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    let staff = JSON.parse(xhr.responseText);
+                    document.getElementById('manageStaffName').value = staff.name;
+                    $("#opt" + staff.position.id).prop('selected', true);
 
-                            const optionsDate = {year: 'numeric', month: 'long', day: 'numeric', weekday: 'short'};
-                            const formattedDate = dateObj.toLocaleDateString('ja-JP', optionsDate).replace('曜日', '');
-
-                            $("#inTime").val(inTime);
-                            $("#outTime").val(outTime);
-                            $("#targetDate").text(formattedDate);
-                        }
-                        if (!today) {
-                            $("#targetDate").css('display', 'block');
-                            $("#currentDate").css('display', 'none');
-                            $("#currentTime").css('display', 'none');
-                            $("#btn-group").css('display', 'none');
-                            $("#passCheck").css('display', 'none');
-                            $("#btn-group").removeClass('d-flex');
-                        } else {
-                            $("#btn-group").css('display', 'block');
-                            $("#targetDate").css('display', 'none');
-                            $("#currentDate").css('display', 'block');
-                            $("#currentTime").css('display', 'block');
-                            $("#passCheck").css('display', 'block');
-                            $("#btn-group").addClass('d-flex');
-                        }
-
-
-                        const buttons = document.querySelectorAll('.date-sel');
-                        buttons.forEach(button => {
-                            button.classList.remove('btn-primary');
-                            button.classList.add('btn-outline-primary');
-                        });
-                        const clickedButton = event.currentTarget;
-                        clickedButton.classList.remove('btn-outline-primary');
-                        clickedButton.classList.add('btn-primary');
-                        getDateList(staffId);
-                    }
+                    let manageStaffModal = new bootstrap.Modal(document.getElementById('manageStaffModal'), {
+                        keyboard: false
+                    });
+                    manageStaffModal.show();
                 }
             };
+
             xhr.send();
         }
 
-        function getDateList(staffId) {
+        function submitManageStaffForm() {
+            let staffPosition = document.getElementById('manageStaffPosition').value;
+
+            if (selectedManageStaffId !== null) {
+                let xhr = new XMLHttpRequest();
+                xhr.open('GET', '/pos/updateStaff?id=' + selectedManageStaffId + '&position=' + staffPosition, true);
+                xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        let manageStaffModal = bootstrap.Modal.getInstance(document.getElementById('manageStaffModal'));
+                        manageStaffModal.hide();
+                        window.location.reload(true);
+                    }
+                };
+                xhr.send();
+            }
+        }
+
+        function delStaff(staffId) {
+            selectedStaffId = staffId;
+            var deleteStaffModal = new bootstrap.Modal(document.getElementById('deleteStaffModal'), {
+                keyboard: false
+            });
+            deleteStaffModal.show();
+        }
+
+
+        function submitStaffForm() {
+            let staffName = document.getElementById('staffName').value.trim();
+            let staffPassword = document.getElementById('staffPassword').value.trim();
+            let staffPhone = document.getElementById('staffPhone').value.trim();
+            let staffPosition = document.getElementById('staffPosition').value;
+
+            if (staffName && staffPassword && staffPhone && staffPosition) {
+                let xhr = new XMLHttpRequest();
+                xhr.open("GET", "/pos/staffAdd?name=" + staffName + "&password=" + staffPassword + "&phone=" + staffPhone + "&position=" + staffPosition, true);
+                xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            if (xhr.responseText == "added") {
+                                document.getElementById('addStaffForm').reset();
+                                let addStaffModal = bootstrap.Modal.getInstance(document.getElementById('addStaffModal'));
+                                addStaffModal.hide();
+                                window.location.reload(true);
+                            } else {
+
+                            }
+                        }
+                    }
+                }
+                xhr.send();
+            } else {
+                $("#err1").show();
+                $("#err2").show();
+            }
+        }
+
+        function confirmDeleteStaff() {
+            if (selectedStaffId !== null) {
+                // XMLHttpRequest 객체 생성
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/pos/staffDel?staffId=' + selectedStaffId, true);
+                xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+                xhr.onreadystatechange = function () {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        var deleteStaffModal = bootstrap.Modal.getInstance(document.getElementById('deleteStaffModal'));
+                        deleteStaffModal.hide();
+                        window.location.reload(true);
+                    }
+                }
+                xhr.send();
+            }
+        }
+
+        function getStaffTimecard(staffId) {
+            p_staffId = staffId;
             let xhr = new XMLHttpRequest();
             xhr.open("GET", "/pos/staffTimeCard?staffId=" + staffId, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        let date = JSON.parse(xhr.responseText);
-                        let salesItemsDiv = document.getElementById('sales-items');
-                        salesItemsDiv.innerHTML = '';
+                        if (xhr.responseText != "") {
+                            let responseList = JSON.parse(xhr.responseText);
+                            responseList.sort((a, b) => {
+                                let dateA = new Date(a.start[0], a.start[1] - 1, a.start[2], a.start[3], a.start[4], a.start[5]);
+                                let dateB = new Date(b.start[0], b.start[1] - 1, b.start[2], b.start[3], b.start[4], b.start[5]);
+                                return dateB - dateA;
+                            });
+                            let table = `<table class="table table-striped table-border">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="col-4">日付</th>
+                                            <th scope="col" class="col-4">出勤時間</th>
+                                            <th scope="col" class="col-4">退社時間</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
+                            responseList.forEach(function (response) {
+                                let start = response.start;
+                                let dateObj = new Date(start[0], start[1] - 1, start[2]);
+                                let dateTime = start[0] + '-' +
+                                    ('0' + start[1]).slice(-2) + '-' +
+                                    ('0' + start[2]).slice(-2);
+                                let inTime = '-';
+                                if (start != null) {
+                                    inTime =
+                                        ('0' + start[3]).slice(-2) + ':' +
+                                        ('0' + start[4]).slice(-2) + ':' +
+                                        ('0' + start[5]).slice(-2);
+                                }
+                                let end = response.end;
+                                let outTime = '-';
+                                if (end != null) {
+                                    outTime =
+                                        ('0' + end[3]).slice(-2) + ':' +
+                                        ('0' + end[4]).slice(-2) + ':' +
+                                        ('0' + end[5]).slice(-2);
+                                }
 
-                        // 현재 날짜를 YYYY-MM-DD 형식으로 생성
-                        let today = new Date();
-                        let todayFormatted = today.getFullYear() + '-' +
-                            ('0' + (today.getMonth() + 1)).slice(-2) + '-' +
-                            ('0' + today.getDate()).slice(-2);
+                                table += `<tr>
+                                    <td>${dateTime}</td>
+                                    <td>${inTime}</td>
+                                    <td>${outTime}</td>
+                                </tr>`;
+                            });
 
-                        let todayExists = false;
-
-                        // 날짜를 최신순으로 정렬
-                        date.sort((a, b) => {
-                            let dateA = new Date(a.start[0], a.start[1] - 1, a.start[2]);
-                            let dateB = new Date(b.start[0], b.start[1] - 1, b.start[2]);
-                            return dateB - dateA;
-                        });
-
-                        date.forEach(function (dateItem) {
-                            let itemButton = document.createElement('button');
-                            itemButton.className = 'btn btn-outline-primary w-100 mb-2 user-select-none date-sel';
-
-                            // dateItem.start 배열에서 년, 월, 일을 추출하여 YYYY-MM-DD 형식으로 변환
-                            let year = dateItem.start[0];
-                            let month = ('0' + dateItem.start[1]).slice(-2); // Add leading zero if needed
-                            let day = ('0' + dateItem.start[2]).slice(-2); // Add leading zero if needed
-
-                            let formattedDate = year + '-' + month + '-' + day;
-                            if (formattedDate === todayFormatted) {
-                                itemButton.textContent = todayFormatted + '（今日）';
-                                itemButton.setAttribute('onclick', `getTimecard(${staffId},'${todayFormatted}',true)`);
-                            } else {
-                                itemButton.textContent = formattedDate;
-                                itemButton.setAttribute('onclick', `getTimecard(${staffId},'${formattedDate}',false)`);
-                            }
-                            salesItemsDiv.appendChild(itemButton);
-
-                            // 현재 날짜와 비교하여 오늘 날짜가 있는지 확인
-                            if (formattedDate === todayFormatted) {
-                                todayExists = true;
-                            }
-                        });
-
-                        // 오늘 날짜가 없는 경우 버튼 추가
-                        if (!todayExists) {
-                            let todayButton = document.createElement('button');
-                            todayButton.className = 'btn btn-outline-primary w-100 mb-2 user-select-none date-sel';
-                            todayButton.textContent = todayFormatted + '（今日）';
-                            todayButton.setAttribute('onclick', `getTimecard(${staffId},'${todayFormatted}',true)`);
-                            salesItemsDiv.prepend(todayButton); // 오늘 날짜 버튼을 맨 위에 추가
+                            table += `</tbody></table>`;
+                            document.getElementById('timetable').innerHTML = table;
                         }
                     }
                 }
@@ -328,8 +380,25 @@
             xhr.send();
         }
 
+        function getMenuList(staffId) {
+            let salesItemsDiv = document.getElementById('sales-items');
+            salesItemsDiv.innerHTML = '';
+            let itemButton = document.createElement('button');
+            itemButton.className = 'btn btn-outline-primary w-100 mb-2 user-select-none date-sel';
+            itemButton.textContent = 'スタッフ管理';
+            itemButton.setAttribute('onclick', 'modStaff(' + staffId + ')');
+            salesItemsDiv.appendChild(itemButton);
+            itemButton = document.createElement('button');
+            itemButton.className = 'btn btn-outline-danger w-100 mb-2 user-select-none date-sel';
+            itemButton.textContent = 'スタッフ削除';
+            itemButton.setAttribute('onclick', 'delStaff(' + staffId + ')');
+            salesItemsDiv.appendChild(itemButton);
+
+        }
+
         function handleStaffClick(staffId, button) {
             var date = button.getAttribute('data-date');
+            $("#manageTitle").text(button.getAttribute('data-name'));
             $("#systemTitle").text("出欠システム - " + button.getAttribute('data-name'));
             const buttons = document.querySelectorAll('.selbtn');
             buttons.forEach(button => {
@@ -339,124 +408,14 @@
             const clickedButton = event.currentTarget;
             clickedButton.classList.remove('btn-outline-primary');
             clickedButton.classList.add('btn-primary');
-            getDateList(staffId);
-        }
-
-        function updateTime() {
-            const now = new Date();
-            const optionsDate = {year: 'numeric', month: 'long', day: 'numeric', weekday: 'short'};
-            const optionsTime = {hour: '2-digit', minute: '2-digit', second: '2-digit'};
-
-            const formattedDate = now.toLocaleDateString('ja-JP', optionsDate).replace('曜日', '');
-            const formattedTime = now.toLocaleTimeString('ja-JP', optionsTime);
-
-            document.getElementById('currentDate').innerText = formattedDate;
-            document.getElementById('currentTime').innerText = formattedTime;
-        }
-
-        function timeIn() {
-            let today = new Date();
-            let todayFormatted = today.getFullYear() + '-' +
-                ('0' + (today.getMonth() + 1)).slice(-2) + '-' +
-                ('0' + today.getDate()).slice(-2);
-            let xhr = new XMLHttpRequest();
-            let password = $("#password").val();
-            xhr.open("GET", "/timeCardIn?staffId=" + p_staffId + '&password=' + password, true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        if (xhr.responseText != "password") {
-                            getTimecard(p_staffId, todayFormatted, true);
-                            $("#passCheck").text(null);
-
-                        } else {
-                            $("#passCheck").text("認証番号を確認してください");
-                        }
-                    }
-                }
-            };
-            xhr.send();
-        }
-
-        function timeOut() {
-            let today = new Date();
-            let todayFormatted = today.getFullYear() + '-' +
-                ('0' + (today.getMonth() + 1)).slice(-2) + '-' +
-                ('0' + today.getDate()).slice(-2);
-            let xhr = new XMLHttpRequest();
-            let password = $("#password").val();
-            xhr.open("GET", "/timeCardOut?staffId=" + p_staffId + '&password=' + password, true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        if (xhr.responseText != "password") {
-                            getTimecard(p_staffId, todayFormatted, true);
-                            $("#passCheck").text(null);
-
-                        } else {
-                            $("#passCheck").text("認証番号を確認してください");
-                        }
-                    }
-                }
-            };
-            xhr.send();
+            getMenuList(staffId);
+            getStaffTimecard(staffId);
         }
 
         document.addEventListener("DOMContentLoaded", () => {
             updateTime();
             setInterval(updateTime, 1000);
         });
-
-        function showToast(message, type) {
-            const toast = document.createElement('div');
-            toast.className = `toast align-items-center text-white bg-${type} border-0`;
-            toast.setAttribute('role', 'alert');
-            toast.setAttribute('aria-live', 'assertive');
-            toast.setAttribute('aria-atomic', 'true');
-
-            const toastBody = document.createElement('div');
-            toastBody.className = 'd-flex';
-            toastBody.innerHTML = `
-            <div class="toast-body">${message}</div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        `;
-
-            toast.appendChild(toastBody);
-            document.body.appendChild(toast);
-
-            const toastElement = new bootstrap.Toast(toast);
-            toastElement.show();
-
-            setTimeout(() => {
-                toastElement.hide();
-                toast.remove();
-            }, 3000);
-        }
-
-        function appendNumber(number) {
-            const quantityInput = document.getElementById('password');
-            let newQuantity = quantityInput.value + number;
-
-            if (newQuantity.length > 4) {
-                newQuantity = newQuantity.slice(0, -2) + number;
-            }
-
-            quantityInput.value = newQuantity;
-        }
-
-
-        function clearNumber() {
-            $("#passCheck").text(null);
-            document.getElementById('password').value = '';
-        }
-
-        function deleteNumber() {
-            const quantityInput = document.getElementById('password');
-            quantityInput.value = quantityInput.value.slice(0, -1) || '';
-        }
-
 
         function makeCoupon() {
             if (confirm("쿠폰을 발급하시겠습니까?")) {

@@ -27,6 +27,15 @@ public class CategoryController {
         model.addAttribute("categoryRequest", categoryRequest);
         return "/category/categoryList.html";
     }
+    // 통합된 css 적용중
+    @RequestMapping(value = "/categoryList2", method = RequestMethod.GET)
+    public String getCategoryList2(Model model) {
+        List<Category> categories = categoryService.getAllCategories();
+        model.addAttribute("categories", categories);
+        CategoryRequest categoryRequest = new CategoryRequest();
+        model.addAttribute("categoryRequest", categoryRequest);
+        return "/category/categoryList2.html";
+    }
 
     // 카테고리 추가 페이지 반환
     @RequestMapping(value = "/categoryCreate", method = RequestMethod.GET)
