@@ -19,284 +19,309 @@ import java.util.*;
 
 @Controller
 public class POSController {
-	private final MenuService menuService;
-	private final CategoryService categoryService;
-	private final SalesService salesService;
-	private final MenuRepository menuRepository;
-	private final OrderNumRepository orderNumRepository;
-	private final OrderRepository orderRepository;
-	private final OrderService orderService;
-	private final OrderWebSocketHandler orderWebSocketHandler;
-	private final CouponService couponService;
-	private final DiscordBotService discordBotService;
-	private final StaffService staffService;
-	private final TimeCardService timeCardService;
-	private final PositionRepository positionRepository;
+    private final MenuService menuService;
+    private final CategoryService categoryService;
+    private final SalesService salesService;
+    private final MenuRepository menuRepository;
+    private final OrderNumRepository orderNumRepository;
+    private final OrderRepository orderRepository;
+    private final OrderService orderService;
+    private final OrderWebSocketHandler orderWebSocketHandler;
+    private final CouponService couponService;
+    private final DiscordBotService discordBotService;
+    private final StaffService staffService;
+    private final TimeCardService timeCardService;
+    private final PositionRepository positionRepository;
+    private final StaffRepository staffRepository;
 
-	public POSController(MenuService menuService, CategoryService categoryService, SalesService salesService, MenuRepository menuRepository, OrderNumRepository orderNumRepository, OrderRepository orderRepository, OrderService orderService, OrderWebSocketHandler orderWebSocketHandler, CouponService couponService, DiscordBotService discordBotService, StaffService staffService, TimeCardService timeCardService, PositionRepository positionRepository) {
-		this.menuService = menuService;
-		this.categoryService = categoryService;
-		this.salesService = salesService;
-		this.menuRepository = menuRepository;
-		this.orderNumRepository = orderNumRepository;
-		this.orderRepository = orderRepository;
-		this.orderService = orderService;
-		this.orderWebSocketHandler = orderWebSocketHandler;
-		this.couponService = couponService;
-		this.discordBotService = discordBotService;
-		this.staffService = staffService;
-		this.timeCardService = timeCardService;
-		this.positionRepository = positionRepository;
-	}
+    public POSController(MenuService menuService, CategoryService categoryService, SalesService salesService, MenuRepository menuRepository, OrderNumRepository orderNumRepository, OrderRepository orderRepository, OrderService orderService, OrderWebSocketHandler orderWebSocketHandler, CouponService couponService, DiscordBotService discordBotService, StaffService staffService, TimeCardService timeCardService, PositionRepository positionRepository, StaffRepository staffRepository) {
+        this.menuService = menuService;
+        this.categoryService = categoryService;
+        this.salesService = salesService;
+        this.menuRepository = menuRepository;
+        this.orderNumRepository = orderNumRepository;
+        this.orderRepository = orderRepository;
+        this.orderService = orderService;
+        this.orderWebSocketHandler = orderWebSocketHandler;
+        this.couponService = couponService;
+        this.discordBotService = discordBotService;
+        this.staffService = staffService;
+        this.timeCardService = timeCardService;
+        this.positionRepository = positionRepository;
+        this.staffRepository = staffRepository;
+    }
 
-	// POS 페이지のGETリクエストを処理するメソッド
-	@RequestMapping(value = "/pos", method = RequestMethod.GET)
-	public String getPOS(Model model, @RequestParam(name = "lang", required = false) String lang, HttpSession session) {
-		List<Category> categories = categoryService.getAllCategories();
+    // POS 페이지のGETリクエストを処理するメソッド
+    @RequestMapping(value = "/pos", method = RequestMethod.GET)
+    public String getPOS(Model model, @RequestParam(name = "lang", required = false) String lang, HttpSession session) {
+        List<Category> categories = categoryService.getAllCategories();
 
-		model.addAttribute("session", session);
-		model.addAttribute("categories", categories);
+        model.addAttribute("session", session);
+        model.addAttribute("categories", categories);
 
-		return "pos/index.html";
-	}
+        return "pos/index.html";
+    }
 
-	// 特定の日付の注文番号リストを取得するメソッド
-	@RequestMapping(value = "/pos/orderList/getOrderNum", method = RequestMethod.GET)
-	@ResponseBody
-	public List<Integer> getOrderNumByDate(@RequestParam Map<String, Object> params) {
-		LocalDate inputDate = params.get("date") == null ? LocalDate.now() : LocalDate.parse(params.get("date").toString());
-		List<Integer> orderNums = orderRepository.findDistinctOrderNumByDateAndProcess(0, inputDate);
-		return orderNums;
-	}
+    // 特定の日付の注文番号リストを取得するメソッド
+    @RequestMapping(value = "/pos/orderList/getOrderNum", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Integer> getOrderNumByDate(@RequestParam Map<String, Object> params) {
+        LocalDate inputDate = params.get("date") == null ? LocalDate.now() : LocalDate.parse(params.get("date").toString());
+        List<Integer> orderNums = orderRepository.findDistinctOrderNumByDateAndProcess(0, inputDate);
+        return orderNums;
+    }
 
-	// 特定の注文番号の注文リストを取得するメソッド
-	@RequestMapping(value = "/pos/orderList/getOrder", method = RequestMethod.GET)
-	@ResponseBody
-	public List<Sales> getOrders(@RequestParam Map<String, Object> params) {
-		int orderNum = Integer.parseInt(params.get("orderNum").toString());
-		LocalDate inputDate = params.get("date") == null ? LocalDate.now() : LocalDate.parse(params.get("date").toString());
-		List<Sales> orders = orderRepository.findSalesByOrderNumAndDate(orderNum, inputDate);
-		return orders;
-	}
+    // 特定の注文番号の注文リストを取得するメソッド
+    @RequestMapping(value = "/pos/orderList/getOrder", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Sales> getOrders(@RequestParam Map<String, Object> params) {
+        int orderNum = Integer.parseInt(params.get("orderNum").toString());
+        LocalDate inputDate = params.get("date") == null ? LocalDate.now() : LocalDate.parse(params.get("date").toString());
+        List<Sales> orders = orderRepository.findSalesByOrderNumAndDate(orderNum, inputDate);
+        return orders;
+    }
 
-	// POS注文リストページのGETリクエストを処理するメソッド
-	@RequestMapping(value = "/pos/orderList", method = RequestMethod.GET)
-	public String getPOSOrderList(Model model, @RequestParam(name = "lang", required = false) String lang, HttpSession session) {
-		List<String> orderDate = orderRepository.findDistinctDateByProcess(0);
-		model.addAttribute("session", session);
-		model.addAttribute("orderDate", orderDate);
-		return "pos/orderList.html";
-	}
+    // POS注文リストページのGETリクエストを処理するメソッド
+    @RequestMapping(value = "/pos/orderList", method = RequestMethod.GET)
+    public String getPOSOrderList(Model model, @RequestParam(name = "lang", required = false) String lang, HttpSession session) {
+        List<String> orderDate = orderRepository.findDistinctDateByProcess(0);
+        model.addAttribute("session", session);
+        model.addAttribute("orderDate", orderDate);
+        return "pos/orderList.html";
+    }
 
-	// 注文を確認するメソッド
-	@RequestMapping(value = "/pos/orderList/confirmOrder", method = RequestMethod.POST)
-	@ResponseBody
-	public String confirmOrder(@RequestParam Map<String, Object> params) {
-		int pk = params.get("pk") == null ? 0 : Integer.parseInt(params.get("pk").toString());
-		int menuId = params.get("menuId") == null ? 0 : Integer.parseInt(params.get("menuId").toString());
-		int orderQuantity = params.get("quantity") == null ? 0 : Integer.parseInt(params.get("quantity").toString());
+    // 注文を確認するメソッド
+    @RequestMapping(value = "/pos/orderList/confirmOrder", method = RequestMethod.POST)
+    @ResponseBody
+    public String confirmOrder(@RequestParam Map<String, Object> params) {
+        int pk = params.get("pk") == null ? 0 : Integer.parseInt(params.get("pk").toString());
+        int menuId = params.get("menuId") == null ? 0 : Integer.parseInt(params.get("menuId").toString());
+        int orderQuantity = params.get("quantity") == null ? 0 : Integer.parseInt(params.get("quantity").toString());
 
-		NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
-		List<Object[]> orderDetail = orderService.findByIdAndShowDeviceName(pk);
+        NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+        List<Object[]> orderDetail = orderService.findByIdAndShowDeviceName(pk);
 
-		Object[] order = orderDetail.get(0);
-		Sales sales = (Sales) order[0];
+        Object[] order = orderDetail.get(0);
+        Sales sales = (Sales) order[0];
 
-		String formattedPrice = numberFormat.format(sales.getPrice() * sales.getQuantity());
+        String formattedPrice = numberFormat.format((long) sales.getPrice() * sales.getQuantity());
 
-		String message = "주문 번호 " + sales.getOrderNum() + "이/가 승인되었습니다.\n" +
-				"===================================\n" +
-				"            주문번호 " + sales.getOrderNum() + "\n" +
-				"===================================\n";
-		if (sales.getDevice() == 3) {
-			message += "주문 기기 " + order[2] + "\t수량\t\t" + "가격\n" +
-					"테이블 번호 " + sales.getDeviceNum() + "\n";
-		} else {
-			message += "주문 기기 " + order[2] + "\t수량\t\t" + "가격\n";
-		}
+        String message = "주문 번호 " + sales.getOrderNum() + "이/가 승인되었습니다.\n" + "===================================\n" + "            주문번호 " + sales.getOrderNum() + "\n" + "===================================\n";
+        if (sales.getDevice() == 3) {
+            message += "주문 기기 " + order[2] + "\t수량\t\t" + "가격\n" + "테이블 번호 " + sales.getDeviceNum() + "\n";
+        } else {
+            message += "주문 기기 " + order[2] + "\t수량\t\t" + "가격\n";
+        }
 
-		message += "-----------------------------------\n" +
-				"주문 메뉴\n" +
-				order[1] + sales.getQuantity() + "개\t\t" + formattedPrice + "원\n" +
-				"-----------------------------------\n" +
-				"주문 시간 " + sales.getDate() + "\n" +
-				"총 가격 " + formattedPrice + "원\n" +
-				"===================================";
+        message += "-----------------------------------\n" + "주문 메뉴\n" + order[1] + sales.getQuantity() + "개\t\t" + formattedPrice + "원\n" + "-----------------------------------\n" + "주문 시간 " + sales.getDate() + "\n" + "총 가격 " + formattedPrice + "원\n" + "===================================";
 
-		orderService.approveOrder(pk, message);
-		orderRepository.updateSalesProcess(pk);
-		orderRepository.updateMenuStock(menuId, orderQuantity);
+        orderService.approveOrder(pk, message);
+        orderRepository.updateSalesProcess(pk);
+        orderRepository.updateMenuStock(menuId, orderQuantity);
 
-		return "success";
-	}
+        return "success";
+    }
 
-	// 特定のカテゴリのメニューリストを取得するメソッド
-	@RequestMapping(value = "/pos/getMenu", method = RequestMethod.GET)
-	@ResponseBody
-	public List<Menu> getMenusByCategory(@RequestParam Map<String, Object> params, HttpSession session) {
-		List<Menu> menus = menuService.getMenuByCategory(Integer.parseInt(params.get("category").toString()));
-		return menus;
-	}
+    // 特定のカテゴリのメニューリストを取得するメソッド
+    @RequestMapping(value = "/pos/getMenu", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Menu> getMenusByCategory(@RequestParam Map<String, Object> params, HttpSession session) {
+        List<Menu> menus = menuService.getMenuByCategory(Integer.parseInt(params.get("category").toString()));
+        return menus;
+    }
 
-	// 注文日リストを取得するメソッド
-	@RequestMapping(value = "/pos/orderList/getOrderDates", method = RequestMethod.GET)
-	@ResponseBody
-	public List<String> getOrderDates() {
-		List<String> dates = orderRepository.findDistinctDateByProcess(0);
-		return dates;
-	}
+    // 注文日リストを取得するメソッド
+    @RequestMapping(value = "/pos/orderList/getOrderDates", method = RequestMethod.GET)
+    @ResponseBody
+    public List<String> getOrderDates() {
+        List<String> dates = orderRepository.findDistinctDateByProcess(0);
+        return dates;
+    }
 
-	// POS注文を処理するメソッド
-	@RequestMapping(value = "/pos/order", method = RequestMethod.POST)
-	@ResponseBody
-	public String postPOSOrder(@RequestBody List<POSOrder> orderItems, HttpSession session) throws IOException {
-		LocalDateTime localDate = LocalDateTime.now();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		String formattedDateTime = localDate.format(formatter);
-		OrderNum orderNum = orderNumRepository.save(new OrderNum());
-		NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+    // POS注文を処理するメソッド
+    @RequestMapping(value = "/pos/order", method = RequestMethod.POST)
+    @ResponseBody
+    public String postPOSOrder(@RequestBody List<POSOrder> orderItems, HttpSession session) throws IOException {
+        LocalDateTime localDate = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateTime = localDate.format(formatter);
+        OrderNum orderNum = orderNumRepository.save(new OrderNum());
+        NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
 
-		String message = "주문 번호 " + orderNum.getOrderNum() + "이/가 승인되었습니다.\n" +
-				"===============================================\n" +
-				"                   주문번호 " + orderNum.getOrderNum() + "\n" +
-				"===============================================\n" +
-				String.format("%-21s %7s %11s\n", "주문 기기 POS", "수량", "가격") +
-				"-----------------------------------------------\n";
+        String message = "주문 번호 " + orderNum.getOrderNum() + "이/가 승인되었습니다.\n" + "===============================================\n" + "                   주문번호 " + orderNum.getOrderNum() + "\n" + "===============================================\n" + String.format("%-21s %7s %11s\n", "주문 기기 POS", "수량", "가격") + "-----------------------------------------------\n";
 
-		LocalDateTime localDateTime = LocalDateTime.now();
-		int sum = 0;
-		String formatSum = "";
+        LocalDateTime localDateTime = LocalDateTime.now();
+        int sum = 0;
+        String formatSum = "";
 
-		for (POSOrder order : orderItems) {
-			SalesRequest sales = new SalesRequest();
+        for (POSOrder order : orderItems) {
+            SalesRequest sales = new SalesRequest();
 
-			Menu menu = menuService.getMenuById(order.getId());
+            Menu menu = menuService.getMenuById(order.getId());
 
-			String menuName = menu.getName();
-			int quantity = order.getQuantity();
-			int totalPrice = menu.getPrice() * order.getQuantity();
-			String formattedPrice = numberFormat.format(menu.getPrice() * order.getQuantity());
-			localDateTime = LocalDateTime.parse(formattedDateTime, formatter);
-			sum += totalPrice;
-			formatSum = numberFormat.format(sum);
+            String menuName = menu.getName();
+            int quantity = order.getQuantity();
+            int totalPrice = menu.getPrice() * order.getQuantity();
+            String formattedPrice = numberFormat.format((long) menu.getPrice() * order.getQuantity());
+            localDateTime = LocalDateTime.parse(formattedDateTime, formatter);
+            sum += totalPrice;
+            formatSum = numberFormat.format(sum);
 
-			message += String.format("%-24s %4d개 %10s원\n", menuName, quantity, formattedPrice);
+            message += String.format("%-24s %4d개 %10s원\n", menuName, quantity, formattedPrice);
 
-			sales.setOrderNum(orderNum.getOrderNum());
-			sales.setDate(localDateTime);
-			sales.setCategory(menu.getCategory());
-			sales.setMenu(menu.getId());
-			sales.setPrice(menu.getPrice());
-			sales.setQuantity(quantity);
-			sales.setDevice(2);
-			sales.setDeviceNum(2);
-			sales.setProcess(1);
+            sales.setOrderNum(orderNum.getOrderNum());
+            sales.setDate(localDateTime);
+            sales.setCategory(menu.getCategory());
+            sales.setMenu(menu.getId());
+            sales.setPrice(menu.getPrice());
+            sales.setQuantity(quantity);
+            sales.setDevice(2);
+            sales.setDeviceNum(2);
+            sales.setProcess(1);
 
-			salesService.save(sales);
+            salesService.save(sales);
 
-			menu.setStock(menu.getStock() - quantity);
+            menu.setStock(menu.getStock() - quantity);
 
-			menuRepository.save(menu);
-		}
+            menuRepository.save(menu);
+        }
 
-		message += "-----------------------------------------------\n" +
-				String.format("주문 시간 %38s\n", localDateTime.toString()) +
-				String.format("총 가격 %38s원\n", formatSum) +
-				"===============================================";
+        message += "-----------------------------------------------\n" + String.format("주문 시간 %38s\n", localDateTime) + String.format("총 가격 %38s원\n", formatSum) + "===============================================";
 
-		discordBotService.sendOrderNotification(message);
+        discordBotService.sendOrderNotification(message);
 
-		return "注文が成功しました";
-	}
+        return "注文が成功しました";
+    }
 
-	@RequestMapping(value = "/pos/staff",method = RequestMethod.GET)
-	public String getStaff(Model model, HttpSession session){
-		List<Staff> staffList = staffService.getAllStaff();
-		model.addAttribute("staffList", staffList);
-		return "pos/staff.html";
-	}
+    @RequestMapping(value = "/pos/staff", method = RequestMethod.GET)
+    public String getStaff(Model model, HttpSession session) {
+        List<Staff> staffList = staffService.getAllStaff();
+        model.addAttribute("staffList", staffList);
+        return "pos/staff.html";
+    }
 
-	@RequestMapping(value = "/pos/staffManage",method = RequestMethod.GET)
-	public String getStaffManage(Model model, HttpSession session){
-		List<Staff> staffList = staffService.getAllStaff();
-		List<Position> positionList = positionRepository.findAll();
-		model.addAttribute("staffList", staffList);
-		model.addAttribute("positionList", positionList);
-		return "pos/staffManage.html";
-	}
+    @RequestMapping(value = "/pos/staffManage", method = RequestMethod.GET)
+    public String getStaffManage(Model model, HttpSession session) {
+        List<Staff> staffList = staffService.getAllStaff();
+        List<Position> positionList = positionRepository.findAll();
+        model.addAttribute("staffList", staffList);
+        model.addAttribute("positionList", positionList);
+        return "pos/staffManage.html";
+    }
 
-	@RequestMapping(value = "/pos/staffTimeCard", method = RequestMethod.GET)
-	@ResponseBody
-	public List<TimeCard> getStaffTimecard(Model model, HttpSession session, @RequestParam Map<String, Object> params){
-		List<TimeCard> timeCards = timeCardService.getTimeCardByStaff(Long.valueOf(params.get("staffId").toString()));
-		return timeCards;
-	}
+    @ResponseBody
+    @RequestMapping(value = "/pos/staffAdd", method = RequestMethod.GET)
+    public String getStaffAdd(Model model, HttpSession session, @RequestParam Map<String, Object> params) {
+        String name = params.get("name").toString();
+        String password = params.get("password").toString();
+        String phone = params.get("phone").toString();
+        String position = params.get("position").toString();
+        Staff newStaff = new Staff();
+        newStaff.setName(name);
+        newStaff.setPassword(password);
+        newStaff.setPhone(phone);
+        newStaff.setPosition(positionRepository.findById(Long.valueOf(position)).orElse(null));
+        staffService.save(newStaff);
+        return "added";
+    }
 
-	@RequestMapping(value = "/pos/staffTimeCheck", method = RequestMethod.GET)
-	@ResponseBody
-	public TimeCard getStaffTimeCheck(Model model, HttpSession session, @RequestParam Map<String, Object> params){
-		Staff staff = staffService.getStaff(Long.valueOf(params.get("staffId").toString()));
-		TimeCard timeCard = timeCardService.getTimeCardByStaffAndStart(staff, params.get("date").toString());
-		return timeCard;
-	}
+    @ResponseBody
+    @RequestMapping(value = "/pos/staffDel", method = RequestMethod.GET)
+    public String getStaffDel(Model model, HttpSession session, @RequestParam Map<String, Object> params) {
+        String staffId = params.get("staffId").toString();
+        Staff target = staffService.getStaff(Long.valueOf(staffId));
+        staffRepository.delete(target);
+        return "deleted";
+    }
 
-	// クーポンを作成するメソッド
-	@RequestMapping(value = "/pos/makeCoupon", method = RequestMethod.POST)
-	@ResponseBody
-	public String makeCoupon() {
-		String coupon = generateUniqueCoupon();
+    @ResponseBody
+    @RequestMapping(value = "/pos/getStaff/{id}", method = RequestMethod.GET)
+    public Staff getStaff(@PathVariable Long id) {
+        Staff staff = staffService.getStaff(id);
+        return staff;
+    }
 
-		couponService.saveCoupon(coupon);
-		couponService.deleteOldCoupons();
+    @ResponseBody
+    @RequestMapping(value = "/pos/updateStaff", method = RequestMethod.GET)
+    public String updateStaff(@RequestParam Map<String, Object> params) {
+        Staff staff = staffService.getStaff(Long.valueOf(params.get("id").toString()));
+        staff.setPosition(positionRepository.findById(Long.valueOf(params.get("position").toString())).orElse(null));
+        staffService.save(staff);
+        return "success";
+    }
 
-		discordBotService.sendOrderNotification("クーポンが発行されました : " + coupon);
+    @RequestMapping(value = "/pos/staffTimeCard", method = RequestMethod.GET)
+    @ResponseBody
+    public List<TimeCard> getStaffTimecard(Model model, HttpSession session, @RequestParam Map<String, Object> params) {
+        List<TimeCard> timeCards = timeCardService.getTimeCardByStaff(Long.valueOf(params.get("staffId").toString()));
+        return timeCards;
+    }
 
-		return coupon;
-	}
+    @RequestMapping(value = "/pos/staffTimeCheck", method = RequestMethod.GET)
+    @ResponseBody
+    public TimeCard getStaffTimeCheck(Model model, HttpSession session, @RequestParam Map<String, Object> params) {
+        Staff staff = staffService.getStaff(Long.valueOf(params.get("staffId").toString()));
+        TimeCard timeCard = timeCardService.getTimeCardByStaffAndStart(staff, params.get("date").toString());
+        return timeCard;
+    }
 
-	//　クーポンの重複チェック
-	private String generateUniqueCoupon() {
-		String coupon;
+    // クーポンを作成するメソッド
+    @RequestMapping(value = "/pos/makeCoupon", method = RequestMethod.POST)
+    @ResponseBody
+    public String makeCoupon() {
+        String coupon = generateUniqueCoupon();
 
-		do {
-			coupon = generateCouponCode();
-		} while (couponService.isCouponExists(coupon));
+        couponService.saveCoupon(coupon);
+        couponService.deleteOldCoupons();
 
-		return coupon;
-	}
+        discordBotService.sendOrderNotification("クーポンが発行されました : " + coupon);
 
-	// クーポンの発行
-	private String generateCouponCode() {
-		StringBuilder couponCode = new StringBuilder();
-		Random random = new Random();
+        return coupon;
+    }
 
-		for (int i = 0; i < 16; i++) {
-			couponCode.append(random.nextInt(10)); // 0-9からの数字を追加
-			if ((i + 1) % 4 == 0 && i != 15) {
-				couponCode.append('-'); // 4桁ごとに '-' を追加
-			}
-		}
+    //　クーポンの重複チェック
+    private String generateUniqueCoupon() {
+        String coupon;
 
-		return couponCode.toString();
-	}
+        do {
+            coupon = generateCouponCode();
+        } while (couponService.isCouponExists(coupon));
 
-	@RequestMapping(value = "/pos/applyCoupon", method = RequestMethod.POST)
-	@ResponseBody
-	public Map<String, Object> applyCoupon(@RequestBody Map<String, String> request) {
-		String couponNum = request.get("couponNum");
+        return coupon;
+    }
 
-		Coupon coupon = couponService.findByCouponNum(couponNum);
+    // クーポンの発行
+    private String generateCouponCode() {
+        StringBuilder couponCode = new StringBuilder();
+        Random random = new Random();
 
-		Map<String, Object> response = new HashMap<>();
+        for (int i = 0; i < 16; i++) {
+            couponCode.append(random.nextInt(10)); // 0-9からの数字を追加
+            if ((i + 1) % 4 == 0 && i != 15) {
+                couponCode.append('-'); // 4桁ごとに '-' を追加
+            }
+        }
 
-		if (coupon != null && coupon.getProcess() == 0) {
-			response.put("valid", "not-used");
-		} else if (coupon != null && coupon.getProcess() == 1) {
-			response.put("valid", "used");
-		} else {
-			response.put("valid", "none");
-		}
+        return couponCode.toString();
+    }
 
-		return response;
-	}
+    @RequestMapping(value = "/pos/applyCoupon", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> applyCoupon(@RequestBody Map<String, String> request) {
+        String couponNum = request.get("couponNum");
+
+        Coupon coupon = couponService.findByCouponNum(couponNum);
+
+        Map<String, Object> response = new HashMap<>();
+
+        if (coupon != null && coupon.getProcess() == 0) {
+            response.put("valid", "not-used");
+        } else if (coupon != null && coupon.getProcess() == 1) {
+            response.put("valid", "used");
+        } else {
+            response.put("valid", "none");
+        }
+
+        return response;
+    }
 }

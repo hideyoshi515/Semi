@@ -35,4 +35,8 @@ public class StaffService {
     public Staff getStaff(Long id) {
         return staffRepository.findById(id).get();
     }
+
+    public void save(Staff staff) {
+        staffRepository.save(staff);
+    }
 }
