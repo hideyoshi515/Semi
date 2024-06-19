@@ -1,6 +1,7 @@
 package co.kr.necohost.semi.app.sales;
 
 import co.kr.necohost.semi.domain.model.dto.SalesRequest;
+import co.kr.necohost.semi.domain.model.entity.Category;
 import co.kr.necohost.semi.domain.model.entity.Menu;
 import co.kr.necohost.semi.domain.model.entity.Sales;
 import co.kr.necohost.semi.domain.repository.MenuRepository;
@@ -21,6 +22,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
@@ -343,8 +345,7 @@ public class SalesController {
     }
 
 
-    @GetMapping("/salesAnalysisDesignExample")
-    public String getSalesAnalysisDesignExample() {
-        return "sales/salesAnalysisDesignExample";
-    }
+
+
+
 }
