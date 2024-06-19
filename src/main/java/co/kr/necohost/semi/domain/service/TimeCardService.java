@@ -8,7 +8,9 @@ import co.kr.necohost.semi.domain.repository.StaffRepository;
 import co.kr.necohost.semi.domain.repository.TimeCardRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,16 +27,12 @@ public class TimeCardService {
 	}
 
 	// 出勤を記録
-	public void clockIn(StaffRequest request) {
-		Staff staff = staffRepository.findByUsername(request.getUsername())
-				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
+	public void clockIn(Staff staff) {
 
 		Optional<TimeCard> recentTimeCard = timeCardRepository.findTopByStaffOrderByStartDesc(staff);
 		LocalDateTime now = LocalDateTime.now();
 
 		if (recentTimeCard.isPresent() && recentTimeCard.get().getStart().toLocalDate().isEqual(now.toLocalDate())) {
-			// 既に出勤記録がある場合
-			System.out.println("Already clocked in today.");
 			return;
 		}
 
@@ -43,14 +41,10 @@ public class TimeCardService {
 		timeCard.setStaff(staff);
 		timeCard.setStart(now);
 		timeCardRepository.save(timeCard);
-		System.out.println("Clock in recorded.");
 	}
 
 	// 退勤を記録
-	public void clockOut(StaffRequest request) {
-		Staff staff = staffRepository.findByUsername(request.getUsername())
-				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
-
+	public void clockOut(Staff staff) {
 		Optional<TimeCard> recentTimeCard = timeCardRepository.findTopByStaffOrderByStartDesc(staff);
 		LocalDateTime now = LocalDateTime.now();
 
@@ -59,13 +53,7 @@ public class TimeCardService {
 			if (timeCard.getEnd() == null) {
 				timeCard.setEnd(now);
 				timeCardRepository.save(timeCard);
-				System.out.println("Clock out recorded.");
-			} else {
-				System.out.println("Already clocked out today.");
 			}
-		} else {
-			// 出勤記録がない場合のエラーメッセージ
-			System.out.println("Cannot clock out without clocking in today.");
 		}
 	}
 
@@ -81,9 +69,16 @@ public class TimeCardService {
 	}
 
 	// ユーザー名でタイムカードを取得
-	public Optional<TimeCard> getTimeCardByUserName(StaffRequest request){
-		Staff staff = staffRepository.findByUsername(request.getUsername())
-				.orElseThrow(() -> new IllegalArgumentException("Invalid username"));
+	public Optional<TimeCard> getTimeCardByUserName(Staff staff){
 		return timeCardRepository.findTopByStaffOrderByStartDesc(staff);
+	}
+
+	public List<TimeCard> getTimeCardByStaff(long staffid) {
+		return timeCardRepository.findAllByStaffId(staffid);
+	}
+
+	public TimeCard getTimeCardByStaffAndStart(Staff staff, String date) {
+		LocalDate localDate = LocalDate.parse(date);
+		return timeCardRepository.findByIdAndStart(staff, localDate);
 	}
 }

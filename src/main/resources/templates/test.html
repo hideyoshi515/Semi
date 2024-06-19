@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/plain_layout}">
+>
+<html lang="ko">
+<body>
+<th:block layout:fragment="content">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가상 키보드</title>
+    <style>
+        .container {
+            text-align: center;
+        }
+    </style>
+<input class="input" placeholder="1" />
+<input class="input" placeholder="2" />
+    <script src="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/index.js"></script>
+<div class="simple-keyboard" id="keyboard"></div>
+
+</th:block>
+</body>
+</html>

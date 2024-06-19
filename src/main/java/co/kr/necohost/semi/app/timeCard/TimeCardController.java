@@ -2,34 +2,34 @@ package co.kr.necohost.semi.app.timeCard;
 
 import co.kr.necohost.semi.domain.model.dto.StaffRequest;
 import co.kr.necohost.semi.domain.model.dto.TimeCardRequest;
+import co.kr.necohost.semi.domain.model.entity.Staff;
 import co.kr.necohost.semi.domain.model.entity.TimeCard;
 import co.kr.necohost.semi.domain.service.DiscordBotService;
 import co.kr.necohost.semi.domain.service.StaffService;
 import co.kr.necohost.semi.domain.service.TimeCardService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import java.nio.charset.StandardCharsets;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
 public class TimeCardController {
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm");
     private final TimeCardService timeCardService;
     private final DiscordBotService discordBotService;
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm");
+    private final StaffService staffService;
 
     public TimeCardController(TimeCardService timeCardService, StaffService staffService, DiscordBotService discordBotService) {
         this.timeCardService = timeCardService;
         this.discordBotService = discordBotService;
+        this.staffService = staffService;
     }
 
     @RequestMapping(value = "/timeCardList", method = RequestMethod.GET)
@@ -46,31 +46,35 @@ public class TimeCardController {
         return "timeCard/timeCardInput.html";
     }
 
-    @RequestMapping(value = "/timeCardIn", method = RequestMethod.POST)
-    public ResponseEntity<String> postTimeCardIn(@RequestBody StaffRequest request) {
-        try {
-            timeCardService.clockIn(request);
-            Optional<TimeCard> timeCard = timeCardService.getTimeCardByUserName(request);
-            discordBotService.sendOrderNotification(request.getUsername() + "が " + timeCard.get().getStart().format(formatter) + "に出勤しました。");
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(new MediaType("text", "plain", StandardCharsets.UTF_8));
-            return new ResponseEntity<>("出勤処理しました。", headers, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    @ResponseBody
+    @RequestMapping(value = "/timeCardIn", method = RequestMethod.GET)
+    public String getTimeCardIn(@RequestParam Map<String, Object> params) {
+        Staff staff = staffService.getStaff(Long.valueOf(params.get("staffId").toString()));
+        String password = params.get("password").toString();
+        if(!staff.getPassword().equals(password)) {
+            return "password";
         }
+        timeCardService.clockIn(staff);
+        Optional<TimeCard> timeCard = timeCardService.getTimeCardByUserName(staff);
+        discordBotService.sendOrderNotification(staff.getName() + "が " + timeCard.get().getStart().format(formatter) + "に出勤しました。");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("text", "plain", StandardCharsets.UTF_8));
+        return staff.getName() + "が " + timeCard.get().getStart().format(formatter) + "に出勤しました。";
     }
 
-    @RequestMapping(value = "/timeCardOut", method = RequestMethod.POST)
-    public ResponseEntity<String> postTimeCardOut(@RequestBody StaffRequest request) {
-        try {
-            timeCardService.clockOut(request);
-            Optional<TimeCard> timeCard = timeCardService.getTimeCardByUserName(request);
-            discordBotService.sendOrderNotification(request.getUsername() + "が " + timeCard.get().getEnd().format(formatter) + "に退勤しました。");
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(new MediaType("text", "plain", StandardCharsets.UTF_8));
-            return new ResponseEntity<>("退勤処理しました。", headers, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    @ResponseBody
+    @RequestMapping(value = "/timeCardOut", method = RequestMethod.GET)
+    public String getTimeCardOut(@RequestParam Map<String, Object> params) {
+        Staff staff = staffService.getStaff(Long.valueOf(params.get("staffId").toString()));
+        String password = params.get("password").toString();
+        if(!staff.getPassword().equals(password)) {
+            return "password";
         }
+        timeCardService.clockOut(staff);
+        Optional<TimeCard> timeCard = timeCardService.getTimeCardByUserName(staff);
+        discordBotService.sendOrderNotification(staff.getName() + "が " + timeCard.get().getEnd().format(formatter) + "に退社しました。");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("text", "plain", StandardCharsets.UTF_8));
+        return staff.getName() + "が " + timeCard.get().getEnd().format(formatter) + "に退社しました。";
     }
 }

@@ -150,8 +150,13 @@
     <script>
         /*<![CDATA[*/
         window.onload = function () {
+            alertTimeSet();
             updateMarquee();
+        }
+        /*]]>*/
+        window.onresize = updateMarquee;
 
+        function alertTimeSet() {
             let successAlert = document.querySelector('.alert-success');
             let errorAlert = document.querySelector('.alert-danger');
 
@@ -167,9 +172,6 @@
                 }, 3000); // 업데이트 실패 안내 메세지를 3초 후에 숨깁니다.
             }
         }
-        /*]]>*/
-
-        window.onresize = updateMarquee;
 
         function updateMarquee() {
             let marqueeElements = document.querySelectorAll('.menu-name-container');
@@ -179,7 +181,7 @@
 
                 const containerWidth = container.offsetWidth;
                 const menuNameWidth = menuName.offsetWidth;
-                const translateX = -(menuNameWidth - containerWidth) + 'px';
+                const translateX = -(menuNameWidth - containerWidth + 5) + 'px';
 
                 menuName.style.setProperty('--translate-x', translateX);
 
@@ -490,6 +492,20 @@
             to {
                 transform: translateX(var(--translate-x));
             }
+        }
+        /* 모달 창의 최대 높이를 설정 */
+        .modal-content {
+            max-height: 90vh; /* 최대 높이를 뷰포트 높이의 90%로 설정 */
+            overflow-y: auto; /* 콘텐츠가 넘칠 경우 스크롤 가능하게 설정 */
+        }
+
+        /* 이미지 크기 조정 */
+        #modalImage {
+            max-width: 100%;
+            max-height: 50vh; /* 이미지의 최대 높이를 뷰포트 높이의 50%로 설정 */
+            object-fit: contain;
+            display: block;
+            margin: 0 auto; /* 이미지 중앙 정렬 */
         }
     </style>
 

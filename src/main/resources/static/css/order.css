@@ -67,7 +67,8 @@ nav a.active {
 #sidebar .btn-group-vertical {
     height: 100%;
 }
-#sidebar .btn-group-vertical .btn{
+
+#sidebar .btn-group-vertical .btn {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -196,11 +197,26 @@ nav a.active {
     justify-content: center !important;
     align-items: center !important;
 }
-
-.modal-footer {
+#alertModal .modal-footer{
     justify-content: space-between !important;
 }
-.modal-content{
+#emptyCartModal .modal-footer{
+    justify-content: space-between !important;
+}
+#successModal .modal-footer{
+    justify-content: space-between !important;
+}
+#cartModal .modal-footer{
+    justify-content: space-between !important;
+}
+#menuModal .modal-footer{
+    justify-content: space-between !important;
+}
+#callMenuModal .modal-footer {
+    justify-content: center
+}
+
+.modal-content {
     background-color: rgba(255, 255, 255, 0.95);
     border-radius: 8px;
 }
@@ -215,67 +231,9 @@ nav a.active {
     width: 1390px;
     height: 64px;
     justify-content: flex-end;
-    box-shadow: 0 4px 8px rgba(0,0,0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-@media only screen and (min-width: 768px) and (max-width: 1366px) {
-    #categoryTitle {
-        border-bottom: solid #ffcc00;
-        width: 780px;
-    }
-
-
-    #paymentbuttonContainer {
-        background-color: #ffcc00;
-        opacity: 0.6;
-        position: sticky;
-        bottom: 0;
-        display: flex;
-        transform: translateX(238px);
-        width: 780px;
-        height: 64px;
-        justify-content: flex-end;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    #sidebar .btn {
-        padding: 15px;
-        font-size: 20px;
-        width: 100%;
-        box-sizing: border-box;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-        border-radius: 5px;
-        flex-grow: 1;
-    }
-
-    #wrapper{
-        display: flex;
-        flex: 1;
-        overflow: visible;
-        margin-top: 60px; /* Adjust for the fixed navbar */
-        min-height: 2400px
-    }
-    #paymentBtn, #paymentCartBtn{
-        width: 100%;
-        max-width: 86px;
-        height: 64px;
-        font-size: 15px;
-    }
-    #sidebar .btn-group-vertical .btn{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        padding: 15px;
-        font-size: 24px;
-        box-sizing: border-box;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-        border-radius: 5px;
-        flex-grow: 1;
-        text-align: center;
-    }
-
-}
 
 @keyframes hoverAnimation {
     0% {
@@ -317,20 +275,173 @@ nav a.active {
     animation: marquee 10s linear infinite;
 }
 
-.active{
+.active {
     background: limegreen !important;
 }
-#paymentBtn, #paymentCartBtn{
+
+#paymentBtn, #paymentCartBtn {
     width: 100%;
     max-width: 98px;
     height: 64px;
     font-size: 18px;
 }
-#paymentBtn:hover, #paymentCartBtn:hover{
+
+#paymentBtn:hover, #paymentCartBtn:hover {
     background-color: red;
     transform: scale(1.05);
 }
-#paymentbuttonContainer:hover{
+
+#paymentbuttonContainer:hover {
     opacity: 1;
     transition: opacity 0.5s ease, transform 0.3s ease;
- }
+}
+
+#call {
+    border: none;
+    border-radius: 5px;
+    width: 10%;
+    height: 64px;
+    transform: translateX(-1055px);
+}
+
+#callbtn {
+    color: #ffcc00;
+    background-color: red;
+    width: 100%;
+    height: 100%;
+    border: none;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#callbtn:hover {
+    background-color: #E91E63;
+    transform: scale(1.05);
+    display: flex;
+}
+
+.menu-button {
+    border: 2px solid red;
+    border-radius: 10px;
+    text-align: center;
+    padding: 20px;
+    margin: 10px;
+    cursor: pointer;
+    height: 64px;
+}
+
+.menu-button:hover {
+    background-color: #f8d7da;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+#callMenuContainer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+}
+#callButton {
+    background-color: red;
+    color: white;
+    padding: 15px 30px;
+    font-size: 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+#callMenuModal .modal-dialog{
+    max-width: 80%;
+    height: 70%;
+}
+#callMenuModal .modal-content{
+    height: 100%;
+}
+
+#callMenuModal .modal-body{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    max-height: 200px;
+}
+#callMenuModal .ml-auto{
+    width: 75%;
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1366px) {
+    #categoryTitle {
+        border-bottom: solid #ffcc00;
+        width: 780px;
+    }
+
+
+    #paymentbuttonContainer {
+        background-color: #ffcc00;
+        opacity: 0.6;
+        position: sticky;
+        bottom: 0;
+        display: flex;
+        transform: translateX(238px);
+        width: 780px;
+        height: 64px;
+        justify-content: flex-end;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #sidebar .btn {
+        padding: 15px;
+        font-size: 20px;
+        width: 100%;
+        box-sizing: border-box;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        border-radius: 5px;
+        flex-grow: 1;
+    }
+
+    #wrapper {
+        display: flex;
+        flex: 1;
+        overflow: visible;
+        margin-top: 60px; /* Adjust for the fixed navbar */
+        min-height: 2400px
+    }
+
+    #paymentBtn, #paymentCartBtn {
+        width: 100%;
+        max-width: 86px;
+        height: 64px;
+        font-size: 15px;
+    }
+
+    #sidebar .btn-group-vertical .btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        padding: 15px;
+        font-size: 24px;
+        box-sizing: border-box;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        border-radius: 5px;
+        flex-grow: 1;
+        text-align: center;
+    }
+    #call {
+        transform: translateX(-530px);
+    }
+    #callMenuModal .ml-auto{
+        width: 120%;
+    }
+}

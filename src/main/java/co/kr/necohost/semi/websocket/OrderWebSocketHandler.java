@@ -17,7 +17,6 @@ public class OrderWebSocketHandler extends TextWebSocketHandler {
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) {
 		sessions.add(session);
-		System.out.println("새로운 세션이 연결됨: " + session.getId());
 	}
 
 	@Override
@@ -30,28 +29,18 @@ public class OrderWebSocketHandler extends TextWebSocketHandler {
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
 		sessions.remove(session);
-		System.out.println("세션이 닫힘: " + session.getId());
 	}
 
-	public void sendMessageToAll(String message) throws IOException {
-		for (WebSocketSession session : sessions) {
-			session.sendMessage(new TextMessage(message));
-		}
-	}
-
-	public void sendMessageToAllSessions(TextMessage message) throws IOException {
-		for (WebSocketSession session : sessions) {
-			System.out.println("세션 ID: " + session.getId() + ", 세션 상태: " + session.isOpen());
-
-			if (session.isOpen()) {
-				try {
-					session.sendMessage(message);
-				} catch (IOException e) {
-					System.out.println("메시지 전송 중 예외 발생: " + e.getMessage());
-					e.printStackTrace();
+	public void sendMessageToAllSessions(TextMessage message) {
+        synchronized (sessions) {
+			for (WebSocketSession session : sessions) {
+				if (session.isOpen()) {
+					try {
+						session.sendMessage(message);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
-			} else {
-				System.out.println("세션이 열려 있지 않음: " + session.getId());
 			}
 		}
 	}

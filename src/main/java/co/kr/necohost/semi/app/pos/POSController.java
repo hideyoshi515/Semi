@@ -2,10 +2,7 @@ package co.kr.necohost.semi.app.pos;
 
 import co.kr.necohost.semi.domain.model.dto.SalesRequest;
 import co.kr.necohost.semi.domain.model.entity.*;
-import co.kr.necohost.semi.domain.repository.CouponRepository;
-import co.kr.necohost.semi.domain.repository.MenuRepository;
-import co.kr.necohost.semi.domain.repository.OrderNumRepository;
-import co.kr.necohost.semi.domain.repository.OrderRepository;
+import co.kr.necohost.semi.domain.repository.*;
 import co.kr.necohost.semi.domain.service.*;
 import co.kr.necohost.semi.websocket.OrderWebSocketHandler;
 import jakarta.servlet.http.HttpSession;
@@ -33,8 +30,10 @@ public class POSController {
 	private final CouponService couponService;
 	private final DiscordBotService discordBotService;
 	private final StaffService staffService;
+	private final TimeCardService timeCardService;
+	private final PositionRepository positionRepository;
 
-	public POSController(MenuService menuService, CategoryService categoryService, SalesService salesService, MenuRepository menuRepository, OrderNumRepository orderNumRepository, OrderRepository orderRepository, OrderService orderService, OrderWebSocketHandler orderWebSocketHandler, CouponService couponService, DiscordBotService discordBotService, StaffService staffService) {
+	public POSController(MenuService menuService, CategoryService categoryService, SalesService salesService, MenuRepository menuRepository, OrderNumRepository orderNumRepository, OrderRepository orderRepository, OrderService orderService, OrderWebSocketHandler orderWebSocketHandler, CouponService couponService, DiscordBotService discordBotService, StaffService staffService, TimeCardService timeCardService, PositionRepository positionRepository) {
 		this.menuService = menuService;
 		this.categoryService = categoryService;
 		this.salesService = salesService;
@@ -46,6 +45,8 @@ public class POSController {
 		this.couponService = couponService;
 		this.discordBotService = discordBotService;
 		this.staffService = staffService;
+		this.timeCardService = timeCardService;
+		this.positionRepository = positionRepository;
 	}
 
 	// POS 페이지のGETリクエストを処理するメソッド
@@ -191,8 +192,6 @@ public class POSController {
 			sales.setDeviceNum(2);
 			sales.setProcess(1);
 
-			System.out.println(menuName + " " + order.getQuantity() + "개" + formattedPrice + " " + formatSum + "원");
-
 			salesService.save(sales);
 
 			menu.setStock(menu.getStock() - quantity);
@@ -215,6 +214,30 @@ public class POSController {
 		List<Staff> staffList = staffService.getAllStaff();
 		model.addAttribute("staffList", staffList);
 		return "pos/staff.html";
+	}
+
+	@RequestMapping(value = "/pos/staffManage",method = RequestMethod.GET)
+	public String getStaffManage(Model model, HttpSession session){
+		List<Staff> staffList = staffService.getAllStaff();
+		List<Position> positionList = positionRepository.findAll();
+		model.addAttribute("staffList", staffList);
+		model.addAttribute("positionList", positionList);
+		return "pos/staffManage.html";
+	}
+
+	@RequestMapping(value = "/pos/staffTimeCard", method = RequestMethod.GET)
+	@ResponseBody
+	public List<TimeCard> getStaffTimecard(Model model, HttpSession session, @RequestParam Map<String, Object> params){
+		List<TimeCard> timeCards = timeCardService.getTimeCardByStaff(Long.valueOf(params.get("staffId").toString()));
+		return timeCards;
+	}
+
+	@RequestMapping(value = "/pos/staffTimeCheck", method = RequestMethod.GET)
+	@ResponseBody
+	public TimeCard getStaffTimeCheck(Model model, HttpSession session, @RequestParam Map<String, Object> params){
+		Staff staff = staffService.getStaff(Long.valueOf(params.get("staffId").toString()));
+		TimeCard timeCard = timeCardService.getTimeCardByStaffAndStart(staff, params.get("date").toString());
+		return timeCard;
 	}
 
 	// クーポンを作成するメソッド
