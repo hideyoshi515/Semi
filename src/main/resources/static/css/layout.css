@@ -70,8 +70,8 @@ input[type=number] {
 .simple-keyboard {
     position: fixed;
     bottom: 0;
-    left: 0;
-    width: 100%;
+    left: 106px;
+    width: 1097px !important;
     z-index: 1000; /* 키보드가 다른 요소들보다 위에 표시되도록 설정 */
     display: none; /* 기본적으로 숨김 */
 }
@@ -90,4 +90,10 @@ input[type=number] {
 
 .language-toggle {
     margin-top: 20px;
+}
+
+@media only screen and (min-device-width: 1440px) and (max-device-width: 1440px) {
+    .bottomDiv{
+        width: 538px;
+    }
 }

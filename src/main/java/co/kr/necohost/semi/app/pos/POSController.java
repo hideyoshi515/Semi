@@ -2,10 +2,7 @@ package co.kr.necohost.semi.app.pos;
 
 import co.kr.necohost.semi.domain.model.dto.SalesRequest;
 import co.kr.necohost.semi.domain.model.entity.*;
-import co.kr.necohost.semi.domain.repository.CouponRepository;
-import co.kr.necohost.semi.domain.repository.MenuRepository;
-import co.kr.necohost.semi.domain.repository.OrderNumRepository;
-import co.kr.necohost.semi.domain.repository.OrderRepository;
+import co.kr.necohost.semi.domain.repository.*;
 import co.kr.necohost.semi.domain.service.*;
 import co.kr.necohost.semi.websocket.OrderWebSocketHandler;
 import jakarta.servlet.http.HttpSession;
@@ -34,8 +31,9 @@ public class POSController {
 	private final DiscordBotService discordBotService;
 	private final StaffService staffService;
 	private final TimeCardService timeCardService;
+	private final PositionRepository positionRepository;
 
-	public POSController(MenuService menuService, CategoryService categoryService, SalesService salesService, MenuRepository menuRepository, OrderNumRepository orderNumRepository, OrderRepository orderRepository, OrderService orderService, OrderWebSocketHandler orderWebSocketHandler, CouponService couponService, DiscordBotService discordBotService, StaffService staffService, TimeCardService timeCardService) {
+	public POSController(MenuService menuService, CategoryService categoryService, SalesService salesService, MenuRepository menuRepository, OrderNumRepository orderNumRepository, OrderRepository orderRepository, OrderService orderService, OrderWebSocketHandler orderWebSocketHandler, CouponService couponService, DiscordBotService discordBotService, StaffService staffService, TimeCardService timeCardService, PositionRepository positionRepository) {
 		this.menuService = menuService;
 		this.categoryService = categoryService;
 		this.salesService = salesService;
@@ -48,6 +46,7 @@ public class POSController {
 		this.discordBotService = discordBotService;
 		this.staffService = staffService;
 		this.timeCardService = timeCardService;
+		this.positionRepository = positionRepository;
 	}
 
 	// POS 페이지のGETリクエストを処理するメソッド
@@ -220,7 +219,9 @@ public class POSController {
 	@RequestMapping(value = "/pos/staffManage",method = RequestMethod.GET)
 	public String getStaffManage(Model model, HttpSession session){
 		List<Staff> staffList = staffService.getAllStaff();
+		List<Position> positionList = positionRepository.findAll();
 		model.addAttribute("staffList", staffList);
+		model.addAttribute("positionList", positionList);
 		return "pos/staffManage.html";
 	}
 

@@ -8,8 +8,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let keyboard = new Keyboard({
         onChange: input => onChange(input), onKeyPress: button => onKeyPress(button), layout: {
-            'default': ['` 1 2 3 4 5 6 7 8 9 0 - = {bksp}', '{tab} q w e r t y u i o p [ ] \\', '{lock} a s d f g h j k l ; \' {enter}', '{shift} z x c v b n m , . / {lang}', '{space}'],
-            'shift': ['~ ! @ # $ % ^ & * ( ) _ + {bksp}', '{tab} Q W E R T Y U I O P { } |', '{lock} A S D F G H J K L : " {enter}', '{shift} Z X C V B N M < > ? {lang}', '{space}'],
+            'default': ['` 1 2 3 4 5 6 7 8 9 0 - = {bksp}', '{tab} ㅂ ㅈ ㄷ ㄱ ㅅ ㅛ ㅕ ㅑ ㅐ ㅔ [ ] \\', '{lock} ㅁ ㄴ ㅇ ㄹ ㅎ ㅗ ㅓ ㅏ ㅣ ; \' {enter}', '{shift} ㅋ ㅌ ㅊ ㅍ ㅠ ㅜ ㅡ , . / {lang}', '{space}'],
+            'shift': ['~ ! @ # $ % ^ & * ( ) _ + {bksp}', '{tab} ㅃ ㅉ ㄸ ㄲ ㅆ ㅛ ㅕ ㅑ ㅒ ㅖ { } |', '{lock} ㅁ ㄴ ㅇ ㄹ ㅎ ㅗ ㅓ ㅏ ㅣ : " {enter}', '{shift} ㅋ ㅌ ㅊ ㅍ ㅠ ㅜ ㅡ < > ? {lang}', '{space}'],
+            'en': ['` 1 2 3 4 5 6 7 8 9 0 - = {bksp}', '{tab} q w e r t y u i o p [ ] \\', '{lock} a s d f g h j k l ; \' {enter}', '{shift} z x c v b n m , . / {lang}', '{space}'],
+            'enShift': ['~ ! @ # $ % ^ & * ( ) _ + {bksp}', '{tab} Q W E R T Y U I O P { } |', '{lock} A S D F G H J K L : " {enter}', '{shift} Z X C V B N M < > ? {lang}', '{space}'],
             'ko': ['` 1 2 3 4 5 6 7 8 9 0 - = {bksp}', '{tab} ㅂ ㅈ ㄷ ㄱ ㅅ ㅛ ㅕ ㅑ ㅐ ㅔ [ ] \\', '{lock} ㅁ ㄴ ㅇ ㄹ ㅎ ㅗ ㅓ ㅏ ㅣ ; \' {enter}', '{shift} ㅋ ㅌ ㅊ ㅍ ㅠ ㅜ ㅡ , . / {lang}', '{space}'],
             'koShift': ['~ ! @ # $ % ^ & * ( ) _ + {bksp}', '{tab} ㅃ ㅉ ㄸ ㄲ ㅆ ㅛ ㅕ ㅑ ㅒ ㅖ { } |', '{lock} ㅁ ㄴ ㅇ ㄹ ㅎ ㅗ ㅓ ㅏ ㅣ : " {enter}', '{shift} ㅋ ㅌ ㅊ ㅍ ㅠ ㅜ ㅡ < > ? {lang}', '{space}'],
             'jp': ['` 1 2 3 4 5 6 7 8 9 0 - = {bksp}', '{tab} た て い す か ん な に ら せ [ ] \\', '{lock} ち と し は き く ま の り ; \' {enter}', '{shift} つ さ そ ひ こ み も ね る め {lang}', '{space}'],
@@ -54,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let shift = false;
 
     function onChange(input) {
-        if (currentLanguage === 'ko') {
+        if (currentLanguage === 'ko' || currentLanguage === 'default') {
             if (focusedInput) {
                 korean.push(input);
                 focusedInput.value = Hangul.assemble(input);
@@ -82,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function handleLanguageSwitch() {
-        const languages = ['default', 'ko', 'jp'];
+        const languages = ['en', 'ko', 'jp'];
         let nextIndex = (languages.indexOf(currentLanguage) + 1) % languages.length;
         switchLanguage(languages[nextIndex]);
     }
@@ -98,6 +100,10 @@ document.addEventListener("DOMContentLoaded", function () {
         if (currentLanguage === 'default') {
             keyboard.setOptions({
                 layoutName: keyboard.options.layoutName === 'default' ? 'shift' : 'default'
+            });
+        } else if (currentLanguage === 'en') {
+            keyboard.setOptions({
+                layoutName: keyboard.options.layoutName === 'en' ? 'enShift' : 'en'
             });
         } else if (currentLanguage === 'ko') {
             keyboard.setOptions({
