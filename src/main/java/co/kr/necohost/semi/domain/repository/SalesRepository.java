@@ -20,6 +20,8 @@ public interface SalesRepository extends JpaRepository<Sales, Long> {
     void deleteById(Long id);
 
     List<Sales> findAllByMenu(Long menuId);
+    //process 값이 1인것만 가져오도록 수정중 6월 19일 오후 2시 54분
+    List<Sales> findAllByMenuAndProcess(Long menuId, int process);
 
     // 프로세스 상태로 판매 기록을 조회
     List<Sales> findByProcess(int process);

@@ -16,10 +16,6 @@
 <th:block layout:fragment="content">
 
     <div class="container">
-        <header class="header" style="height:42px !important;">
-            <a onclick="location.href='/adminSalesMainHome'">ホーム</a>
-            <a onclick="location.href='/adminSalesMainMenu'">メニュー</a>
-        </header>
         <main class="main-content">
             <div class="container">
                 <!-- 첫째 줄 -->
@@ -52,12 +48,12 @@
                         <img src="/img/storeownerpage/menurevenueicon.png" alt="メニュー別売上販売の現状">
                         <p>メニュー別総売上</p>
                     </div>
-                    <div class="button" onclick="location.href='/menuList'"
+                    <div class="button" onclick="location.href='/menuList2'"
                     >
                         <img src="/img/storeownerpage/inventoryicon.png" alt="メニュー別商品管理">
                         <p>メニュー別商品管理</p>
                     </div>
-                    <div class="button" onclick="location.href='/categoryList'">
+                    <div class="button" onclick="location.href='/categoryList2'">
                         <img src="/img/storeownerpage/inventoryicon.png" alt="カテゴリー別商品管理">
                         <p>カテゴリー別商品管理</p>
                     </div>
@@ -68,9 +64,9 @@
                 </div>
                 <!-- 3째 줄 -->
                 <div style="display: flex">
-                    <div class="button">
-                        <img src="/img/storeownerpage/costicon.png" alt="原価管理">
-                        <p>原価管理</p>
+                    <div class="button" onclick="location.href='/adminSalesMainHome'">
+                        <img src="/img/storeownerpage/money.png" alt="今日の売上高">
+                        <p>今日の売上高</p>
                     </div>
                     <div class="button">
                         <img src="/img/storeownerpage/ordericon.png" alt="注文分析">

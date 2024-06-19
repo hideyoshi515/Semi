@@ -65,6 +65,10 @@ public class SalesService {
 	public List<Sales> getAllSalesForMenu(Long menuId) {
 		return salesRepository.findAllByMenu(menuId);
 	}
+	//process 값이 1인것만 가져오도록 수정중 6월 19일 오후 2시 54분
+	public List<Sales> getAllSalesForMenuAndProcess(Long menuId, int process) {
+		return salesRepository.findAllByMenuAndProcess(menuId, process);
+	}
 
 
 	// 時間別の販売額を計算（管理者ページ - ホームページ）
@@ -292,7 +296,7 @@ public class SalesService {
 
 	// 指定された日付範囲のカテゴリ別売上を取得（4つ目のボタン カテゴリ別売上販売の現状）
 	public Map<String, Double> getSalesByCategoryInRange(LocalDateTime startDate, LocalDateTime endDate) {
-		List<Sales> salesList = salesRepository.findSalesByDateRangeWithProcess(startDate, endDate);
+		List<Sales> salesList = salesRepository.findSalesByDateRangeWithProcess(startDate,  endDate);
 		List<Category> categoryList = categoryRepository.findAll();
 
 		Map<Long, String> categoryMap = categoryList.stream()
