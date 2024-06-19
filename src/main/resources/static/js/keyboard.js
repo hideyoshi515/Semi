@@ -66,6 +66,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 focusedInput.value = input;
             }
         }
+        if(focusedInput.maxLength != -1 && focusedInput.value.length > focusedInput.maxLength){
+            focusedInput.value = focusedInput.value.substr(0, focusedInput.maxLength-1) + input.slice(-1);
+        }
     }
 
     function onKeyPress(button) {
