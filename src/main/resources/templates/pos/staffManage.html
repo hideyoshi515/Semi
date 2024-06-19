@@ -107,17 +107,54 @@
             <section class="menu" style="width: 314px;">
                 <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos">POS</a>
                 <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos/orderList">注文リスト</a>
-                <a class="btn btn-primary w-100 mb-2 user-select-none" href="/pos/staff">出欠管理</a>
-                <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos/staffManage">スタッフ管理</a>
+                <a class="btn btn-outline-primary w-100 mb-2 user-select-none" href="/pos/staff">出欠管理</a>
+                <a class="btn btn-primary w-100 mb-2 user-select-none" href="/pos/staffManage">スタッフ管理</a>
                 <button class="btn btn-outline-primary w-100 mb-2 user-select-none selbtn"
                         th:onclick="|makeCoupon()|"
                         th:text="'クーポン発行'"></button>
             </section>
             <section class="sales-menu" style="width: 314px;">
+                <button class="btn btn-outline-primary w-100 mb-2 user-select-none" onclick="addStaff()">スタッフ登録</button>
             </section>
         </footer>
     </div>
-
+    <div class="modal fade" id="addStaffModal" tabindex="-1" aria-labelledby="addStaffModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addStaffModalLabel">スタッフ登録</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addStaffForm">
+                        <div class="mb-3">
+                            <label for="staffName" class="form-label">名前</label>
+                            <input type="text" class="form-control input" id="staffName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="staffPassword" class="form-label">認証番号（数字４文字）</label>
+                            <input type="text" class="form-control input" id="staffPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="staffPhone" class="form-label">電話番号（ハイフンなし）</label>
+                            <input type="tel" class="form-control input" id="staffPhone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="staffPosition" class="form-label">ポジション</label>
+                            <select class="form-select" id="staffPosition" required>
+                                <option th:each="position : ${positionList}" th:value="${position.id}" th:text="${position.position_Name}"></option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+                    <button type="button" class="btn btn-primary" onclick="submitStaffForm()">登録</button>
+                </div>
+            </div>
+        </div>
+    <div class="simple-keyboard" id="keyboard"></div>
+    </div>
     <script>
         let p_staffId;
         let today = new Date();
@@ -125,6 +162,35 @@
         let year = today.getFullYear();
         let month = ('0' + (today.getMonth() + 1)).slice(-2);
         let day = ('0' + today.getDate()).slice(-2);
+
+        function addStaff() {
+            var addStaffModal = new bootstrap.Modal(document.getElementById('addStaffModal'), {
+                keyboard: false
+            });
+            addStaffModal.show();
+        }
+
+        function submitStaffForm() {
+            var staffName = document.getElementById('staffName').value;
+            var staffPassword = document.getElementById('staffPassword').value;
+            var staffPhone = document.getElementById('staffPhone').value;
+            var staffPosition = document.getElementById('staffPosition').value;
+
+            if(staffName && staffPassword && staffPhone && staffPosition) {
+                // 여기에 서버로 데이터를 전송하는 코드를 작성하세요.
+                // 예: Ajax 요청을 사용하여 폼 데이터를 서버로 전송
+                console.log("Staff Data:", staffName, staffPassword, staffPhone, staffPosition);
+
+                // 폼 초기화
+                document.getElementById('addStaffForm').reset();
+
+                // 모달 닫기
+                var addStaffModal = bootstrap.Modal.getInstance(document.getElementById('addStaffModal'));
+                addStaffModal.hide();
+            } else {
+                alert("모든 필드를 채워주세요.");
+            }
+        }
 
         function getTimecard(staffId, date, today) {
             p_staffId = staffId;
@@ -488,16 +554,6 @@
             padding: 10px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .date-display {
-            font-size: 2em;
-            font-weight: bold;
-        }
-
-        .time-display {
-            font-size: 4em;
-            font-weight: bold;
         }
     </style>
 </th:block>

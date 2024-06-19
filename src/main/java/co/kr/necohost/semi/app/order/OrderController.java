@@ -108,8 +108,6 @@ public class OrderController {
 		orderService.approveOrder(orderID, message);
 		orderService.updateOrderApproval(orderID, orderQuantity, menuID);
 
-		System.out.println("Order " + sales.getOrderNum() + ": " + sales + ", " + Arrays.toString(Arrays.copyOfRange(order, 1, order.length)));
-
 		return ("redirect:/orderList");
 	}
 
@@ -138,7 +136,6 @@ public class OrderController {
 		for (int i = 0; i < orderDetail.size(); i++) {
 			Object[] order = orderDetail.get(i);
 			Sales sales = (Sales) order[0];
-			System.out.println("Order " + i + ": " + sales + ", " + Arrays.toString(Arrays.copyOfRange(order, 1, order.length)));
 		}
 
 		for (int i = 0; i < 8; i++) {

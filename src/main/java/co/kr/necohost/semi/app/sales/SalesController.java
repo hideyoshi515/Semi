@@ -58,11 +58,6 @@ public class SalesController {
         model.addAttribute("session", session);
         model.addAttribute("lang", lang);
 
-        System.out.println("관리자 홈페이지 통합 확인중");
-        System.out.println(todaySales);
-        System.out.println(session);
-        System.out.println(lang);
-
         return "sales/adminSalesMainHome";
     }
 

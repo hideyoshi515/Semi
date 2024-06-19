@@ -45,7 +45,7 @@
                     <div class="menu-item mb-5 me-4" th:each="item : ${orderedItems}"
                          style="width: 645px; height: 130px;">
                         <div class="border border-1 rounded-1 d-flex w-100" style="width: 180px;">
-                            <img class="col-3" th:src="${item.key.image}"
+                            <img class="col-3" th:src="|/${item.key.image}|"
                                  onerror="this.onerror=null; this.src='/img/americano.png'"
                                  style="width: 8rem; height: auto;">
                             <div class="col-5" style="text-align: start !important;">

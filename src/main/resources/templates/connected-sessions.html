@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>연결된 세션 목록</title>
+</head>
+<body>
+<h1>현재 연결된 WebSocket 세션 목록</h1>
+<ul>
+    <th:block th:each="sessionId : ${sessionIds}">
+        <li th:text="${sessionId}"></li>
+    </th:block>
+</ul>
+</body>
+</html>

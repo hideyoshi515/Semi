@@ -9,23 +9,20 @@ import co.kr.necohost.semi.domain.repository.OrderNumRepository;
 import co.kr.necohost.semi.domain.repository.OrderRepository;
 import co.kr.necohost.semi.domain.service.*;
 import co.kr.necohost.semi.websocket.OrderWebSocketHandler;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class DeviceController {
@@ -137,13 +134,8 @@ public class DeviceController {
 	@RequestMapping(value = "/orderPaymentSelect", method = RequestMethod.POST)
 	public String OrderPaymentSelect(HttpSession session, Model model,@RequestParam String paymentMethod, AccountRequest accountRequest,@RequestParam Map<String, Object> params) {
 		Map<Menu, Integer> orders = getSessionOrders(session);
-		if (orders == null) {
-			System.out.println("오류오류오류");
-		}
 
 		DeviceRequest deviceRequest = createDefaultDeviceRequest(orders);
-
-		System.out.println("DeviceRequest: " + deviceRequest);
 
 		long totalPrice = processOrder(orders, deviceRequest, paymentMethod, accountRequest);
 
@@ -172,21 +164,13 @@ public class DeviceController {
 			salePrice = menu.getPrice();
 
 			if (couponNum != null && !couponNum.isEmpty()) {
-				System.out.println("쿠폰 사용 준비: " + couponNum);
 
 				if (coupon != null) {
-					System.out.println("쿠폰 찾음: " + coupon);
 
 					if (coupon.getProcess() == 0) {
 						salePrice *= 0.9;  // 10% 할인 적용
-						System.out.println(salePrice);
 
-						System.out.println("쿠폰 사용됨: " + couponNum);
-					} else {
-						System.out.println("쿠폰 이미 사용됨: " + couponNum);
 					}
-				} else {
-					System.out.println("쿠폰을 찾을 수 없음: " + couponNum);
 				}
 			}
 
@@ -209,17 +193,10 @@ public class DeviceController {
 		}
 
 		if (coupon != null) {
-			System.out.println("쿠폰 찾음: " + coupon);
 			if (coupon.getProcess() == 0) {
 				coupon.setProcess(1);  // 쿠폰 사용 처리
 				couponService.save(coupon);
-
-				System.out.println("쿠폰 사용됨: " + couponNum);
-			} else {
-				System.out.println("쿠폰 이미 사용됨: " + couponNum);
 			}
-		} else {
-			System.out.println("쿠폰을 찾을 수 없음: " + couponNum);
 		}
 
 		orders.clear();
@@ -232,14 +209,10 @@ public class DeviceController {
 		}
 
 		// WebSocket 메시지 전송
-		try {
-			orderWebSocketHandler.sendMessageToAllSessions(new TextMessage("새로운 주문이 들어왔습니다."));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        orderWebSocketHandler.sendMessageToAllSessions(new TextMessage("Order"));
 
 
-		// WebSocket을 통해 새로운 주문 알림 전송
+        // WebSocket을 통해 새로운 주문 알림 전송
 		String message = "New order created: " + deviceRequest.getOrderNum();
 		for (WebSocketSession webSocketSession : orderWebSocketHandler.getSessions()) {
 			try {
@@ -314,7 +287,6 @@ public class DeviceController {
 					salesService.save(salesRequest);
 				} catch (Exception e) {
 					e.printStackTrace();
-					System.out.println("Error Saving sales request" + e.getMessage());
 				}
 
 				menu.setStock(menu.getStock() - quantity);
@@ -498,21 +470,10 @@ public class DeviceController {
 			salePrice = menu.getPrice();
 
 			if (couponNum != null && !couponNum.isEmpty()) {
-				System.out.println("쿠폰 사용 준비: " + couponNum);
-
 				if (coupon != null) {
-					System.out.println("쿠폰 찾음: " + coupon);
-
 					if (coupon.getProcess() == 0) {
 						salePrice *= 0.9;  // 10% 할인 적용
-						System.out.println(salePrice);
-
-						System.out.println("쿠폰 사용됨: " + couponNum);
-					} else {
-						System.out.println("쿠폰 이미 사용됨: " + couponNum);
 					}
-				} else {
-					System.out.println("쿠폰을 찾을 수 없음: " + couponNum);
 				}
 			}
 
@@ -535,17 +496,10 @@ public class DeviceController {
 		}
 
 		if (coupon != null) {
-			System.out.println("쿠폰 찾음: " + coupon);
 			if (coupon.getProcess() == 0) {
 				coupon.setProcess(1);  // 쿠폰 사용 처리
 				couponService.save(coupon);
-
-				System.out.println("쿠폰 사용됨: " + couponNum);
-			} else {
-				System.out.println("쿠폰 이미 사용됨: " + couponNum);
 			}
-		} else {
-			System.out.println("쿠폰을 찾을 수 없음: " + couponNum);
 		}
 
 		orders.clear();
@@ -558,13 +512,20 @@ public class DeviceController {
 		}
 
 		// WebSocket 메시지 전송
-		try {
-			orderWebSocketHandler.sendMessageToAllSessions(new TextMessage("새로운 주문이 들어왔습니다."));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        orderWebSocketHandler.sendMessageToAllSessions(new TextMessage("Order"));
 
-		return "redirect:/order/kiosk/success";
+        return "redirect:/order/kiosk/success";
+	}
+
+	@GetMapping("/connected-sessions")
+	public String getConnectedSessions(Model model) {
+		List<WebSocketSession> sessions = orderWebSocketHandler.getSessions();
+		List<String> sessionIds = sessions.stream()
+				.map(WebSocketSession::getId)
+				.collect(Collectors.toList());
+		model.addAttribute("sessionIds", sessionIds);
+		orderWebSocketHandler.sendMessageToAllSessions(new TextMessage("Pong"));
+		return "connected-sessions.html";
 	}
 
 	@RequestMapping(value = "/order/kiosk/success", method = RequestMethod.GET)

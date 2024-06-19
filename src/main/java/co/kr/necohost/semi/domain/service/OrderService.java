@@ -26,7 +26,6 @@ public class OrderService {
 		var order = orderRepository.findById((int) orderId).orElse(null);
 
 		if (order != null) {
-			System.out.println("주문승인");
 			discordBotService.sendOrderNotification(message);
 		}
 	}
