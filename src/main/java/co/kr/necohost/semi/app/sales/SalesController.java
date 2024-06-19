@@ -190,8 +190,9 @@ public class SalesController {
         Map<String, Integer> quantityByCategory = salesService.getQuantityByCategoryInRange(startDateTime, endDateTime);
 
         model.addAttribute("salesByCategory", salesByCategory);
+        System.out.println(salesByCategory);
         model.addAttribute("quantityByCategory", quantityByCategory);
-
+        System.out.println(quantityByCategory);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         model.addAttribute("formattedStartDate", startDate.format(formatter));
         model.addAttribute("formattedEndDate", endDate.format(formatter));
@@ -275,7 +276,8 @@ public class SalesController {
         Long menuId = Long.parseLong(params.get("menuId").toString());
 
         Menu menu = menuService.getMenuById(menuId);
-        List<Sales> salesData = salesService.getAllSalesForMenu(menuId);
+        //process 가 1인것만 계산하도록 수정
+        List<Sales> salesData = salesService.getAllSalesForMenuAndProcess(menuId,1);
 
         LocalDateTime now = LocalDateTime.now();
         DecimalFormat decimalFormat = new DecimalFormat("#,###");
