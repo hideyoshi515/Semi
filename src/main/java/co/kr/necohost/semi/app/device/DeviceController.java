@@ -280,11 +280,11 @@ public class DeviceController {
 				salesRequest.setDevice(1);
 				salesRequest.setDeviceNum(0);
 				salesRequest.setOrderNum(deviceRequest.getOrderNum());
-				salesRequest.setProcess(paymentMethod.equals("CASH") ? 0 : 1);
+				salesRequest.setProcess(0);
 				salesRequest.setOrderNum(orderNum.getOrderNum());
 
 				try {
-					salesService.save(salesRequest);
+//					salesService.save(salesRequest);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
