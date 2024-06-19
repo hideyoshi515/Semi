@@ -391,39 +391,39 @@ public class SalesService {
 
 
 	// プロセスが1の（販売完了）売上量と売上額を計算
-	public Map<String, Double> getTotalSalesAndQuantityByProcess(int process) {
-		List<Sales> salesList = findByProcess(process).stream()
-				.filter(s -> s.getProcess() == 1)
-				.collect(Collectors.toList());
-
-		double totalSalesAmount = salesList.stream()
-				.mapToDouble(s -> s.getPrice() * s.getQuantity())
-				.sum();
-		int totalQuantity = salesList.stream()
-				.mapToInt(Sales::getQuantity)
-				.sum();
-
-		Map<String, Double> result = new HashMap<>();
-		result.put("totalSalesAmount", totalSalesAmount);
-		result.put("totalQuantity", Double.valueOf(totalQuantity));
-		return result;
-	}
+//	public Map<String, Double> getTotalSalesAndQuantityByProcess(int process) {
+//		List<Sales> salesList = findByProcess(process).stream()
+//				.filter(s -> s.getProcess() == 1)
+//				.collect(Collectors.toList());
+//
+//		double totalSalesAmount = salesList.stream()
+//				.mapToDouble(s -> s.getPrice() * s.getQuantity())
+//				.sum();
+//		int totalQuantity = salesList.stream()
+//				.mapToInt(Sales::getQuantity)
+//				.sum();
+//
+//		Map<String, Double> result = new HashMap<>();
+//		result.put("totalSalesAmount", totalSalesAmount);
+//		result.put("totalQuantity", Double.valueOf(totalQuantity));
+//		return result;
+//	}
 
 	// プロセスが1の（販売完了）原価の総額を計算
-	public double calculateTotalCostByProcess(int process) {
-		List<Sales> salesList = findByProcess(process).stream()
-				.filter(s -> s.getProcess() == 1)
-				.collect(Collectors.toList());
-
-		double totalCost = 0.0;
-
-		for (Sales sale : salesList) {
-			Menu menu = menuRepository.findById(sale.getMenu()).orElseThrow(() -> new RuntimeException("Menu not found"));
-			totalCost += sale.getQuantity() * menu.getCost();
-		}
-
-		return totalCost;
-	}
+//	public double calculateTotalCostByProcess(int process) {
+//		List<Sales> salesList = findByProcess(process).stream()
+//				.filter(s -> s.getProcess() == 1)
+//				.collect(Collectors.toList());
+//
+//		double totalCost = 0.0;
+//
+//		for (Sales sale : salesList) {
+//			Menu menu = menuRepository.findById(sale.getMenu()).orElseThrow(() -> new RuntimeException("Menu not found"));
+//			totalCost += sale.getQuantity() * menu.getCost();
+//		}
+//
+//		return totalCost;
+//	}
 
 	// 特定メニューの売上データ
 	public Map<String, Object> calculateMenuSalesData(Long menuId) {

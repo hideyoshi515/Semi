@@ -70,6 +70,34 @@ public class MenuController {
 
 		return "/menu/menuList.html";
 	}
+	//css작업시 참고용으로 원래 메뉴리스트 css 보는중
+	@RequestMapping(value = "/menuList2", method = RequestMethod.GET)
+	public String getMenuList2(Model model, @RequestParam Map<String, String> params, @ModelAttribute("successMessage") String successMessage, @ModelAttribute("errorMessage") String errorMessage) {
+		List<Menu> menus;
+		List<Category> categories = categoryService.getAllCategories();
+		if (params.get("category") != null) {
+			menus = menuService.getMenuByCategory(Integer.parseInt(params.get("category")));
+		} else {
+			menus = menuService.getAllMenus();
+		}
+
+		//최근 days일 간의 판매량
+		int days = 7;
+		Map<Menu, Integer> salesCount = menus.stream()
+				.collect(Collectors.toMap(
+						Function.identity(),
+						m -> salesRepository.getCountByMenuAfterDaysAgo(m.getId(), days)
+				));
+
+		model.addAttribute("salesDays", days);
+		model.addAttribute("salesCount", salesCount);
+		model.addAttribute("menus", menus);
+		model.addAttribute("categories", categories);
+		model.addAttribute("successMessage", successMessage);
+		model.addAttribute("errorMessage", errorMessage);
+
+		return "/menu/menuList2.html";
+	}
 
 	// 메뉴 생성 페이지를 반환
 	@RequestMapping(value = "/menuCreate", method = RequestMethod.GET)
