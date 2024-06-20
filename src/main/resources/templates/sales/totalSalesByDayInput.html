@@ -3,9 +3,9 @@
         xmlns:th="http://www.thymeleaf.org/"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{layout/pos_layout}">
->
 <head>
     <link rel="stylesheet" href="/css/metroStyle.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         function submitForm() {
             document.querySelector('form').submit();
@@ -29,9 +29,50 @@
             }
         }
 
-        window.onload = formatGrowthRate;
-    </script>
+        window.onload = function() {
+            formatGrowthRate();
+            if (document.getElementById('salesChart')) {
+                const hourlySales = /*[[${hourlySales}]]*/ {};
+                const labels = Object.keys(hourlySales);
+                const data = Object.values(hourlySales);
 
+                const ctx = document.getElementById('salesChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '時間帯別累積売上',
+                            data: data,
+                            borderColor: '#006BD6',
+                            backgroundColor: 'rgba(0, 107, 214, 0.5)',
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                type: 'category',
+                                title: {
+                                    display: true,
+                                    text: '時間'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: '累積売上 (₩)'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    </script>
 </head>
 <body>
 <th:block layout:fragment="content">
@@ -47,7 +88,7 @@
                             <span class="me-2">日付:</span>
                             <input type="date" id="date" name="date" required th:value="${param.date}"
                                    onchange="location.href='/totalSalesByDayInput?date='+this.value" style="height: 48px">
-                            <div class="button my-0" onclick="redirectToWeeklySales() "style="height: 48px">
+                            <div class="button my-0" onclick="redirectToWeeklySales()" style="height: 48px">
                                 <p style="font-size:11pt">属している一週間の総売上高</p>
                             </div>
                         </div>
@@ -60,9 +101,104 @@
                         <h3 th:if="${param.date == null && year == null}" class="mt-2">
                             日付を指定してください
                         </h3>
+                        <div th:if="${hourlySales != null}" style="height: 520px;">
+                            <canvas id="salesChart"></canvas>
+                        </div>
                     </h1>
                 </form>
             </div>
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                const hourlySales = /*[[${hourlySales}]]*/ {};
+                /*]]>*/
+/*
+                const allHours = Array.from({length: 24}, (_, i) => (i < 10 ? '0' + i : i) + ':00');
+                const data = Array(24).fill(0);
+                for (const [key, value] of Object.entries(hourlySales)) {
+                    const hour = key.split(':')[0];
+                    const index = parseInt(hour);
+                    data[index] = value;
+                }
+                const hourlyLabels = allHours.map(hour => {
+                    const endHour = parseInt(hour.split(':')[0]) + 1;
+                    return `${hour} ~ ${endHour < 10 ? '0' + endHour : endHour}:00`;
+                });*/
+                // 9시에서 21시까지의 라벨 배열을 생성합니다.
+                const hoursRange = Array.from({ length: 13 }, (_, i) => i + 9);
+                const labels = hoursRange.map(hour => (hour < 10 ? '0' + hour : hour) + ':00');
+
+                const data = Array(13).fill(0);
+
+                for (const [key, value] of Object.entries(hourlySales)) {
+                    const hour = parseInt(key.split(':')[0]);
+                    if (hour >= 9 && hour <= 21) {
+                        const index = hour - 9;
+                        data[index] = value;
+                    }
+                }
+
+                const hourlyLabels = labels.map(hour => {
+                    const endHour = parseInt(hour.split(':')[0]) + 1;
+                    return `${hour} ~ ${endHour < 10 ? '0' + endHour : endHour}:00`;
+                });
+
+                const ctx = document.getElementById('salesChart').getContext('2d');
+
+                var salesChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: hourlyLabels,
+                        datasets: [{
+                            label: '時間帯別累積売上',
+                            data: data,
+                            borderColor: '#006BD6',
+                            backgroundColor: 'rgba(0, 107, 214, 0.5)',
+                            fill: true,
+                            order: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                type: 'category',
+                                title: {
+                                    display: true,
+                                    text: '時間'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: '累積売上 (₩)'
+                                }
+                            }
+                        }
+                    },
+                    plugins: [{
+                        id: 'datalabels',
+                        afterDatasetsDraw(chart, args, options) {
+                            const { ctx, data } = chart;
+
+                            ctx.save();
+                            data.datasets.forEach((dataset, index) => {
+                                chart.getDatasetMeta(index).data.forEach((bar, index) => {
+                                    const value = dataset.data[index];
+                                    ctx.fillStyle = options.color || '#555';
+                                    ctx.font = options.font || 'bold 12px sans-serif';
+                                    ctx.textAlign = 'center';
+                                    ctx.textBaseline = 'bottom';
+                                    ctx.fillText(value.toLocaleString(), bar.x, bar.y - 5);
+                                });
+                            });
+                            ctx.restore();
+                        }
+                    }]
+                });
+            </script>
+
         </div>
     </div>
 </th:block>

@@ -122,6 +122,26 @@ public class SalesController {
         model.addAttribute("monthlySales", monthlySales);
         return "sales/totalSalesByMonth";
     }
+    //시간대별 누적매출 기능 추가중
+//    @RequestMapping(value = "/totalSalesByDayInput", method = RequestMethod.GET)
+//    public String getTotalSalesByDay(@RequestParam(value = "date", required = false) LocalDate date,
+//                                     Model model) {
+//
+//        if (date != null) {
+//            int year = date.getYear();
+//            int month = date.getMonthValue();
+//            int day = date.getDayOfMonth();
+//            double totalSales = salesService.getTotalSalesByDay(year, month, day);
+//            DecimalFormat decimalFormat = new DecimalFormat("#,##0");
+//            String formattedTotalSales = decimalFormat.format(totalSales);
+//
+//            model.addAttribute("year", year);
+//            model.addAttribute("month", month);
+//            model.addAttribute("day", day);
+//            model.addAttribute("totalSales", formattedTotalSales);
+//        }
+//        return "/sales/totalSalesByDayInput.html";
+//    }
 
     @RequestMapping(value = "/totalSalesByDayInput", method = RequestMethod.GET)
     public String getTotalSalesByDay(@RequestParam(value = "date", required = false) LocalDate date,
@@ -131,17 +151,31 @@ public class SalesController {
             int year = date.getYear();
             int month = date.getMonthValue();
             int day = date.getDayOfMonth();
+
+            // 해당 날짜의 총 매출
             double totalSales = salesService.getTotalSalesByDay(year, month, day);
             DecimalFormat decimalFormat = new DecimalFormat("#,##0");
             String formattedTotalSales = decimalFormat.format(totalSales);
+
+            // 해당 날짜의 시간대별 누적 매출
+            LocalDateTime startOfDay = date.atStartOfDay();
+            LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+            Map<LocalDateTime, Double> hourlySales = salesService.getHourlySalesByDay(startOfDay, endOfDay);
+            Map<String, Double> formattedHourlySales = salesService.getFormattedHourly(hourlySales);
+
+            System.out.print(formattedHourlySales);
 
             model.addAttribute("year", year);
             model.addAttribute("month", month);
             model.addAttribute("day", day);
             model.addAttribute("totalSales", formattedTotalSales);
+            model.addAttribute("hourlySales", formattedHourlySales);
         }
         return "/sales/totalSalesByDayInput.html";
     }
+    //시간대별 누적매출 기능 추가중
+
+
 
     @RequestMapping(value = "/totalWeeklySalesByDayInput", method = RequestMethod.GET)
     public String getTotalWeeklySalesByDay(@RequestParam(value = "date", required = false) LocalDate date,

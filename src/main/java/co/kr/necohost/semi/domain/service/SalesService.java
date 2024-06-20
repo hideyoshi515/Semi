@@ -108,6 +108,17 @@ public class SalesService {
 		return formattedHourlySales;
 	}
 
+	public Map<String, Double> getFormattedHourly(Map<LocalDateTime, Double> hourlySales) {
+		Map<String, Double> formattedHourlySales = new TreeMap<>();
+		DateTimeFormatter hourFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+		for (Map.Entry<LocalDateTime, Double> entry : hourlySales.entrySet()) {
+			formattedHourlySales.put(entry.getKey().format(hourFormatter), entry.getValue());
+		}
+
+		return formattedHourlySales;
+	}
+
 	// 今日の現在時刻までのフォーマットされた総売上を返す（管理者ページ - ホームページ）
 	public String getFormattedTotalSalesUntilNow(LocalDateTime now) {
 		double totalSalesToday = getTotalSalesUntilNow(now);
