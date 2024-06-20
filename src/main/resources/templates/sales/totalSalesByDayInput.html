@@ -3,9 +3,9 @@
         xmlns:th="http://www.thymeleaf.org/"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{layout/pos_layout}">
->
 <head>
     <link rel="stylesheet" href="/css/metroStyle.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         function submitForm() {
             document.querySelector('form').submit();
@@ -29,9 +29,50 @@
             }
         }
 
-        window.onload = formatGrowthRate;
-    </script>
+        window.onload = function() {
+            formatGrowthRate();
+            if (document.getElementById('salesChart')) {
+                const hourlySales = /*[[${hourlySales}]]*/ {};
+                const labels = Object.keys(hourlySales);
+                const data = Object.values(hourlySales);
 
+                const ctx = document.getElementById('salesChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '時間帯別累積売上',
+                            data: data,
+                            borderColor: '#006BD6',
+                            backgroundColor: 'rgba(0, 107, 214, 0.5)',
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                type: 'category',
+                                title: {
+                                    display: true,
+                                    text: '時間'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: '累積売上 (₩)'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    </script>
 </head>
 <body>
 <th:block layout:fragment="content">
@@ -47,7 +88,7 @@
                             <span class="me-2">日付:</span>
                             <input type="date" id="date" name="date" required th:value="${param.date}"
                                    onchange="location.href='/totalSalesByDayInput?date='+this.value" style="height: 48px">
-                            <div class="button my-0" onclick="redirectToWeeklySales() "style="height: 48px">
+                            <div class="button my-0" onclick="redirectToWeeklySales()" style="height: 48px">
                                 <p style="font-size:11pt">属している一週間の総売上高</p>
                             </div>
                         </div>
@@ -60,9 +101,61 @@
                         <h3 th:if="${param.date == null && year == null}" class="mt-2">
                             日付を指定してください
                         </h3>
+                        <div th:if="${hourlySales != null}">
+                            <canvas id="salesChart"></canvas>
+                        </div>
                     </h1>
                 </form>
             </div>
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                const hourlySales = /*[[${hourlySales}]]*/ {};
+                /*]]>*/
+                //라벨링 시도중
+                var hourlyLabels = Object.keys(hourlySales).map((label, index, array) => {
+                    var [hour, minute] = label.split(':');
+                    var endHour = parseInt(hour) + 1;
+                    return `${label} ~ ${endHour < 10 ? '0' + endHour : endHour}:00`;
+                });
+
+                const labels = Object.keys(hourlySales);
+                const data = Object.values(hourlySales);
+                const ctx = document.getElementById('salesChart').getContext('2d');
+                var salesChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: hourlyLabels,
+                        datasets: [{
+                            label: '時間帯別累積売上',
+                            data: data,
+                            borderColor: '#006BD6',
+                            backgroundColor: 'rgba(0, 107, 214, 0.5)',
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                type: 'category',
+                                title: {
+                                    display: true,
+                                    text: '時間'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: '累積売上 (₩)'
+                                }
+                            }
+                        }
+                    }
+                });
+
+            </script>
         </div>
     </div>
 </th:block>
