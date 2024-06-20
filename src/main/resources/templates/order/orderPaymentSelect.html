@@ -7,6 +7,8 @@
     <style>
         body{
             background-color: #f2e7c3;
+            overflow-x: hidden;
+            overflow-y: hidden;
         }
 
         .h1 {
@@ -85,7 +87,7 @@
         }
 
         .paymentSelect button:hover {
-            background-color: #ffca2c;
+            transform: scale(1.2);
         }
 
         .cancel {
@@ -105,6 +107,26 @@
         .cancel button:hover {
             background-color: #da190b;
         }
+        .sparkle {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, rgba(255,255,0,1) 0%, rgba(255,255,255,0.7) 70%);
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+            animation: sparkle 0.8s ease-out;
+        }
+        @keyframes sparkle {
+            0%{
+                transform: scale(0);
+                opacity: 1;
+            }
+            100%{
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
 
         @media only screen and (min-width: 768px) and (max-width: 1366px) {
             .tablet-container {
@@ -116,7 +138,7 @@
 
     </style>
 </head>
-<body>
+<body onclick="createSparkle(event)">
 <th:block layout:fragment="content">
     <div class="h1">
         <h1>お支払い</h1>
@@ -602,6 +624,20 @@
             document.body.appendChild(form);
 
             form.submit();
+        }
+        function createSparkle(event) {
+            const sparkle = document.createElement('div');
+            sparkle.classList.add('sparkle');
+            document.body.appendChild(sparkle);
+
+            const x = event.clientX;
+            const y = event.clientY;
+            sparkle.style.left =`${x - sparkle.clientWidth / 2}px`;
+            sparkle.style.top = `${y - sparkle.clientHeight / 2}px`;
+
+            sparkle.addEventListener('animationend', function () {
+                sparkle.remove();
+            });
         }
 
 
