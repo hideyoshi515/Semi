@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org/"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/pos_layout}">
+>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POSOLDESK 売上管理プログラム</title>
+    <link rel="stylesheet" href="/css/metroStyle.css">
+</head>
+
+<body>
+<th:block layout:fragment="content">
+    <div class="pos-content">
+        <div class="posDiv outDiv">
+            <section class="menu-title" style="width: 360px">
+                <h1>メンバシップ会員照会</h1>
+            </section>
+
+
+            <div class="content">
+                <div class="table-container" style="width: 100% !important;">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th scope="col" class="col-1">会員番号</th>
+                            <th scope="col" class="col-3">名前</th>
+                            <th scope="col" class="col-4">電話番号</th>
+                            <th scope="col" class="col-2">現在ポイント</th>
+                            <th scope="col" class="col-1">備考</th>
+                            <th scope="col" class="col-1">削除</th>
+                        </tr>
+                        </thead>
+                        <tbody id="salesTableBody">
+                        <tr th:each="account : ${accountList}">
+                            <td th:text="${account.id}"></td>
+                            <td th:text="${account.name}"></td>
+                            <td th:text="|${#strings.substring(account.phone,0,3)}-${#strings.substring(account.phone,3,7)}-${#strings.substring(account.phone,7,11)}|"></td>
+                            <td th:text="|${#numbers.formatInteger(account.msPoint,1,'COMMA')} P|"></td>
+                            <td th:text="${#strings.capitalize(account.OAuth)}"></td>
+                            <td><div class="btn btn-danger" th:text="削除" th:onclick="|openConfirmModal(${account.id})|"></div></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteLabel">削除確認</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    本当に削除しますか
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteButton" onclick="confirmDelete()">削除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let deleteId;
+        function openConfirmModal(id) {
+            deleteId = id;
+            let myModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+            myModal.show();
+        }
+
+        function confirmDelete() {
+            if (deleteId !== null) {
+                delMem(deleteId);
+                let myModalEl = document.getElementById('confirmDeleteModal');
+                let modal = bootstrap.Modal.getInstance(myModalEl);
+                modal.hide();
+            }
+        }
+
+        function delMem(id) {
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", "/memberRemove?id="+id, true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    window.location.reload(true);
+                }
+            };
+            xhr.send();
+        }
+    </script>
+</th:block>
+</body>
+</html>

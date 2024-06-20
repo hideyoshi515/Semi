@@ -24,7 +24,7 @@ public class UserController {
     }
 
     // ホームページのリクエストを処理するメソッド
-    @RequestMapping("/")
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public String index(Model model, HttpSession session) {
         List<Menu> menuList = menuService.getAllMenus();
         Random rand = new Random();
@@ -36,9 +36,26 @@ public class UserController {
 
     // ユーザーの会員チェックを行うメソッド
     @ResponseBody
-    @RequestMapping("/user/memberCheck")
+    @RequestMapping(value = "/user/memberCheck",method = RequestMethod.GET)
     public Account getMemberCheck(@RequestParam Map<String, Object> params) {
         String phoneNum = params.get("phoneNum").toString().replaceAll("-", "");
         return accountRepository.findByPhone(phoneNum).orElse(null);
+    }
+
+    @RequestMapping(value = "/membershipList",method = RequestMethod.GET)
+    public String getMembershipList(Model model, HttpSession session) {
+        List<Account> accountList = accountRepository.findAll();
+        model.addAttribute("accountList", accountList);
+        return "sales/membershipList.html";
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/memberRemove",method = RequestMethod.GET)
+    public String getMemberRemove(@RequestParam Map<String, Object> params) {
+        Account account = accountRepository.findById(Long.valueOf(params.get("id").toString())).orElse(null);
+        if(account != null) {
+            accountRepository.delete(account);
+        }
+        return null;
     }
 }
