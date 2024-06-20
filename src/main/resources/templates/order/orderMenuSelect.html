@@ -57,7 +57,9 @@
                    th:each="category : ${categories}"
                    th:text="${category.name}"
                    th:href="|#section${categoryStat.count}|"
-                   th:if="${categoryStat.count == 1}">
+                   th:if="${categoryStat.count == 1}"
+                   data-category="${category.name}"
+                   onclick="setActive(this)">
                     <!--                        th:onclick="|filterMenu('${category.id}')|">-->
                     <i class="fas fa-clipboard-list"></i>
                 </a>
@@ -65,7 +67,9 @@
                    th:each="category : ${categories}"
                    th:text="${category.name}"
                    th:href="|#section${categoryStat.count}|"
-                   th:if="${categoryStat.count > 1}">
+                   th:if="${categoryStat.count > 1}"
+                   data-category="${category.name}"
+                    onclick="setActive(this)">
                     <!--                        th:onclick="|filterMenu('${category.id}')|">-->
                     <i class="fas fa-clipboard-list"></i>
                 </a>
@@ -657,6 +661,14 @@
             sparkle.addEventListener('animationend', function () {
                 sparkle.remove();
             });
+        }
+        function setActive(element) {
+            var buttons = document.querySelectorAll('.scrollNav');
+            buttons.forEach(function(btn) {
+                btn.classList.remove('active-btn');
+            });
+
+            element.classList.add('active-btn');
         }
     </script>
 </th:block>
