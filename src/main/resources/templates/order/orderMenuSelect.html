@@ -1,22 +1,36 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/plain_layout}">
 <head>
     <script>
         let idleTime = 0;
         let idleInterval;
-        const maxIdleTime = 300;
+        const maxIdleTime = 60;
+        const showMessageTime = 10;
 
         function resetIdleTimer() {
             idleTime = 0;
+            document.getElementById('idleMessage').style.display = 'none';
+        }
+        function updateIdleMessage(){
+            if (idleTime >= showMessageTime){
+                const remainingTime = maxIdleTime - idleTime;
+                const idleMessageElement = document.getElementById('idleMessage')
+                idleMessageElement.innerText = `${remainingTime}초 후에 처음화면으로 돌아갑니다.`
+                idleMessageElement.style.display = 'block';
+            } else {
+                document.getElementById('idleMessage').innerText = 'none';
+            }
         }
 
         function startIdleTimer() {
             idleInterval = setInterval(function () {
                 idleTime++;
+                updateIdleMessage();
                 if (idleTime >= maxIdleTime) {
                     clearInterval(idleInterval);
-                    window.location.href = '/orderStart';
+                    window.location.href = '/order';
                 }
             }, 1000);
         }
@@ -29,10 +43,11 @@
         window.onload = function () {
             startIdleTimer();
         };
+
     </script>
     <link rel="stylesheet" href="/css/order.css">
 </head>
-<body>
+<body onclick="createSparkle(event)">
 <th:block layout:fragment="content">
     <div id="wrapper" class="mt-0">
         <div id="sidebarMein"></div>
@@ -91,8 +106,9 @@
                     </div>
                 </div>
             </div>
+            <div id="idleMessage" style="position: fixed; bottom: 10px; right: 10px; background-color: rgba(0, 0, 0, 0.5); color: white; padding: 10px; border-radius: 5px; z-index: 1000; display: none"></div>
         </div>
-        <p>어서오세요.>-< <br> 하와와</p>
+        <p>いらっしゃいませ>-<</p>
     </div>
 
     <!-- Modal -->
@@ -111,15 +127,9 @@
                             <div id="modalPrice" class="">価格</div>
                             <label for="quantityInput" class="form-label">数量</label>
                             <div class="input-group">
-                                <button type="button" class="btn btn-outline-secondary"
-                                        onclick="changeQuantity(-1)">-
-                                </button>
-                                <input type="number" class="form-control text-center" id="quantityInput"
-                                       name="quantity"
-                                       value="1" min="1" readonly>
-                                <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity(1)">
-                                    +
-                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="changeQuantitySingle(-1)">-</button>
+                                <input type="number" class="form-control text-center" id="quantityInput" name="quantity" value="1" min="1" readonly>
+                                <button type="button" class="btn btn-outline-secondary" onclick="changeQuantitySingle(1)">+</button>
                             </div>
                         </div>
                         <input type="hidden" id="menuIdInput" name="menuId">
@@ -265,6 +275,7 @@
             </div>
         </div>
     </div>
+
     <script>
         let cartData = null;
         document.getElementById('menuModal').addEventListener('show.bs.modal', function (event) {
@@ -350,7 +361,7 @@
             });
         }
 
-        function changeQuantity(amount) {
+        function changeQuantitySingle(amount) {
             const quantityInput = document.getElementById('quantityInput');
             const currentQuantity = parseInt(quantityInput.value);
             let newQuantity = currentQuantity + amount;
@@ -497,11 +508,6 @@
             loadCart();
         });
 
-
-        window.onload = function () {
-            startIdleTimer();
-        };
-
         document.addEventListener("DOMContentLoaded", function () {
             var marqueeElements = document.querySelectorAll('.marquee');
 
@@ -637,6 +643,20 @@
 
                 form.submit();
             }
+        }
+        function createSparkle(event) {
+            const sparkle = document.createElement('div');
+            sparkle.classList.add('sparkle');
+            document.body.appendChild(sparkle);
+
+            const x = event.clientX;
+            const y = event.clientY + window.scrollY;
+            sparkle.style.left =`${x - sparkle.clientWidth / 2}px`;
+            sparkle.style.top = `${y - sparkle.clientHeight / 2}px`;
+
+            sparkle.addEventListener('animationend', function () {
+                sparkle.remove();
+            });
         }
     </script>
 </th:block>

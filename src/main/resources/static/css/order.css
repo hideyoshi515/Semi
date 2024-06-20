@@ -1,11 +1,42 @@
-
+/*@keyframes gradientAnimation {*/
+/*    0% {*/
+/*        background-position: 0% 50%;*/
+/*    }*/
+/*    50% {*/
+/*        background-position: 100% 50%;*/
+/*    }*/
+/*    100% {*/
+/*        background-position: 0% 50%;*/
+/*    }*/
+/*}*/
 body {
-    background-color: #ecf4f8 !important;
+    background-color: #f2e7c3;
+    /*animation: gradientAnimation 10s ease infinite;*/
     margin: 0 !important;
     padding: 20px !important;
     display: flex;
     height: 100vh;
     flex-direction: column;
+}
+.sparkle {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, rgba(255,255,0,1) 0%, rgba(255,255,255,0.7) 70%);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    animation: sparkle 0.8s ease-out;
+}
+@keyframes sparkle {
+    0%{
+        transform: scale(0);
+        opacity: 1;
+    }
+    100%{
+        transform: scale(2);
+        opacity: 0;
+    }
 }
 
 nav {
@@ -74,7 +105,7 @@ nav a.active {
     align-items: center;
     width: 100%;
     padding: 15px;
-    font-size: 30px;
+    font-size: 1.9rem;
     box-sizing: border-box;
     transition: background-color 0.3s ease, transform 0.3s ease;
     border-radius: 5px;
@@ -117,6 +148,7 @@ nav a.active {
 .card-body {
     background-color: white !important;
     padding: 20px !important;
+
 }
 
 .card-title {
@@ -131,19 +163,6 @@ nav a.active {
     color: #495057 !important;
 }
 
-.card .rounded-3 {
-    overflow: hidden !important;
-    position: relative !important;
-}
-
-.card .rounded-3 .w-100.h-100 {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    color: white !important;
-    font-size: 1.5rem !important;
-    font-weight: bold !important;
-}
 
 #categoryTitle {
     border-bottom: solid #ffcc00;
@@ -323,7 +342,7 @@ nav a.active {
 }
 
 .menu-button {
-    border: 2px solid red;
+    border: 2px solid #ffcc00;
     border-radius: 10px;
     text-align: center;
     padding: 20px;
@@ -431,7 +450,7 @@ nav a.active {
         align-items: center;
         width: 100%;
         padding: 15px;
-        font-size: 24px;
+        font-size: 1.05rem;
         box-sizing: border-box;
         transition: background-color 0.3s ease, transform 0.3s ease;
         border-radius: 5px;
